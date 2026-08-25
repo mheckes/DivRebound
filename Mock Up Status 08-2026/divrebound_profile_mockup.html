@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>DivRebound</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --teal-deep:#0F2240; --teal-mid:#1A3A6B; --teal-light:#E8EEF7;
+    --gold:#00B4D8; --gold-light:#E0F7FC;
+    --bg:#F2F4F7; --surface:#FFFFFF;
+    --charcoal:#111827; --muted:#6B7C93; --stone:#AAB4C4; --divider:#D8DFE8;
+    --success:#059669; --success-bg:#D1FAE5;
+    --danger:#A8433A; --danger-tint:#F7E9E7;
+
+    --font-display:"DM Serif Display", Georgia, "Times New Roman", serif;
+    --font-body:"DM Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono:"JetBrains Mono", "Courier New", monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{min-height:100%;}
+  body{margin:0;background:#E4E8EE;color:var(--charcoal);font-family:var(--font-body);padding:24px 0;}
+
+  .app-shell{
+    display:flex;min-height:calc(100vh - 48px);max-width:1280px;margin:0 auto;
+    background:#fff;border-radius:14px;overflow:hidden;
+    box-shadow:0 8px 30px rgba(15,34,64,.14), 0 0 0 1px var(--divider);
+  }
+
+  .sidebar{width:250px;flex-shrink:0;background:var(--teal-deep);color:#fff;padding:20px 16px;display:flex;flex-direction:column;gap:22px;}
+  .sidebar-brand{display:flex;align-items:center;gap:10px;}
+  .sidebar-wordmark{font-family:var(--font-display);font-size:17px;letter-spacing:.01em;}
+  .sidebar-wordmark span{color:var(--gold);}
+  .sidebar-actions{display:flex;flex-direction:column;gap:8px;}
+  .sidebar-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;font-family:var(--font-body);font-size:12.5px;font-weight:600;padding:9px 12px;border-radius:8px;cursor:pointer;text-align:left;}
+  .sidebar-btn:hover{background:rgba(255,255,255,.16);}
+  .sidebar-divider{height:1px;background:rgba(255,255,255,.15);}
+  .sidebar-section{display:flex;flex-direction:column;gap:6px;}
+  .sidebar-section-title{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.55);font-weight:700;margin-bottom:2px;}
+  .sidebar-link{font-size:13px;color:rgba(255,255,255,.9);text-decoration:none;padding:6px 8px;border-radius:6px;display:block;cursor:pointer;}
+  .sidebar-link:hover{background:rgba(255,255,255,.1);}
+  .sidebar-link.active{background:rgba(0,180,216,.16);color:var(--gold);font-weight:600;}
+  .sidebar-new{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--gold);padding:6px 8px;border-radius:6px;cursor:pointer;}
+  .sidebar-new:hover{background:rgba(255,255,255,.1);}
+
+  .icon{width:14px;height:14px;flex-shrink:0;}
+  details.nav-country{margin-bottom:2px;}
+  details.nav-country > summary{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;list-style:none;color:#fff;}
+  details.nav-country > summary::-webkit-details-marker{display:none;}
+  details.nav-country > summary:hover{background:rgba(255,255,255,.08);}
+  details.nav-country .chevron{transition:transform .15s ease;}
+  details.nav-country[open] .chevron{transform:rotate(90deg);}
+  details.nav-country.disabled > summary{color:rgba(255,255,255,.35);cursor:default;}
+  details.nav-country.disabled > summary:hover{background:none;}
+  .tree-stub-tag{margin-left:auto;font-size:9.5px;background:rgba(255,255,255,.12);padding:2px 6px;border-radius:99px;font-weight:600;}
+  .nav-case-group{margin-left:8px;padding-left:14px;border-left:1.5px solid rgba(255,255,255,.15);}
+  details.nav-case{margin-bottom:1px;}
+  details.nav-case > summary{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;font-size:12.5px;color:rgba(255,255,255,.85);cursor:pointer;list-style:none;}
+  details.nav-case > summary::-webkit-details-marker{display:none;}
+  details.nav-case > summary:hover{background:rgba(255,255,255,.08);}
+  details.nav-case.active > summary{background:rgba(0,180,216,.16);color:var(--gold);font-weight:600;}
+  details.nav-case .chevron{transition:transform .15s ease;width:12px;height:12px;opacity:.6;}
+  details.nav-case[open] .chevron{transform:rotate(90deg);}
+  .nav-steps{margin-left:20px;padding-left:12px;border-left:1.5px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:1px;}
+  .nav-step{display:flex;align-items:center;gap:7px;padding:4px 8px;border-radius:6px;font-size:12px;color:rgba(255,255,255,.55);cursor:pointer;}
+  .nav-step:hover{background:rgba(255,255,255,.06);}
+  .nav-step.current{color:#fff;font-weight:600;}
+  .nav-step.current .icon{color:var(--gold);}
+  .nav-step.done .icon{color:var(--success);}
+
+  .content{flex:1;min-width:0;padding:24px;overflow-x:hidden;max-width:640px;}
+  .content-header{margin-bottom:18px;}
+  .content-title{font-family:var(--font-display);font-size:22px;color:var(--charcoal);margin:0 0 4px 0;}
+  .content-sub{font-size:12.5px;color:var(--muted);}
+
+  .card{background:#fff;border:1px solid var(--divider);border-radius:14px;margin-bottom:18px;overflow:hidden;}
+  .card-head{padding:13px 18px;background:var(--teal-deep);}
+  .card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;}
+  .card-body{padding:20px 22px;}
+
+  .field-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+  .field-row:last-child{margin-bottom:0;}
+  .field{flex:1;min-width:150px;}
+  .field label{display:block;font-size:11.5px;font-weight:600;color:var(--charcoal);margin-bottom:5px;}
+  .field input, .field select{
+    width:100%;border:1px solid var(--divider);border-radius:7px;padding:8px 10px;
+    font-size:12.5px;font-family:var(--font-mono);color:var(--charcoal);background:#fff;
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--teal-deep);}
+  .field .hint{font-size:11px;color:var(--muted);margin-top:5px;font-family:var(--font-body);}
+  .field .optional-tag{font-weight:400;color:var(--muted);font-size:10.5px;}
+  .hint{font-size:11px;color:var(--muted);margin-top:5px;}
+
+  .help-disclosure{border:1px solid var(--divider);border-radius:10px;margin-bottom:18px;overflow:hidden;background:#fff;}
+  .help-disclosure > summary{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;list-style:none;font-size:12px;font-weight:700;color:var(--teal-deep);background:var(--teal-light);}
+  .help-disclosure > summary::-webkit-details-marker{display:none;}
+  .help-disclosure > summary:hover{background:#DAEAEC;}
+  .help-disclosure .chevron{width:12px;height:12px;transition:transform .15s ease;flex-shrink:0;}
+  .help-disclosure[open] .chevron{transform:rotate(90deg);}
+  .help-disclosure .info-icon{width:14px;height:14px;flex-shrink:0;}
+  .help-disclosure-body{border-top:1px solid var(--divider);padding:14px;font-size:11.5px;color:var(--muted);line-height:1.6;}
+  .help-list{list-style:none;margin:0;padding:0;}
+  .help-list li{position:relative;padding-left:14px;margin-bottom:7px;}
+  .help-list li:last-child{margin-bottom:0;}
+  .help-list li::before{content:"–";position:absolute;left:0;color:var(--stone);}
+
+  .save-row{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:4px;}
+  .save-hint{font-size:11.5px;color:var(--muted);}
+  .save-btn{background:var(--gold);color:var(--charcoal);border:none;padding:11px 22px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+  .save-btn:hover{background:#0090AD;}
+
+  @media (max-width: 760px){
+    .app-shell{flex-direction:column;max-width:100%;}
+    .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px 14px;gap:12px;}
+    .sidebar-actions{flex-direction:row;}
+    .sidebar-section{display:none;}
+    .sidebar-divider{display:none;}
+    .content{padding:16px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ================= SIDEBAR ================= -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div style="width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,0.13);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M4 8L9.5 15" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M9.5 15L19 5" stroke="#00B4D8" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M13.5 5H19V10.5" stroke="#00B4D8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="sidebar-wordmark">Div<span>Rebound</span></div>
+    </div>
+
+    <div class="sidebar-actions">
+      <button class="sidebar-btn" onclick="alert('Öffnet Datei-Dialog zum Import einer .divrebound.json')">📂 Bearbeitung laden</button>
+      <button class="sidebar-btn" onclick="alert('Exportiert aktuellen Stand als verschlüsselte .divrebound.json')">💾 Bearbeitung speichern</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Nutzer</div>
+      <a class="sidebar-link active">Persönliche Daten</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Quellensteuer</div>
+      <div class="sidebar-new">＋ Neuer DivRebound</div>
+      <details class="nav-country">
+        <summary>
+          <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          Dänemark
+        </summary>
+        <div class="nav-case-group">
+          <details class="nav-case">
+            <summary>
+              <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              DivRebound 07/2026
+            </summary>
+            <div class="nav-steps">
+              <div class="nav-step done">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Schritt 1: Wohnsitzbescheinigung
+              </div>
+              <div class="nav-step done">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Schritt 2: SKAT-Portal
+              </div>
+            </div>
+          </details>
+          <details class="nav-case">
+            <summary>
+              <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              DivRebound 12/2024
+            </summary>
+          </details>
+        </div>
+      </details>
+      <details class="nav-country disabled">
+        <summary>
+          <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          Schweiz
+          <span class="tree-stub-tag">bald</span>
+        </summary>
+      </details>
+      <details class="nav-country disabled">
+        <summary>
+          <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          Italien
+          <span class="tree-stub-tag">bald</span>
+        </summary>
+      </details>
+    </div>
+  </div>
+
+  <!-- ================= CONTENT ================= -->
+  <div class="content">
+    <div class="content-header">
+      <h1 class="content-title">Persönliche Daten</h1>
+    </div>
+
+    <!-- 1) Persönliche Angaben -->
+    <div class="card">
+      <div class="card-head"><span class="card-title">Persönliche Angaben</span></div>
+      <div class="card-body">
+        <div class="field-row">
+          <div class="field"><label>Vorname</label><input type="text" data-field="firstName"></div>
+          <div class="field"><label>Nachname</label><input type="text" data-field="lastName"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Geburtsdatum</label><input type="text" data-field="birthDate" placeholder="TT.MM.JJJJ"></div>
+          <div class="field"><label>Geburtsort<span class="optional-tag"> · wie im Reisepass</span></label><input type="text" data-field="birthPlace"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Wohnsitzland</label>
+            <select data-field="country">
+              <option value="DE">Deutschland</option>
+              <option value="AT">Österreich</option>
+              <option value="CH">Schweiz</option>
+            </select>
+          </div>
+          <div class="field"><label>Steuer-ID (TIN)</label><input type="text" data-field="tin"></div>
+        </div>
+        <div class="field-row">
+          <div class="field" style="flex:2;"><label>Adresse</label><input type="text" data-field="address"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Postleitzahl</label><input type="text" data-field="postalCode"></div>
+          <div class="field"><label>Ort</label><input type="text" data-field="town"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Email<span class="optional-tag"> · optional</span></label><input type="text" data-field="email"></div>
+          <div class="field"><label>Telefon<span class="optional-tag"> · optional</span></label><input type="text" data-field="phone" placeholder="inkl. Ländervorwahl"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2) Bankverbindung -->
+    <div class="card">
+      <div class="card-head"><span class="card-title">Bankverbindung</span></div>
+      <div class="card-body">
+        <div class="field-row">
+          <div class="field"><label>Name der Bank</label><input type="text" data-field="bankName"></div>
+          <div class="field"><label>Kontoinhaber</label><input type="text" data-field="bankHolder"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>BIC / SWIFT</label><input type="text" data-field="bankBic"></div>
+          <div class="field"><label>IBAN</label><input type="text" data-field="bankIban"></div>
+        </div>
+        <div class="hint">Geben Sie hier ein Konto an, das SEPA-Überweisungen empfangen kann und auf dem Sie Ihre Quellensteuer-Erstattung erhalten wollen.</div>
+      </div>
+    </div>
+
+    <!-- 3) Finanzamt -->
+    <div class="card">
+      <div class="card-head"><span class="card-title">Finanzamt</span></div>
+      <div class="card-body">
+        <div class="field-row">
+          <div class="field" style="flex:2;"><label>Name &amp; Adresse</label><input type="text" data-field="taxOffice" placeholder="z.B. Finanzamt München I, Deroystraße 4, 80335 München"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4) Datenschutz -->
+    <details class="help-disclosure">
+      <summary>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        🔒 Wo werden meine Daten gespeichert?
+      </summary>
+      <div class="help-disclosure-body">
+        <ul class="help-list">
+          <li>Alles hier bleibt lokal auf diesem Gerät — nichts wird an einen Server übertragen.</li>
+          <li>Für die Bearbeitung an einem anderen Gerät: verschlüsselte <span style="font-family:var(--font-mono);">.divrebound.json</span>-Datei exportieren und dort wieder importieren.</li>
+          <li>Andere Nutzer dieser App sehen ausschließlich ihre eigenen Daten — nie Ihre.</li>
+          <li>Löschen des Browser-/App-Speichers löscht auch diese Daten unwiderruflich, sofern kein Export vorher gespeichert wurde.</li>
+        </ul>
+      </div>
+    </details>
+
+    <div class="save-row">
+      <span class="save-hint">Aktualisierung gilt für neu angelegte Fälle. Laufende Fälle bei Bedarf direkt dort anpassen.</span>
+      <button class="save-btn" onclick="alert('Persönliche Daten gespeichert.')">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Personenbezogene Werte kommen ausschließlich aus diesem einen Profil-Objekt -
+   in der echten App: aus dem lokalen InvestorProfile des angemeldeten Nutzers. */
+const profile = {
+  firstName: "Matthias",
+  lastName: "Heckes",
+  birthDate: "14.03.1985",
+  birthPlace: "München",
+  country: "DE",
+  tin: "69214187506",
+  address: "Sauerbruchstr. 62",
+  postalCode: "81377",
+  town: "München",
+  email: "heckes@gmail.com",
+  phone: "0049 171 3735934",
+  bankName: "comdirect Bank",
+  bankHolder: "Matthias Heckes",
+  bankBic: "COBADEHD055",
+  bankIban: "DE03200411550205529100",
+  taxOffice: "Finanzamt München I, Deroystraße 4, 80335 München",
+};
+
+document.querySelectorAll('[data-field]').forEach(el => {
+  const value = profile[el.getAttribute('data-field')] ?? '';
+  el.value = value;
+});
+</script>
+
+</body>
+</html>

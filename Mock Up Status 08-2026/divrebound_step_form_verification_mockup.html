@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>DivRebound</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --teal-deep:#0F2240; --teal-mid:#1A3A6B; --teal-light:#E8EEF7;
+    --gold:#00B4D8; --gold-light:#E0F7FC;
+    --bg:#F2F4F7; --surface:#FFFFFF;
+    --charcoal:#111827; --muted:#6B7C93; --stone:#AAB4C4; --divider:#D8DFE8;
+    --success:#059669; --success-bg:#D1FAE5;
+    --danger:#A8433A; --danger-tint:#F7E9E7;
+
+    --font-display:"DM Serif Display", Georgia, "Times New Roman", serif;
+    --font-body:"DM Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono:"JetBrains Mono", "Courier New", monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{margin:0;background:var(--bg);color:var(--charcoal);font-family:var(--font-body);}
+
+  .app-shell{display:flex;min-height:100vh;max-width:1280px;margin:0 auto;background:#fff;box-shadow:0 0 0 1px var(--divider);}
+
+  .sidebar{width:250px;flex-shrink:0;background:var(--teal-deep);color:#fff;padding:20px 16px;display:flex;flex-direction:column;gap:22px;}
+  .sidebar-brand{display:flex;align-items:center;gap:10px;}
+  .sidebar-wordmark{font-family:var(--font-display);font-size:17px;letter-spacing:.01em;}
+  .sidebar-wordmark span{color:var(--gold);}
+  .sidebar-actions{display:flex;flex-direction:column;gap:8px;}
+  .sidebar-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;font-family:var(--font-body);font-size:12.5px;font-weight:600;padding:9px 12px;border-radius:8px;cursor:pointer;text-align:left;}
+  .sidebar-btn:hover{background:rgba(255,255,255,.16);}
+  .sidebar-divider{height:1px;background:rgba(255,255,255,.15);}
+  .sidebar-section{display:flex;flex-direction:column;gap:6px;}
+  .sidebar-section-title{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.55);font-weight:700;margin-bottom:2px;}
+  .sidebar-link{font-size:13px;color:rgba(255,255,255,.9);text-decoration:none;padding:6px 8px;border-radius:6px;display:block;cursor:pointer;}
+  .sidebar-link:hover{background:rgba(255,255,255,.1);}
+  .sidebar-new{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--gold);padding:6px 8px;border-radius:6px;cursor:pointer;}
+  .sidebar-new:hover{background:rgba(255,255,255,.1);}
+  .icon{width:14px;height:14px;flex-shrink:0;}
+  details.nav-country{margin-bottom:2px;}
+  details.nav-country > summary{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;list-style:none;color:#fff;}
+  details.nav-country > summary::-webkit-details-marker{display:none;}
+  details.nav-country > summary:hover{background:rgba(255,255,255,.08);}
+  details.nav-country .chevron{transition:transform .15s ease;}
+  details.nav-country[open] .chevron{transform:rotate(90deg);}
+  details.nav-country.disabled > summary{color:rgba(255,255,255,.35);cursor:default;}
+  details.nav-country.disabled > summary:hover{background:none;}
+  .tree-stub-tag{margin-left:auto;font-size:9.5px;background:rgba(255,255,255,.12);padding:2px 6px;border-radius:99px;font-weight:600;}
+
+  .nav-case-group{margin-left:8px;padding-left:14px;border-left:1.5px solid rgba(255,255,255,.15);}
+  details.nav-case{margin-bottom:1px;}
+  details.nav-case > summary{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;font-size:12.5px;color:rgba(255,255,255,.85);cursor:pointer;list-style:none;}
+  details.nav-case > summary::-webkit-details-marker{display:none;}
+  details.nav-case > summary:hover{background:rgba(255,255,255,.08);}
+  details.nav-case.active > summary{background:rgba(0,180,216,.16);color:var(--gold);font-weight:600;}
+  details.nav-case .chevron{transition:transform .15s ease;width:12px;height:12px;opacity:.6;}
+  details.nav-case[open] .chevron{transform:rotate(90deg);}
+
+  .nav-steps{margin-left:20px;padding-left:12px;border-left:1.5px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:1px;}
+  .nav-step{display:flex;align-items:center;gap:7px;padding:4px 8px;border-radius:6px;font-size:12px;color:rgba(255,255,255,.55);cursor:pointer;}
+  .nav-step:hover{background:rgba(255,255,255,.06);}
+  .nav-step.current{color:#fff;font-weight:600;}
+  .nav-step.current .icon{color:var(--gold);}
+  .nav-step.done .icon{color:var(--success);}
+
+  .content{flex:1;min-width:0;padding:24px;overflow-x:hidden;max-width:640px;}
+  .content-header{margin-bottom:18px;}
+  .content-title{font-family:var(--font-display);font-size:22px;color:var(--charcoal);margin:0 0 4px 0;}
+  .content-breadcrumb{font-size:12px;color:var(--muted);}
+  .content-breadcrumb b{color:var(--teal-deep);}
+
+  .card{background:#fff;border:1px solid var(--divider);border-radius:14px;margin-bottom:18px;overflow:hidden;}
+  .card-head{padding:13px 18px;display:flex;align-items:center;justify-content:space-between;}
+  .card-head.head-teal{background:var(--teal-deep);}
+  .card-head.head-teal .card-title{color:#fff;}
+  .card-head.head-gold{background:var(--gold);}
+  .card-head.head-gold .card-title{color:var(--charcoal);}
+  .card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--teal-deep);}
+  .card-body{padding:20px 22px;}
+
+  .intro-text{font-size:13px;color:var(--charcoal);line-height:1.6;margin-bottom:16px;}
+
+  .open-btn{
+    width:100%;background:var(--gold);color:var(--charcoal);border:none;padding:13px 18px;border-radius:10px;
+    font-size:14px;font-weight:700;font-family:var(--font-body);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:18px;
+  }
+  .open-btn:hover{background:#0090AD;}
+
+  .checklist{display:flex;flex-direction:column;gap:10px;margin-bottom:4px;}
+  .checklist-item{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;}
+  .checklist-item .mark{color:var(--teal-deep);flex-shrink:0;font-weight:700;}
+  .checklist-item b{font-family:var(--font-mono);font-size:12px;background:var(--bg);padding:1px 6px;border-radius:4px;}
+
+  .confirm-question{font-size:13.5px;font-weight:600;margin:20px 0 12px 0;}
+  .confirm-buttons{display:flex;gap:10px;}
+  .confirm-btn{
+    flex:1;padding:11px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--font-body);
+    border:1.5px solid var(--divider);background:#fff;color:var(--charcoal);
+  }
+  .confirm-btn:hover{border-color:var(--teal-deep);}
+  .confirm-btn.selected-yes{background:var(--success-bg);border-color:var(--success);color:var(--success);}
+  .confirm-btn.selected-no{background:var(--danger-tint);border-color:var(--danger);color:var(--danger);}
+
+  .trouble-panel{display:none;margin-top:16px;padding:14px 16px;background:var(--gold-light);border:1px solid var(--gold);border-radius:10px;font-size:12.5px;color:#005a78;}
+  .trouble-panel.visible{display:block;}
+  .trouble-panel b{color:#007A9E;}
+  .trouble-panel ul{margin:8px 0 0 18px;padding:0;line-height:1.6;}
+
+  .bottom-bar{display:flex;align-items:center;justify-content:space-between;margin-top:22px;flex-wrap:wrap;gap:12px;}
+  .next-btn{background:var(--teal-deep);color:#fff;border:none;padding:11px 22px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+  .next-btn:disabled{background:var(--stone);cursor:not-allowed;}
+  .next-btn:not(:disabled):hover{background:var(--teal-mid);}
+  .back-link{font-size:12.5px;color:var(--teal-deep);cursor:pointer;text-decoration:none;display:inline-block;margin-bottom:14px;}
+  .back-link:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div style="width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,0.13);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M4 8L9.5 15" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M9.5 15L19 5" stroke="#00B4D8" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M13.5 5H19V10.5" stroke="#00B4D8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="sidebar-wordmark">Div<span>Rebound</span></div>
+    </div>
+
+    <div class="sidebar-actions">
+      <button class="sidebar-btn" onclick="alert('Öffnet Datei-Dialog zum Import einer .divrebound.json')">📂 Bearbeitung laden</button>
+      <button class="sidebar-btn" onclick="alert('Exportiert aktuellen Stand als verschlüsselte .divrebound.json')">💾 Bearbeitung speichern</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Nutzer</div>
+      <a class="sidebar-link">Persönliche Daten</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Quellensteuer</div>
+      <div class="sidebar-new">＋ Neuer DivRebound</div>
+      <details class="nav-country" open>
+        <summary>
+          <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          Dänemark
+        </summary>
+        <div class="nav-case-group">
+          <details class="nav-case active" open>
+            <summary>
+              <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              DivRebound 07/2026
+            </summary>
+            <div class="nav-steps">
+              <div class="nav-step done">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Schritt 1: Wohnsitzbescheinigung
+              </div>
+              <div class="nav-step current">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/></svg>
+                Schritt 2: SKAT-Portal
+              </div>
+            </div>
+          </details>
+          <details class="nav-case">
+            <summary>
+              <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              DivRebound 12/2024
+            </summary>
+            <div class="nav-steps">
+              <div class="nav-step done">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Schritt 1: Wohnsitzbescheinigung
+              </div>
+              <div class="nav-step done">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Schritt 2: SKAT-Portal
+              </div>
+            </div>
+          </details>
+        </div>
+      </details>
+
+      <details class="nav-country disabled">
+        <summary>
+          <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          Schweiz
+          <span class="tree-stub-tag">bald</span>
+        </summary>
+      </details>
+      <details class="nav-country disabled">
+        <summary>
+          <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          Italien
+          <span class="tree-stub-tag">bald</span>
+        </summary>
+      </details>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="content-header">
+      <div class="content-breadcrumb">Dänemark <b>›</b> DivRebound 07/2026 <b>›</b> Schritt 2</div>
+      <h1 class="content-title">SKAT-Formular öffnen</h1>
+    </div>
+
+    <a class="back-link" onclick="alert('Zurück zur Fallübersicht')">← Zurück</a>
+
+    <div class="card">
+      <div class="card-head head-teal">
+        <span class="card-title">Formular-Verifizierung</span>
+      </div>
+      <div class="card-body">
+        <div class="intro-text">
+          Öffnen Sie das dänische Online-Formular in einem neuen Tab und ordnen Sie beide Fenster nebeneinander an, so dass die Einträge einfach übertragen werden können.
+        </div>
+
+        <button class="open-btn" onclick="window.open('https://udbytterefusion.skat.dk/SelfService/submission/submit/Skattestyrelsen','_blank'); markOpened();">
+          ↗ SKAT-Formular in neuem Tab öffnen
+        </button>
+
+        <div class="checklist">
+          <div class="checklist-item"><span class="mark">✓</span> Seitentitel <b>„Refusion af udbytteskat / Claim for refund of Danish dividend tax"</b></div>
+          <div class="checklist-item"><span class="mark">✓</span> Sie füllen das Formular ohne MitID aus. (Ein dänischer Login mit MitID ist nicht erforderlich.)</div>
+        </div>
+
+        <div class="confirm-question">Sehen Sie das Formular wie oben beschrieben?</div>
+        <div class="confirm-buttons">
+          <button class="confirm-btn" id="btn-yes" onclick="selectAnswer(true)">✓ Ja</button>
+          <button class="confirm-btn" id="btn-no" onclick="selectAnswer(false)">✕ Nein</button>
+        </div>
+
+        <div class="trouble-panel" id="trouble-panel">
+          <b>Troubleshooting:</b>
+          <ul>
+            <li>Sprache oben rechts auf Englisch umstellen, falls Dänisch unübersichtlich ist</li>
+            <li>Weiterhin Probleme? <a href="https://skat.dk/kontakt" target="_blank" style="color:#007A9E;">Kontakt zu SKAT aufnehmen</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <span></span>
+      <button class="next-btn" id="next-btn" disabled onclick="alert('Weiter zum Cheat Sheet')">Weiter zum Cheat Sheet →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function markOpened(){
+  // Platzhalter: könnte z.B. einen Hinweis "Tab geöffnet" einblenden
+}
+
+function selectAnswer(isYes){
+  const yesBtn = document.getElementById('btn-yes');
+  const noBtn = document.getElementById('btn-no');
+  const trouble = document.getElementById('trouble-panel');
+  const nextBtn = document.getElementById('next-btn');
+
+  yesBtn.classList.remove('selected-yes');
+  noBtn.classList.remove('selected-no');
+
+  if(isYes){
+    yesBtn.classList.add('selected-yes');
+    trouble.classList.remove('visible');
+    nextBtn.disabled = false;
+  } else {
+    noBtn.classList.add('selected-no');
+    trouble.classList.add('visible');
+    nextBtn.disabled = true;
+  }
+}
+</script>
+
+</body>
+</html>

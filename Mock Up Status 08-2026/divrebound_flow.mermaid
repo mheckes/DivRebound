@@ -1,0 +1,62 @@
+flowchart TD
+    Start["Benutzer-Profil vorhanden?<br/>Import von Daten?"]
+    Start -->|nein| PA["Aktien im Privatvermögen gehalten?<br/><i>(ersetzt frühere Anlegertyp-Frage)</i>"]
+    Start -->|ja| SkipInfo["Menü/Inhalte passen sich an,<br/>Profil-Daten vorausgefüllt"]
+
+    PA --> Residence["Wohnsitzland?<br/>DE / AT / CH"]
+    SkipInfo --> Target
+    Residence --> Target["Auswahl Zielland für<br/>Quellensteuer-Erstattung<br/>DK / CH / SE / IT / weitere (Stub)"]
+
+    Target --> ValidateGate{"Validierung:<br/>DBA vorhanden?<br/>Zielland ≠ Wohnsitzland?"}
+    ValidateGate -->|nein, ungültig| BlockMsg["Hinweis: kein<br/>Cross-Border-Reclaim möglich"]
+    ValidateGate -->|ja| Overview["Prozessübersicht anzeigen:<br/>Schritt 1 & 2, benötigte Dokumente,<br/>erwartete Dauer"]
+
+    Overview --> ChooseStep{"Welcher Schritt<br/>soll gestartet werden?"}
+
+    ChooseStep --> StepA
+    ChooseStep --> StepB
+
+    subgraph ProzessA ["PROZESS A – Wohnsitzbescheinigung (Nutzer + Finanzamt)"]
+        direction TB
+        StepA["Schritt 1: Start"] --> Upload["Upload Dividendenabrechnung(en)<br/>Mehrfach-Upload möglich<br/>(mehrere Jahre / Unternehmen)"]
+        Upload --> ISINCheck{"Validierung:<br/>ISIN-Präfix = Zielland?<br/>(z.B. ^DK)"}
+        ISINCheck -->|nein| RejectFile["Datei abgelehnt +<br/>Erklärung (z.B. ETF-Sitz IE/LU)"]
+        RejectFile --> Upload
+        ISINCheck -->|ja| Review["Anzeige extrahierter Daten:<br/>Positions-/Jahresübersicht<br/>zur Kontrolle/Korrektur"]
+        Review --> MissingData["Abfrage fehlender Pflichtdaten:<br/>Geburtsdatum, Geburtsort, Steuer-ID"]
+
+        MissingData --> TaxOfficeGate{"Finanzamt bereits<br/>im Profil gespeichert?"}
+        TaxOfficeGate -->|ja| ConfirmTO["Anzeige zur Bestätigung:<br/>'Finanzamt X – noch aktuell?'"]
+        TaxOfficeGate -->|nein| EnterTO["Freitext-Eingabe Finanzamt<br/>+ Hinweis, wo zu finden<br/>(Steuerbescheid / BZSt-Suche)<br/>→ wird ins InvestorProfile gespeichert"]
+        ConfirmTO --> OptLetter
+        EnterTO --> OptLetter["Optional: Anschreiben ans<br/>Finanzamt erstellen"]
+
+        OptLetter --> GenDoc["PDF-Generierung:<br/>Formular 02.050 ausgefüllt<br/>(11 Felder aus Profil + Case)"]
+        GenDoc --> DownloadForm["Download-Button<br/>+ Hinweis: ausdrucken,<br/>unterschreiben, beim Finanzamt<br/>vorlegen – NICHT direkt bei SKAT"]
+        DownloadForm --> SaveState1["Bearbeitungsstand speichern<br/>→ Download .divrebound.json<br/>(verschlüsselt, Passphrase)"]
+        SaveState1 --> StatusA["Case-Status:<br/>residency_form_generated →<br/>awaiting_tax_office"]
+    end
+
+    StatusA -. "Medienbruch: 2-3 Wochen,<br/>Bearbeitung durch Finanzamt<br/>(außerhalb des Tools)" .-> StepB
+
+    subgraph ProzessB ["PROZESS B – Antragstellung bei SKAT (Nutzer + Online-Portal)"]
+        direction TB
+        StepB["Schritt 2: Start<br/>(eigener Einstiegspunkt,<br/>z.B. nach Import der .json-Datei)"]
+        StepB --> DataGate{"Alle Daten für<br/>Cheat Sheet vorhanden?"}
+        DataGate -->|nein| AskMissing["Abfrage fehlender Daten<br/>(z.B. Bankverbindung)"]
+        AskMissing --> DataGate
+        DataGate -->|ja| Verify["Formular-Verifizierung:<br/>SKAT-Portal öffnen (neuer Tab)<br/>+ Checkliste (Titel, kein MitID<br/>nötig, richtige Formularvariante)"]
+        Verify -->|Problem| Troubleshoot["Troubleshooting-Panel:<br/>Sprache umstellen, Privat- vs.<br/>Erhverv-Formular, Kontakt SKAT"]
+        Troubleshoot --> Verify
+        Verify -->|bestätigt| ChunkGate{"Mehr als 20<br/>Ausschüttungen?"}
+        ChunkGate -->|ja| SplitChunks["Automatische Aufteilung<br/>in mehrere Anträge<br/>(chronologisch, älteste zuerst)"]
+        ChunkGate -->|nein| OneChunk["Ein Antrag"]
+        SplitChunks --> CheatSheet["Cheat Sheet je Chunk anzeigen<br/>(Seite an Seite mit Portal)"]
+        OneChunk --> CheatSheet
+        CheatSheet --> SaveState2["Bearbeitungsstand speichern<br/>→ Download .divrebound.json"]
+        SaveState2 --> StatusB["Case-Status:<br/>skat_form_verified →<br/>submitted (nach tatsächlicher<br/>Einreichung durch Nutzer)"]
+    end
+
+    StatusB --> Done{"Fertig für den Moment!<br/>Neue Quellensteuer-<br/>Rückforderung starten?"}
+    Done -->|ja, neues Land/Jahr| Target
+    Done -->|nein| End["Ende / zurück zur Fallübersicht<br/>(Sidebar: Land → Case → Schritt)"]

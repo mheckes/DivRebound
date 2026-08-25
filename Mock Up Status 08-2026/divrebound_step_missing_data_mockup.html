@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>DivRebound</title>
+<style>
+  /*
+    HINWEIS: Google Fonts nur für diese Vorschau geladen (wie im Original-CI-
+    Dokument). Produktiv-Einbettung: WOFF2-Dateien selbst hosten (GDPR/IP-
+    Transfer-Vermeidung), siehe Begründung im vorherigen Mockup.
+  */
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --teal-deep:#0F2240; --teal-mid:#1A3A6B; --teal-light:#E8EEF7;
+    --gold:#00B4D8; --gold-light:#E0F7FC;
+    --bg:#F2F4F7; --surface:#FFFFFF;
+    --charcoal:#111827; --muted:#6B7C93; --stone:#AAB4C4; --divider:#D8DFE8;
+    --success:#059669; --success-bg:#D1FAE5;
+    --danger:#A8433A; --danger-tint:#F7E9E7;
+
+    --font-display:"DM Serif Display", Georgia, "Times New Roman", serif;
+    --font-body:"DM Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono:"JetBrains Mono", "Courier New", monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{margin:0;background:var(--bg);color:var(--charcoal);font-family:var(--font-body);}
+
+  .app-shell{display:flex;min-height:100vh;max-width:1280px;margin:0 auto;background:#fff;box-shadow:0 0 0 1px var(--divider);}
+
+  .sidebar{width:250px;flex-shrink:0;background:var(--teal-deep);color:#fff;padding:20px 16px;display:flex;flex-direction:column;gap:22px;}
+  .sidebar-brand{display:flex;align-items:center;gap:10px;}
+  .sidebar-wordmark{font-family:var(--font-display);font-size:17px;letter-spacing:.01em;}
+  .sidebar-wordmark span{color:var(--gold);}
+  .sidebar-actions{display:flex;flex-direction:column;gap:8px;}
+  .sidebar-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;font-family:var(--font-body);font-size:12.5px;font-weight:600;padding:9px 12px;border-radius:8px;cursor:pointer;text-align:left;}
+  .sidebar-btn:hover{background:rgba(255,255,255,.16);}
+  .sidebar-divider{height:1px;background:rgba(255,255,255,.15);}
+  .sidebar-section{display:flex;flex-direction:column;gap:6px;}
+  .sidebar-section-title{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.55);font-weight:700;margin-bottom:2px;}
+  .sidebar-link{font-size:13px;color:rgba(255,255,255,.9);text-decoration:none;padding:6px 8px;border-radius:6px;display:block;cursor:pointer;}
+  .sidebar-link:hover{background:rgba(255,255,255,.1);}
+  .sidebar-new{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--gold);padding:6px 8px;border-radius:6px;cursor:pointer;}
+  .sidebar-new:hover{background:rgba(255,255,255,.1);}
+  .icon{width:14px;height:14px;flex-shrink:0;}
+  details.nav-country{margin-bottom:2px;}
+  details.nav-country > summary{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;list-style:none;color:#fff;}
+  details.nav-country > summary::-webkit-details-marker{display:none;}
+  details.nav-country > summary:hover{background:rgba(255,255,255,.08);}
+  details.nav-country .chevron{transition:transform .15s ease;}
+  details.nav-country[open] .chevron{transform:rotate(90deg);}
+  details.nav-country.disabled > summary{color:rgba(255,255,255,.35);cursor:default;}
+  details.nav-country.disabled > summary:hover{background:none;}
+  .tree-stub-tag{margin-left:auto;font-size:9.5px;background:rgba(255,255,255,.12);padding:2px 6px;border-radius:99px;font-weight:600;}
+
+  .nav-case-group{margin-left:8px;padding-left:14px;border-left:1.5px solid rgba(255,255,255,.15);}
+  details.nav-case{margin-bottom:1px;}
+  details.nav-case > summary{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;font-size:12.5px;color:rgba(255,255,255,.85);cursor:pointer;list-style:none;}
+  details.nav-case > summary::-webkit-details-marker{display:none;}
+  details.nav-case > summary:hover{background:rgba(255,255,255,.08);}
+  details.nav-case.active > summary{background:rgba(0,180,216,.16);color:var(--gold);font-weight:600;}
+  details.nav-case .chevron{transition:transform .15s ease;width:12px;height:12px;opacity:.6;}
+  details.nav-case[open] .chevron{transform:rotate(90deg);}
+
+  .nav-steps{margin-left:20px;padding-left:12px;border-left:1.5px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:1px;}
+  .nav-step{display:flex;align-items:center;gap:7px;padding:4px 8px;border-radius:6px;font-size:12px;color:rgba(255,255,255,.55);cursor:pointer;}
+  .nav-step:hover{background:rgba(255,255,255,.06);}
+  .nav-step.current{color:#fff;font-weight:600;}
+  .nav-step.current .icon{color:var(--gold);}
+  .nav-step.done .icon{color:var(--success);}
+
+  .content{flex:1;min-width:0;padding:24px;overflow-x:hidden;max-width:640px;}
+  .content-header{margin-bottom:18px;}
+  .content-title{font-family:var(--font-display);font-size:22px;color:var(--charcoal);margin:0 0 4px 0;}
+  .content-breadcrumb{font-size:12px;color:var(--muted);}
+  .content-breadcrumb b{color:var(--teal-deep);}
+
+  .card{background:#fff;border:1px solid var(--divider);border-radius:14px;margin-bottom:18px;overflow:hidden;}
+  .card-head{padding:13px 18px;display:flex;align-items:center;justify-content:space-between;}
+  .card-head.head-teal{background:var(--teal-deep);}
+  .card-head.head-teal .card-title{color:#fff;}
+  .card-head.head-teal .count-pill{background:rgba(255,255,255,.18);color:#fff;}
+  .card-head.head-gold{background:var(--gold);}
+  .card-head.head-gold .card-title{color:var(--charcoal);}
+  .card-head.head-gold .count-pill{background:rgba(255,255,255,.4);color:var(--charcoal);}
+  .card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--teal-deep);}
+  .count-pill{font-size:11.5px;padding:3px 10px;border-radius:99px;font-weight:600;}
+  .card-body{padding:20px 22px;}
+
+  .known-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--divider);}
+  .known-row:last-child{border-bottom:none;}
+  .known-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;}
+  .known-input{
+    border:1px solid transparent;border-radius:6px;padding:4px 7px;background:transparent;
+    font-family:var(--font-mono);font-size:13.5px;color:var(--charcoal);width:100%;font-weight:600;
+  }
+  .known-input:hover,.known-input:focus{border-color:var(--teal-deep);background:#fff;outline:none;}
+  .badge-source{font-size:10px;padding:3px 8px;border-radius:99px;background:var(--success-bg);color:var(--success);font-weight:600;white-space:nowrap;flex-shrink:0;}
+  .profile-diff{font-size:11px;color:var(--muted);margin:8px 0 9px 0;padding-left:2px;}
+  .profile-diff a{color:var(--teal-deep);font-weight:600;}
+  .badge-derived{font-size:10px;padding:3px 8px;border-radius:99px;background:var(--gold-light);color:#007A9E;font-weight:600;white-space:nowrap;flex-shrink:0;}
+
+  .section-label{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:22px 0 12px 0;}
+  .section-label:first-of-type{margin-top:0;}
+
+  .field{margin-bottom:18px;}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--charcoal);margin-bottom:5px;}
+  .hint{font-size:11px;color:var(--muted);margin-top:4px;}
+  .field input{
+    width:100%;padding:9px 11px;border:1.5px solid var(--divider);border-radius:8px;
+    font-family:var(--font-mono);font-size:13.5px;color:var(--charcoal);background:#fff;
+    transition:border-color .15s ease;
+  }
+  .field input:focus{outline:none;border-color:var(--teal-deep);}
+  .field input:disabled{background:var(--bg);color:var(--muted);cursor:not-allowed;}
+  .field input.valid{border-color:var(--success);background:var(--success-bg);}
+  .field input.invalid{border-color:var(--danger);background:var(--danger-tint);}
+  .field-feedback{font-size:11px;margin-top:5px;display:flex;align-items:center;gap:5px;min-height:14px;}
+  .field-feedback.ok{color:var(--success);}
+  .field-feedback.err{color:var(--danger);}
+
+  .bottom-bar{display:flex;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap;gap:12px;}
+  .progress-text{font-size:12.5px;color:var(--muted);}
+  .progress-text b{color:var(--teal-deep);}
+  .next-btn{background:var(--teal-deep);color:#fff;border:none;padding:11px 22px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+  .next-btn:disabled{background:var(--stone);cursor:not-allowed;}
+  .next-btn:not(:disabled):hover{background:var(--teal-mid);}
+  .back-link{font-size:12.5px;color:var(--teal-deep);cursor:pointer;text-decoration:none;}
+  .back-link:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div style="width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,0.13);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M4 8L9.5 15" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M9.5 15L19 5" stroke="#00B4D8" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M13.5 5H19V10.5" stroke="#00B4D8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="sidebar-wordmark">Div<span>Rebound</span></div>
+    </div>
+
+    <div class="sidebar-actions">
+      <button class="sidebar-btn" onclick="alert('Öffnet Datei-Dialog zum Import einer .divrebound.json')">📂 Bearbeitung laden</button>
+      <button class="sidebar-btn" onclick="alert('Exportiert aktuellen Stand als verschlüsselte .divrebound.json')">💾 Bearbeitung speichern</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Nutzer</div>
+      <a class="sidebar-link">Persönliche Daten</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Quellensteuer</div>
+      <div class="sidebar-new">＋ Neuer DivRebound</div>
+      <details class="nav-country" open>
+        <summary>
+          <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          Dänemark
+        </summary>
+        <div class="nav-case-group">
+          <details class="nav-case active" open>
+            <summary>
+              <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              DivRebound 07/2026
+            </summary>
+            <div class="nav-steps">
+              <div class="nav-step current">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/></svg>
+                Schritt 1: Wohnsitzbescheinigung
+              </div>
+              <div class="nav-step todo">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Schritt 2: SKAT-Portal
+              </div>
+            </div>
+          </details>
+          <details class="nav-case">
+            <summary>
+              <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              DivRebound 12/2024
+            </summary>
+            <div class="nav-steps">
+              <div class="nav-step done">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Schritt 1: Wohnsitzbescheinigung
+              </div>
+              <div class="nav-step done">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Schritt 2: SKAT-Portal
+              </div>
+            </div>
+          </details>
+        </div>
+      </details>
+
+      <details class="nav-country disabled">
+        <summary>
+          <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          Schweiz
+          <span class="tree-stub-tag">bald</span>
+        </summary>
+      </details>
+      <details class="nav-country disabled">
+        <summary>
+          <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          Italien
+          <span class="tree-stub-tag">bald</span>
+        </summary>
+      </details>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="content-header">
+      <div class="content-breadcrumb">Dänemark <b>›</b> DivRebound 07/2026 <b>›</b> Schritt 1</div>
+      <h1 class="content-title">Fehlende Angaben ergänzen</h1>
+    </div>
+
+    <div class="card">
+      <div class="card-head head-teal">
+        <span class="card-title">Aus den Abrechnungen übernommen</span>
+        <span class="count-pill">3 von 8 Feldern</span>
+      </div>
+      <div class="card-body">
+        <div class="known-row">
+          <div style="flex:1;"><div class="known-label">Name</div><input class="known-input" data-field="fullName"></div>
+          <span class="badge-source">✓ aus PDF</span>
+        </div>
+        <div class="known-row">
+          <div style="flex:1;"><div class="known-label">Adresse</div><input class="known-input" data-field="address"></div>
+          <span class="badge-source">✓ aus PDF</span>
+        </div>
+        <div class="known-row">
+          <div style="flex:1;"><div class="known-label">PLZ / Ort</div><input class="known-input" data-field="postalCity"></div>
+          <span class="badge-source">✓ aus PDF</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head head-teal">
+        <span class="card-title">Zeitraum der Ansässigkeit</span>
+      </div>
+      <div class="card-body">
+        <div class="hint" style="margin-bottom:14px;">"Von" wurde aus dem frühesten Zahltag Ihrer Ausschüttungen abgeleitet — bitte prüfen.</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;">
+          <div class="field" style="flex:1;min-width:140px;margin-bottom:0;">
+            <label for="res-from">Von</label>
+            <input type="text" id="res-from" class="mono-input" value="01.04.2025">
+            <span class="badge-derived" style="display:inline-block;margin-top:6px;">↺ aus Abrechnungen abgeleitet</span>
+          </div>
+          <div class="field" style="flex:1;min-width:140px;margin-bottom:0;">
+            <label for="res-until">Bis</label>
+            <input type="text" id="res-until" class="mono-input" placeholder="andauernd" disabled>
+            <label style="font-weight:400;font-size:11.5px;display:flex;align-items:center;gap:6px;margin-top:8px;cursor:pointer;">
+              <input type="checkbox" id="res-ongoing" checked onchange="toggleResidenceUntil()" style="width:14px;height:14px;accent-color:var(--teal-deep);">
+              Wohnsitz besteht weiterhin
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head head-gold">
+        <span class="card-title">Bitte noch ergänzen</span>
+        <span class="count-pill" id="missing-pill">3 Felder offen</span>
+      </div>
+      <div class="card-body">
+
+        <div class="field">
+          <label for="birthdate">Geburtsdatum</label>
+          <input type="text" id="birthdate" placeholder="TT.MM.JJJJ" oninput="validateAll()">
+          <div class="field-feedback" id="birthdate-feedback"></div>
+        </div>
+
+        <div class="field">
+          <label for="birthplace">Geburtsort</label>
+          <input type="text" id="birthplace" placeholder="z.B. München" oninput="validateAll()">
+          <div class="hint">Wie im gültigen Reisepass/Personalausweis angegeben.</div>
+          <div class="field-feedback" id="birthplace-feedback"></div>
+        </div>
+
+        <div class="field">
+          <label for="tin">Steuer-ID (Deutschland)</label>
+          <input type="text" id="tin" placeholder="z.B. 12345678901" maxlength="11" oninput="validateAll()">
+          <div class="hint">11-stellig, rein numerisch. Zu finden auf Ihrem Einkommensteuerbescheid.</div>
+          <div class="field-feedback" id="tin-feedback"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <a class="back-link" onclick="alert('Zurück zur Positions-/Jahresübersicht')">← Zurück</a>
+      <button class="next-btn" id="next-btn" disabled onclick="alert('Weiter zur Zusammenfassung / Dokumentengenerierung')">Weiter →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Personenbezogene Werte kommen ausschließlich aus dem lokalen Profil des
+   angemeldeten Nutzers - nie fest im Code hinterlegt, nie zwischen Nutzern geteilt. */
+const parsedFromPdf = {
+  fullName: "Matthias Heckes",
+  address: "Leopoldstraße 14",
+  postalCity: "80802 München",
+};
+const storedProfile = {
+  fullName: "Matthias Heckes",
+  address: "Sauerbruchstr. 62",
+  postalCity: "81377 München",
+};
+
+function renderProfile(){
+  document.querySelectorAll('[data-field]').forEach(el => {
+    const field = el.getAttribute('data-field');
+    const value = parsedFromPdf[field] ?? '';
+    if(el.tagName === 'INPUT') el.value = value;
+    else el.textContent = value;
+
+    if(storedProfile[field] !== undefined && storedProfile[field] !== value){
+      const row = el.closest('.known-row');
+      const notice = document.createElement('div');
+      notice.className = 'profile-diff';
+      notice.innerHTML = `Benutzerprofil enthält noch "${storedProfile[field]}" · <a href="#" onclick="updateProfile('${field}','${value}');return false;">Aktualisieren</a>`;
+      row.after(notice);
+    }
+  });
+}
+renderProfile();
+
+function updateProfile(field, value){
+  storedProfile[field] = value;
+  const notice = document.querySelector(`[data-field="${field}"]`).closest('.known-row').nextElementSibling;
+  if(notice && notice.classList.contains('profile-diff')) notice.remove();
+}
+
+function toggleResidenceUntil(){
+  const ongoing = document.getElementById('res-ongoing').checked;
+  const untilField = document.getElementById('res-until');
+  untilField.disabled = ongoing;
+  if(ongoing) untilField.value = '';
+}
+
+function validateAll(){
+  let allValid = true;
+  let filledCount = 0;
+
+  // Geburtsdatum: TT.MM.JJJJ, simple Plausibilitätsprüfung
+  const birthdate = document.getElementById('birthdate');
+  const bdFeedback = document.getElementById('birthdate-feedback');
+  const bdMatch = birthdate.value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if(birthdate.value === ''){
+    birthdate.classList.remove('valid','invalid'); bdFeedback.textContent=''; bdFeedback.className='field-feedback'; allValid=false;
+  } else if(bdMatch && Number(bdMatch[1])<=31 && Number(bdMatch[2])<=12){
+    birthdate.classList.add('valid'); birthdate.classList.remove('invalid');
+    bdFeedback.textContent='✓ gültig'; bdFeedback.className='field-feedback ok'; filledCount++;
+  } else {
+    birthdate.classList.add('invalid'); birthdate.classList.remove('valid');
+    bdFeedback.textContent='Bitte im Format TT.MM.JJJJ eingeben'; bdFeedback.className='field-feedback err'; allValid=false;
+  }
+
+  // Geburtsort: nur "nicht leer"
+  const birthplace = document.getElementById('birthplace');
+  const bpFeedback = document.getElementById('birthplace-feedback');
+  if(birthplace.value.trim() === ''){
+    birthplace.classList.remove('valid','invalid'); bpFeedback.textContent=''; bpFeedback.className='field-feedback'; allValid=false;
+  } else {
+    birthplace.classList.add('valid'); birthplace.classList.remove('invalid');
+    bpFeedback.textContent='✓ übernommen'; bpFeedback.className='field-feedback ok'; filledCount++;
+  }
+
+  // Steuer-ID: 11-stellig numerisch (Deutschland, aus residence.country des Profils)
+  const tin = document.getElementById('tin');
+  const tinFeedback = document.getElementById('tin-feedback');
+  const tinDigitsOnly = tin.value.replace(/\s/g,'');
+  if(tin.value === ''){
+    tin.classList.remove('valid','invalid'); tinFeedback.textContent=''; tinFeedback.className='field-feedback'; allValid=false;
+  } else if(/^\d{11}$/.test(tinDigitsOnly)){
+    tin.classList.add('valid'); tin.classList.remove('invalid');
+    tinFeedback.textContent='✓ gültiges Format'; tinFeedback.className='field-feedback ok'; filledCount++;
+  } else {
+    tin.classList.add('invalid'); tin.classList.remove('valid');
+    tinFeedback.textContent = `Muss 11-stellig sein (aktuell ${tinDigitsOnly.length} Ziffern)`;
+    tinFeedback.className='field-feedback err'; allValid=false;
+  }
+
+  document.getElementById('missing-pill').textContent = (3-filledCount) + ' Felder offen';
+  document.getElementById('next-btn').disabled = !allValid;
+}
+validateAll();
+</script>
+
+</body>
+</html>

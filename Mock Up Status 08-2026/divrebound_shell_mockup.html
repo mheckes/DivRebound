@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>DivRebound (Navy/Cyan CI-Variante)</title>
+<style>
+  /*
+    HINWEIS: Der @import unten lädt die Schriften über Google Fonts - genau wie
+    im Original-CI-Dokument (divrebound_ci_v2.html), damit man sie in dieser
+    Vorschau überhaupt sieht (die vorherige local()-only-Deklaration griff nie,
+    da kaum jemand diese Schrift lokal installiert hat - deshalb sah es aus wie
+    Georgia). Für die PRODUKTIV-Einbettung auf der öffentlichen Website gilt
+    weiterhin die GDPR-Empfehlung von vorhin: WOFF2-Dateien selbst hosten statt
+    live von fonts.googleapis.com zu laden, um die Übertragung der Besucher-IP
+    an Google zu vermeiden. Dieser @import ist also ein bewusster
+    Vorschau-Kompromiss, keine Kursänderung bei der Produktionsempfehlung.
+  */
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    /* Exakt aus divrebound_ci_v2.html übernommen */
+    --teal-deep:#0F2240; --teal-mid:#1A3A6B; --teal-light:#E8EEF7;
+    --gold:#00B4D8; --gold-light:#E0F7FC;
+    --bg:#F2F4F7; --surface:#FFFFFF;
+    --charcoal:#111827; --muted:#6B7C93; --stone:#AAB4C4; --divider:#D8DFE8;
+    --success:#059669; --success-bg:#D1FAE5;
+
+    /* Nicht im CI definiert - eigener Vorschlag für Fehler-/Ablehnungszustände,
+       bewusst in der gleichen warmen, gedämpften Familie wie Gold/Charcoal
+       gehalten statt eines fremden Rot-Tons. Braucht noch euer Go/No-Go,
+       da es eine Ergänzung zur bestehenden Palette ist, keine Ableitung. */
+    --danger:#A8433A; --danger-tint:#F7E9E7;
+
+    --font-display:"DM Serif Display", Georgia, "Times New Roman", serif;
+    --font-body:"DM Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono:"JetBrains Mono", "Courier New", monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{min-height:100%;}
+  body{margin:0;background:#E4E8EE;color:var(--charcoal);font-family:var(--font-body);padding:24px 0;}
+
+  /* ---------- App-Rahmen: Sidebar + Inhalt ---------- */
+  .app-shell{
+    display:flex;
+    min-height:calc(100vh - 48px);
+    max-width:1280px;
+    margin:0 auto;
+    background:#fff;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 8px 30px rgba(15,34,64,.14), 0 0 0 1px var(--divider);
+  }
+
+  .sidebar{
+    width:250px; flex-shrink:0;
+    background:var(--teal-deep);
+    color:#fff;
+    padding:20px 16px;
+    display:flex; flex-direction:column; gap:22px;
+  }
+  .sidebar-brand{display:flex;align-items:center;gap:10px;}
+  .sidebar-wordmark{font-family:var(--font-display);font-size:17px;letter-spacing:.01em;}
+  .sidebar-wordmark span{color:var(--gold);}
+
+  .sidebar-actions{display:flex;flex-direction:column;gap:8px;}
+  .sidebar-btn{
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
+    color:#fff; font-family:var(--font-body); font-size:12.5px; font-weight:600;
+    padding:9px 12px; border-radius:8px; cursor:pointer; text-align:left;
+  }
+  .sidebar-btn:hover{background:rgba(255,255,255,.16);}
+
+  .sidebar-divider{height:1px;background:rgba(255,255,255,.15);}
+
+  .sidebar-section{display:flex;flex-direction:column;gap:6px;}
+  .sidebar-section-title{
+    font-size:10.5px; text-transform:uppercase; letter-spacing:.07em;
+    color:rgba(255,255,255,.55); font-weight:700; margin-bottom:2px;
+  }
+  .sidebar-link{
+    font-size:13px; color:rgba(255,255,255,.9); text-decoration:none;
+    padding:6px 8px; border-radius:6px; display:block; cursor:pointer;
+  }
+  .sidebar-link:hover{background:rgba(255,255,255,.1);}
+  .sidebar-new{
+    display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700;
+    color:var(--gold); padding:6px 8px; border-radius:6px; cursor:pointer;
+  }
+  .sidebar-new:hover{background:rgba(255,255,255,.1);}
+
+  .icon{width:14px;height:14px;flex-shrink:0;}
+  details.nav-country{margin-bottom:2px;}
+  details.nav-country > summary{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;list-style:none;color:#fff;}
+  details.nav-country > summary::-webkit-details-marker{display:none;}
+  details.nav-country > summary:hover{background:rgba(255,255,255,.08);}
+  details.nav-country .chevron{transition:transform .15s ease;}
+  details.nav-country[open] .chevron{transform:rotate(90deg);}
+  details.nav-country.disabled > summary{color:rgba(255,255,255,.35);cursor:default;}
+  details.nav-country.disabled > summary:hover{background:none;}
+  .tree-stub-tag{margin-left:auto;font-size:9.5px;background:rgba(255,255,255,.12);padding:2px 6px;border-radius:99px;font-weight:600;}
+
+  .nav-case-group{margin-left:8px;padding-left:14px;border-left:1.5px solid rgba(255,255,255,.15);}
+  details.nav-case{margin-bottom:1px;}
+  details.nav-case > summary{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;font-size:12.5px;color:rgba(255,255,255,.85);cursor:pointer;list-style:none;}
+  details.nav-case > summary::-webkit-details-marker{display:none;}
+  details.nav-case > summary:hover{background:rgba(255,255,255,.08);}
+  details.nav-case.active > summary{background:rgba(0,180,216,.16);color:var(--gold);font-weight:600;}
+  details.nav-case .chevron{transition:transform .15s ease;width:12px;height:12px;opacity:.6;}
+  details.nav-case[open] .chevron{transform:rotate(90deg);}
+
+  .nav-steps{margin-left:20px;padding-left:12px;border-left:1.5px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:1px;}
+  .nav-step{display:flex;align-items:center;gap:7px;padding:4px 8px;border-radius:6px;font-size:12px;color:rgba(255,255,255,.55);cursor:pointer;}
+  .nav-step:hover{background:rgba(255,255,255,.06);}
+  .nav-step.current{color:#fff;font-weight:600;}
+  .nav-step.current .icon{color:var(--gold);}
+  .nav-step.done .icon{color:var(--success);}
+
+  /* ---------- Content-Bereich ---------- */
+  .content{flex:1;min-width:0;padding:24px;overflow-x:hidden;}
+  .content-header{margin-bottom:18px;}
+  .content-title{font-family:var(--font-display);font-size:22px;color:var(--charcoal);margin:0 0 4px 0;}
+  .content-breadcrumb{font-size:12px;color:var(--muted);}
+  .content-breadcrumb b{color:var(--teal-deep);}
+
+  /* ---------- Wiederverwendete Komponenten aus der Positions-/Jahresübersicht ---------- */
+  .upload-btn{font-size:12.5px;background:var(--gold);color:var(--charcoal);border:none;padding:9px 16px;border-radius:9px;cursor:pointer;font-weight:700;font-family:var(--font-body);}
+  .upload-btn:hover{background:#0090AD;}
+  .dropzone{border:2px dashed var(--teal-deep);border-radius:12px;padding:18px;text-align:center;color:var(--teal-deep);font-size:12.5px;background:#fff;margin-bottom:18px;cursor:pointer;transition:background .15s ease, border-color .15s ease;}
+  .dropzone:hover{background:var(--teal-light);}
+  .dropzone.dragover{background:var(--teal-light);border-color:var(--gold);border-style:solid;}
+  .dropzone .dz-icon{font-size:20px;margin-bottom:4px;}
+  .dropzone .dz-main{font-weight:700;color:var(--teal-deep);}
+  .dropzone .dz-sub{color:var(--muted);font-size:11px;margin-top:3px;}
+  .dropzone input[type="file"]{display:none;}
+  .topbar-row{display:flex;justify-content:flex-end;margin-bottom:10px;}
+
+  .card{background:#fff;border:1px solid var(--divider);border-radius:14px;margin-bottom:18px;overflow:hidden;}
+  .card-head{padding:13px 18px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;}
+  .card-head.head-danger{background:var(--danger);border-bottom:none;}
+  .card-head.head-danger .card-title{color:#fff;}
+  .card-head.head-danger .count-pill{background:rgba(255,255,255,.25);color:#fff;}
+
+  .issues-summary{border:1px solid var(--danger);border-radius:12px;margin-bottom:18px;overflow:hidden;background:#fff;}
+  .issues-summary > summary{
+    display:flex;align-items:center;gap:9px;padding:12px 16px;cursor:pointer;list-style:none;
+    font-size:12.5px;font-weight:600;color:var(--charcoal);background:var(--danger-tint);
+  }
+  .issues-summary > summary::-webkit-details-marker{display:none;}
+  .issues-summary > summary:hover{background:#f2d9d6;}
+  .issues-summary .chevron{width:14px;height:14px;color:var(--muted);transition:transform .15s ease;flex-shrink:0;}
+  .issues-summary[open] .chevron{transform:rotate(90deg);}
+  .issues-icon{color:var(--danger);}
+  .issues-sub{color:var(--muted);font-weight:400;margin-left:auto;font-size:11.5px;}
+  .issues-body{border-top:1px solid var(--divider);}
+  .card-head.head-gold{background:var(--gold);border-bottom:none;}
+  .card-head.head-gold .card-title{color:var(--charcoal);}
+  .card-head.head-gold .count-pill{background:rgba(255,255,255,.4);color:var(--charcoal);}
+  .card-head.head-teal{background:var(--teal-deep);border-bottom:none;}
+  .card-head.head-teal .card-title{color:#fff;}
+  .card-head.head-teal .count-pill{background:rgba(255,255,255,.18);color:#fff;}
+  .card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--teal-deep);}
+  .count-pill{font-size:11.5px;padding:3px 10px;border-radius:99px;font-weight:600;}
+  .pill-danger{background:var(--danger-tint);color:var(--danger);}
+  .pill-ok{background:var(--success-bg);color:var(--success);}
+  .pill-dupe{background:var(--gold-light);color:#007A9E;}
+
+  .flag-item{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:12px 18px;border-top:1px solid rgba(0,0,0,.04);}
+  .flag-item:first-child{border-top:none;}
+  .flag-item.rejected{background:#fff;}
+  .flag-item.dupe{background:#fff;}
+  .flag-icon{font-size:16px;}
+  .rejected .flag-icon{color:var(--danger);}
+  .dupe .flag-icon{color:#007A9E;}
+  .flag-file{font-size:12.5px;font-weight:600;}
+  .flag-reason.rejected-text{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .flag-reason.dupe-text{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .flag-meta{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);text-align:right;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  thead th{text-align:left;padding:9px 10px;background:var(--bg);color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid var(--divider);}
+
+  .th-tip{position:relative;border-bottom:1px dotted var(--muted);cursor:help;}
+  .th-tip-bubble{
+    position:absolute;top:calc(100% + 9px);left:0;width:200px;
+    background:var(--charcoal);color:#fff;
+    font-family:var(--font-body);font-size:11px;font-weight:400;text-transform:none;letter-spacing:normal;line-height:1.45;
+    padding:9px 11px;border-radius:8px;box-shadow:0 6px 18px rgba(26,37,38,.25);
+    opacity:0;visibility:hidden;transform:translateY(-4px);
+    transition:opacity .15s ease, transform .15s ease;z-index:50;
+  }
+  .th-tip-bubble::after{content:"";position:absolute;bottom:100%;left:14px;border:5px solid transparent;border-bottom-color:var(--charcoal);}
+  .th-tip:hover .th-tip-bubble{opacity:1;visibility:visible;transform:translateY(0);}
+  tbody td{padding:9px 10px;border-bottom:1px solid var(--divider);vertical-align:middle;}
+  .year-row td{background:transparent;color:var(--teal-deep);font-weight:600;font-size:12.5px;padding:10px 10px 6px 10px;border-bottom:1px solid var(--divider);}
+  .dupe-row{border-left:3px solid var(--gold);}
+  .dist-row:hover{background:var(--bg);}
+  .dupe-row:hover{background:var(--bg);}
+  .subtotal-row td{font-weight:600;background:transparent;border-top:1px solid var(--divider);font-size:12.5px;color:var(--muted);text-align:right;}
+  .subtotal-row td:first-child{text-align:left;}
+  .total-row td{font-weight:700;background:transparent;border-top:2px solid var(--teal-deep);font-size:12.5px;color:var(--charcoal);text-align:right;}
+  .total-row td:first-child{text-align:left;}
+  .mono{font-family:var(--font-mono);}
+  .editable{border:1px solid transparent;border-radius:5px;padding:3px 0 3px 5px;background:transparent;font-family:var(--font-mono);font-size:12.5px;color:var(--charcoal);width:100%;text-align:right;}
+  tbody td:nth-child(4), tbody td:nth-child(5), tbody td:nth-child(6), tbody td:nth-child(7){text-align:right;}
+  thead th:nth-child(3), thead th:nth-child(4), thead th:nth-child(5), thead th:nth-child(6), thead th:nth-child(7){text-align:right;}
+  .editable:hover,.editable:focus{border-color:var(--teal-deep);background:#fff;outline:none;}
+  .date-input{min-width:98px;}
+  .computed-cell{font-family:var(--font-mono);color:var(--muted);}
+  .refund-cell{font-family:var(--font-mono);font-weight:500;color:var(--charcoal);}
+  .badge{font-size:10px;padding:3px 7px;border-radius:99px;font-weight:600;white-space:nowrap;}
+  .badge-extracted{background:var(--bg);color:var(--muted);border:1px solid var(--divider);}
+  .badge-confirmed{background:var(--success-bg);color:var(--success);}
+  .badge-dupe{background:var(--gold-light);color:#007A9E;}
+  .row-actions{display:flex;gap:6px;}
+  .icon-btn{width:24px;height:24px;border-radius:6px;border:1px solid var(--divider);background:#fff;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;color:var(--teal-deep);}
+  .icon-btn:hover{background:var(--teal-light);}
+  .confirm-check{width:16px;height:16px;accent-color:var(--teal-deep);cursor:pointer;}
+
+  .info-banner{margin:18px 18px 16px 18px;padding:14px 16px;background:var(--gold-light);border:1px solid var(--gold);border-radius:10px;font-size:12px;color:#007A9E;display:flex;gap:10px;}
+  .info-banner b{color:#007A9E;}
+  .info-banner .icon{font-size:15px;flex-shrink:0;}
+
+  .refund-banner{margin:18px 18px 18px 18px;padding:18px 20px;background:var(--teal-deep);border-radius:12px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+  .refund-banner .label{font-size:12px;opacity:.85;}
+  .refund-banner .amount-dkk{font-size:30px;font-weight:700;font-family:var(--font-mono);line-height:1.1;}
+  .refund-banner .amount-eur{font-size:14px;opacity:.8;font-family:var(--font-mono);margin-top:2px;}
+  .refund-banner .sub{font-size:10.5px;opacity:.7;margin-top:6px;}
+  .refund-banner .formula{font-size:11px;background:rgba(255,255,255,.12);padding:8px 12px;border-radius:8px;font-family:var(--font-mono);}
+  .refund-banner.zero{background:var(--muted);}
+
+  .limitation-ok{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:var(--success);font-weight:600;white-space:nowrap;}
+
+  .bottom-bar{display:flex;align-items:center;justify-content:space-between;margin-top:22px;flex-wrap:wrap;gap:12px;}
+  .progress-text{font-size:12.5px;color:var(--muted);}
+  .progress-text b{color:var(--teal-deep);}
+  .next-btn{background:var(--teal-deep);color:#fff;border:none;padding:11px 22px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+  .next-btn:disabled{background:var(--stone);cursor:not-allowed;}
+  .next-btn:not(:disabled):hover{background:var(--teal-deep);}
+
+  /* ---------- Responsive: schmale Einbettung / Mobilgerät ---------- */
+  @media (max-width: 760px){
+    .app-shell{flex-direction:column;max-width:100%;}
+    .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px 14px;gap:12px;}
+    .sidebar-actions{flex-direction:row;}
+    .sidebar-section{display:none;} /* Aktivitäten-Baum auf Mobil zunächst eingeklappt/versteckt */
+    .sidebar-divider{display:none;}
+    .content{padding:16px;}
+    table{font-size:11px;}
+    thead th{padding:6px 6px;}
+    tbody td{padding:6px 6px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ================= SIDEBAR ================= -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div style="width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,0.13);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M4 8L9.5 15" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M9.5 15L19 5" stroke="#00B4D8" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M13.5 5H19V10.5" stroke="#00B4D8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="sidebar-wordmark">Div<span>Rebound</span></div>
+    </div>
+
+    <div class="sidebar-actions">
+      <button class="sidebar-btn" onclick="alert('Öffnet Datei-Dialog zum Import einer .divrebound.json')">📂 Bearbeitung laden</button>
+      <button class="sidebar-btn" onclick="alert('Exportiert aktuellen Stand als verschlüsselte .divrebound.json')">💾 Bearbeitung speichern</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Nutzer</div>
+      <a class="sidebar-link">Persönliche Daten</a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Quellensteuer</div>
+      <div class="sidebar-new">＋ Neuer DivRebound</div>
+
+      <details class="nav-country" open>
+        <summary>
+          <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          Dänemark
+        </summary>
+        <div class="nav-case-group">
+          <details class="nav-case active" open>
+            <summary>
+              <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              DivRebound 07/2026
+            </summary>
+            <div class="nav-steps">
+              <div class="nav-step current">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/></svg>
+                Schritt 1: Wohnsitzbescheinigung
+              </div>
+              <div class="nav-step todo">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Schritt 2: SKAT-Portal
+              </div>
+            </div>
+          </details>
+          <details class="nav-case">
+            <summary>
+              <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              DivRebound 12/2024
+            </summary>
+            <div class="nav-steps">
+              <div class="nav-step done">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Schritt 1: Wohnsitzbescheinigung
+              </div>
+              <div class="nav-step done">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Schritt 2: SKAT-Portal
+              </div>
+            </div>
+          </details>
+        </div>
+      </details>
+
+      <details class="nav-country disabled">
+        <summary>
+          <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          Schweiz
+          <span class="tree-stub-tag">bald</span>
+        </summary>
+      </details>
+      <details class="nav-country disabled">
+        <summary>
+          <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          Italien
+          <span class="tree-stub-tag">bald</span>
+        </summary>
+      </details>
+    </div>
+  </div>
+
+  <!-- ================= CONTENT ================= -->
+  <div class="content">
+    <div class="content-header">
+      <div class="content-breadcrumb">Dänemark <b>›</b> DivRebound 07/2026 <b>›</b> Schritt 1</div>
+      <h1 class="content-title">Positions-/Jahresübersicht</h1>
+    </div>
+
+    <div class="topbar-row">
+      <button class="upload-btn" onclick="document.getElementById('file-input').click()">＋ Weitere Abrechnung(en) hochladen</button>
+    </div>
+    <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" multiple accept="application/pdf" onchange="handleFiles(this.files)">
+      <div class="dz-icon">⬆</div>
+      <div class="dz-main">…oder Dividendenabrechnung(en) hierher ziehen</div>
+      <div class="dz-sub">PDF · Mehrfachauswahl möglich · z.B. mehrere Jahre oder mehrere Aktien auf einmal</div>
+    </div>
+
+    <!-- Hinweise zu Dateien: eine Zeile, Details erst auf Klick -->
+    <details class="issues-summary">
+      <summary>
+        <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span class="issues-icon">⚠</span>
+        <span>3 Hinweise zu Ihren Dateien</span>
+        <span class="issues-sub">2 nicht übernommen · 1 ggf. bereits beantragt</span>
+      </summary>
+      <div class="issues-body">
+        <div class="flag-item dupe">
+          <span class="flag-icon">↺</span>
+          <div>
+            <div class="flag-file">Wertpapier-ereignis_20260401_dk0062498333_63833752.pdf</div>
+            <div class="flag-reason dupe-text">Gleiche ISIN, Zahltag und Betrag bereits im Fall „Dänemark – Steuerjahr 2026" erfasst (eingereicht 02.05.2026). Bitte prüfen, ob diese Abrechnung schon eingereicht wurde.</div>
+          </div>
+          <span class="flag-meta">DK0062498333</span>
+        </div>
+        <div class="flag-item rejected">
+          <span class="flag-icon">✕</span>
+          <div>
+            <div class="flag-file">Dividendengutschrift_20_St_A1JJES_CALIDA_HLDG…pdf</div>
+            <div class="flag-reason rejected-text">ISIN beginnt mit <span class="mono">CH</span>, nicht <span class="mono">DK</span>.</div>
+          </div>
+          <span class="flag-meta">CH0126639464</span>
+        </div>
+        <div class="flag-item rejected">
+          <span class="flag-icon">✕</span>
+          <div>
+            <div class="flag-file">Wertpapier-ereignis_…US5801351017_….pdf</div>
+            <div class="flag-reason rejected-text">ISIN beginnt mit <span class="mono">US</span>, nicht <span class="mono">DK</span>.</div>
+          </div>
+          <span class="flag-meta">US5801351017</span>
+        </div>
+      </div>
+    </details>
+
+    <!-- Erfasste Ausschüttungen -->
+    <div class="card">
+      <div class="card-head head-teal">
+        <span class="card-title">Erfasste Ausschüttungen — Dänemark</span>
+        <span class="count-pill pill-ok">3 übernommen · 2 Steuerjahre</span>
+      </div>
+
+      <div style="overflow-x:auto;">
+      <table id="dist-table" style="min-width:920px;">
+        <colgroup>
+          <col style="width:28px;"><col style="width:160px;"><col style="width:110px;">
+          <col style="width:55px;"><col style="width:100px;"><col style="width:110px;">
+          <col style="width:100px;"><col style="width:150px;"><col style="width:40px;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th style="width:28px;"><input type="checkbox" class="confirm-check" id="select-all" onchange="toggleAll(this)" title="Alle auswählen/abwählen"></th>
+            <th>ISIN / Emittent</th>
+            <th>Zahltag</th>
+            <th>Stück</th>
+            <th>
+              <span class="th-tip">Dividende brutto (DKK)
+                <span class="th-tip-bubble">Die ausgeschüttete Dividende in dänischen Kronen, vor Abzug jeglicher Steuern.</span>
+              </span>
+            </th>
+            <th>
+              <span class="th-tip">Quellensteuer (DKK)
+                <span class="th-tip-bubble">27&nbsp;% dänische Quellensteuer, meist berechnet statt direkt aus dem PDF gelesen.</span>
+              </span>
+            </th>
+            <th>
+              <span class="th-tip">Erstattbar (DKK)
+                <span class="th-tip-bubble">Differenz zwischen einbehaltener Quellensteuer (27&nbsp;%) und dem zulässigen Steuersatz (15&nbsp;%) laut DBA.</span>
+              </span>
+            </th>
+            <th title="Zeigt einen Hinweis, sobald die 3-Jahres-Verjährungsfrist bald abläuft. Ohne Hinweis: unkritisch.">Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="year-row"><td colspan="9">Steuerjahr 2025</td></tr>
+          <tr class="dist-row" data-year="2025">
+            <td><input type="checkbox" class="confirm-check row-check" onchange="updateAll()"></td>
+            <td><div style="font-weight:600;">Novo-Nordisk AS</div><div class="mono" style="font-size:10.5px;color:var(--muted);">DK0062498333</div></td>
+            <td><input class="editable mono date-input" value="01.04.2025"></td>
+            <td><input class="editable mono" value="60"></td>
+            <td><input class="editable mono gross-input" value="474,00" oninput="updateAll()"></td>
+            <td class="computed-cell withheld-cell">127,98</td>
+            <td class="refund-cell refund-cell-val">56,88</td>
+            <td><span class="badge badge-confidence badge-extracted" data-default-text="automatisch erkannt" data-default-class="badge-extracted">automatisch erkannt</span></td>
+            <td><button class="icon-btn" title="Weitere Optionen" onclick="alert('Original ansehen / Entfernen')">⋮</button></td>
+          </tr>
+          <tr class="dist-row" data-year="2025">
+            <td><input type="checkbox" class="confirm-check row-check" onchange="updateAll()"></td>
+            <td><div style="font-weight:600;">Novo-Nordisk AS</div><div class="mono" style="font-size:10.5px;color:var(--muted);">DK0062498333</div></td>
+            <td><input class="editable mono date-input" value="19.08.2025"></td>
+            <td><input class="editable mono" value="100"></td>
+            <td><input class="editable mono gross-input" value="375,00" oninput="updateAll()"></td>
+            <td class="computed-cell withheld-cell">101,25</td>
+            <td class="refund-cell refund-cell-val">45,00</td>
+            <td><span class="badge badge-confidence badge-extracted" data-default-text="automatisch erkannt" data-default-class="badge-extracted">automatisch erkannt</span></td>
+            <td><button class="icon-btn" title="Weitere Optionen" onclick="alert('Original ansehen / Entfernen')">⋮</button></td>
+          </tr>
+          <tr class="subtotal-row" data-subtotal-year="2025">
+            <td colspan="4">Zwischensumme 2025</td>
+            <td class="mono subtotal-gross">849,00</td>
+            <td class="mono subtotal-withheld">229,23</td>
+            <td class="mono subtotal-refund">101,88</td>
+            <td colspan="2"></td>
+          </tr>
+
+          <tr class="year-row"><td colspan="9">Steuerjahr 2026</td></tr>
+          <tr class="dist-row dupe-row" data-year="2026" title="Möglicherweise bereits in einem früheren Antrag verwendet — siehe Hinweis oben">
+            <td><input type="checkbox" class="confirm-check row-check" onchange="updateAll()"></td>
+            <td><div style="font-weight:600;">Novo-Nordisk AS</div><div class="mono" style="font-size:10.5px;color:var(--muted);">DK0062498333</div></td>
+            <td><input class="editable mono date-input" value="31.03.2026"></td>
+            <td><input class="editable mono" value="100"></td>
+            <td><input class="editable mono gross-input" value="795,00" oninput="updateAll()"></td>
+            <td class="computed-cell withheld-cell">214,65</td>
+            <td class="refund-cell refund-cell-val">95,40</td>
+            <td><span class="badge badge-confidence badge-dupe" data-default-text="⚠ bereits beantragt?" data-default-class="badge-dupe">⚠ bereits beantragt?</span></td>
+            <td><button class="icon-btn" title="Weitere Optionen" onclick="alert('Original ansehen / Entfernen')">⋮</button></td>
+          </tr>
+          <tr class="subtotal-row" data-subtotal-year="2026">
+            <td colspan="4">Zwischensumme 2026</td>
+            <td class="mono subtotal-gross">795,00</td>
+            <td class="mono subtotal-withheld">214,65</td>
+            <td class="mono subtotal-refund">95,40</td>
+            <td colspan="2"></td>
+          </tr>
+
+          <tr class="total-row">
+            <td colspan="4">Gesamt</td>
+            <td class="mono" id="total-gross">1.644,00</td>
+            <td class="mono" id="total-withheld">443,88</td>
+            <td class="mono" id="total-refund">197,28</td>
+            <td colspan="2"></td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="refund-banner zero" id="refund-banner">
+        <div>
+          <div class="label" id="refund-label">Voraussichtliche Erstattung (Schätzung)</div>
+          <div class="amount-dkk"><span id="refund-dkk">0,00</span> DKK</div>
+          <div class="amount-eur">≈ <span id="refund-eur">0,00</span> EUR</div>
+          <div class="sub" id="refund-sub"></div>
+        </div>
+        <div class="formula">Brutto × (27% − 15% DBA)</div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="progress-text"><b id="confirmed-count">0</b> von <b id="total-count">3</b> Ausschüttungen bestätigt <span style="opacity:.75;">— nicht ausgewählte Ausschüttungen werden vorerst nicht eingereicht.</span></div>
+      <button class="next-btn" id="next-btn" disabled onclick="alert('Weiter zu: fehlende Pflichtdaten (Geburtsdatum, Geburtsort, Steuer-ID)')">
+        Weiter →
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const WITHHOLDING_RATE = 0.27;
+const TREATY_RATE = 0.15;
+const APPROX_EUR_DKK_RATE = 7.46;
+
+function parseDeNumber(str){ return parseFloat(str.replace(/\./g,'').replace(',','.')) || 0; }
+function formatDeNumber(num){ return num.toLocaleString('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+function toggleAll(masterCheckbox){
+  document.querySelectorAll('.row-check').forEach(cb => cb.checked = masterCheckbox.checked);
+  updateAll();
+}
+
+function updateAll(){
+  document.querySelectorAll('.dist-row').forEach(row => {
+    const gross = parseDeNumber(row.querySelector('.gross-input').value);
+    row.querySelector('.withheld-cell').textContent = formatDeNumber(gross * WITHHOLDING_RATE);
+    row.querySelector('.refund-cell-val').textContent = formatDeNumber(gross * (WITHHOLDING_RATE - TREATY_RATE));
+  });
+
+  let grandGross=0, grandWithheld=0, grandRefund=0;
+  ['2025','2026'].forEach(year => {
+    let yGross=0, yWithheld=0, yRefund=0;
+    document.querySelectorAll(`.dist-row[data-year="${year}"]`).forEach(row=>{
+      const gross = parseDeNumber(row.querySelector('.gross-input').value);
+      yGross += gross; yWithheld += gross*WITHHOLDING_RATE; yRefund += gross*(WITHHOLDING_RATE-TREATY_RATE);
+    });
+    const sub = document.querySelector(`.subtotal-row[data-subtotal-year="${year}"]`);
+    if(sub){
+      sub.querySelector('.subtotal-gross').textContent = formatDeNumber(yGross);
+      sub.querySelector('.subtotal-withheld').textContent = formatDeNumber(yWithheld);
+      sub.querySelector('.subtotal-refund').textContent = formatDeNumber(yRefund);
+    }
+    grandGross+=yGross; grandWithheld+=yWithheld; grandRefund+=yRefund;
+  });
+  document.getElementById('total-gross').textContent = formatDeNumber(grandGross);
+  document.getElementById('total-withheld').textContent = formatDeNumber(grandWithheld);
+  document.getElementById('total-refund').textContent = formatDeNumber(grandRefund);
+
+  let selRefund = 0, selectedCount = 0;
+  document.querySelectorAll('.dist-row').forEach(row => {
+    if(row.querySelector('.row-check').checked){
+      selectedCount++;
+      const gross = parseDeNumber(row.querySelector('.gross-input').value);
+      selRefund += gross * (WITHHOLDING_RATE - TREATY_RATE);
+    }
+  });
+  const banner = document.getElementById('refund-banner');
+  document.getElementById('refund-dkk').textContent = formatDeNumber(selRefund);
+  document.getElementById('refund-eur').textContent = formatDeNumber(selRefund / APPROX_EUR_DKK_RATE);
+  if(selectedCount === 0){
+    banner.classList.add('zero');
+    document.getElementById('refund-sub').textContent = '';
+  } else {
+    banner.classList.remove('zero');
+    document.getElementById('refund-sub').textContent = '';
+  }
+
+  const total = document.querySelectorAll('.row-check').length;
+  const confirmed = document.querySelectorAll('.row-check:checked').length;
+  document.getElementById('confirmed-count').textContent = confirmed;
+  document.getElementById('next-btn').disabled = confirmed < 1;
+  document.querySelectorAll('.row-check').forEach(cb=>{
+    const badge = cb.closest('tr').querySelector('.badge-confidence');
+    if(badge){
+      if(cb.checked){
+        badge.textContent = 'bestätigt';
+        badge.className = 'badge badge-confidence badge-confirmed';
+      } else {
+        badge.textContent = badge.dataset.defaultText;
+        badge.className = 'badge badge-confidence ' + badge.dataset.defaultClass;
+      }
+    }
+  });
+  document.getElementById('select-all').checked = confirmed === total;
+}
+
+function handleFiles(fileList){
+  if(!fileList || fileList.length === 0) return;
+  const names = Array.from(fileList).map(f => f.name).join('\n');
+  alert(`${fileList.length} Datei(en) empfangen, Extraktion würde jetzt starten:\n\n${names}`);
+}
+
+const dropzone = document.getElementById('dropzone');
+['dragenter','dragover'].forEach(evt => dropzone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); dropzone.classList.add('dragover'); }));
+['dragleave','drop'].forEach(evt => dropzone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('dragover'); }));
+dropzone.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+
+updateAll();
+</script>
+
+</body>
+</html>
