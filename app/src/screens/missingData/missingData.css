@@ -1,0 +1,104 @@
+/* Screen-spezifische Ergänzungen für "Fehlende Angaben ergänzen"
+   (#/dk/:caseId/step1/missing-data). Alles, was schon über style/base.css
+   abgedeckt ist (.card, .card-head.head-navy, .card-title, .count-pill,
+   .btn-primary/.btn-secondary/.btn-accent, .info-banner, .field-row/-label/
+   -hint/-input/-error, .badge/.badge-confirmed/.badge-dupe, .mono), wird hier
+   NICHT wiederholt. Eigene Klassen mit "md-"-Präfix (missingData), damit sie
+   nicht mit generisch benannten Klassen anderer Screens kollidieren. */
+
+/* Head-Variante "gold" aus dem Mockup (--gold -> --cyan gemäß CI-Umbenennung) -
+   in base.css gibt es bislang nur .head-navy. */
+#divrebound-app .card-head.head-cyan {
+  background: var(--cyan);
+}
+#divrebound-app .card-head.head-cyan .card-title {
+  color: var(--charcoal);
+}
+#divrebound-app .card-head.head-cyan .count-pill {
+  background: rgba(255, 255, 255, 0.4);
+  color: var(--charcoal);
+}
+
+/* count-pill auf dunklem head-navy-Hintergrund braucht helle Farben -
+   base.css definiert das bislang nicht mit. */
+#divrebound-app .card-head.head-navy .count-pill {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* "Aus den Abrechnungen übernommen": Zeile mit editierbarem, unauffälligem
+   Inline-Feld + Quellen-Badge, plus optionaler Profil-Abweichungs-Hinweis. */
+#divrebound-app .md-known-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--divider);
+}
+#divrebound-app .md-known-row:last-child {
+  border-bottom: none;
+}
+#divrebound-app .md-known-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 3px;
+}
+#divrebound-app .md-known-input {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 4px 7px;
+  background: transparent;
+  font-size: 13.5px;
+  color: var(--charcoal);
+  width: 100%;
+  font-weight: 600;
+}
+#divrebound-app .md-known-input:hover,
+#divrebound-app .md-known-input:focus {
+  border-color: var(--navy);
+  background: #fff;
+  outline: none;
+}
+#divrebound-app .md-profile-diff {
+  font-size: 11px;
+  color: var(--muted);
+  margin: -4px 0 9px 0;
+  padding-left: 2px;
+}
+#divrebound-app .md-profile-diff a {
+  color: var(--navy);
+  font-weight: 600;
+}
+
+/* Pflichtfeld-Eingaben: visuelles Feedback gültig/ungültig, ergänzt die reine
+   Fehlertext-Anzeige von .field-error. */
+#divrebound-app .field-input.valid {
+  border-color: var(--success);
+  background: var(--success-bg);
+}
+#divrebound-app .field-input.invalid {
+  border-color: var(--danger);
+  background: var(--danger-tint);
+}
+
+/* Fußzeile mit "Zurück"-Link und "Weiter"-Button. */
+#divrebound-app .md-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+#divrebound-app .md-back-link {
+  font-size: 12.5px;
+  color: var(--navy);
+  cursor: pointer;
+  text-decoration: none;
+}
+#divrebound-app .md-back-link:hover {
+  text-decoration: underline;
+}

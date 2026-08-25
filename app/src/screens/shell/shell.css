@@ -1,0 +1,334 @@
+/* Screen-spezifische Regeln für die Positions-/Jahresübersicht (Schritt 1,
+   erster Screen). Gemeinsame Klassen (.card, .badge*, table, .mono, ...)
+   kommen aus style/base.css. */
+
+#divrebound-app .topbar-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+#divrebound-app .issues-summary {
+  border: 1px solid var(--danger);
+  border-radius: 12px;
+  margin-bottom: 18px;
+  overflow: hidden;
+  background: #fff;
+}
+#divrebound-app .issues-summary > summary {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 16px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--charcoal);
+  background: var(--danger-tint);
+}
+#divrebound-app .issues-summary > summary::-webkit-details-marker {
+  display: none;
+}
+#divrebound-app .issues-summary > summary:hover {
+  background: #f2d9d6;
+}
+#divrebound-app .issues-summary .chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+#divrebound-app .issues-summary[open] .chevron {
+  transform: rotate(90deg);
+}
+#divrebound-app .issues-icon {
+  color: var(--danger);
+}
+#divrebound-app .issues-sub {
+  color: var(--muted);
+  font-weight: 400;
+  margin-left: auto;
+  font-size: 11.5px;
+}
+#divrebound-app .issues-body {
+  border-top: 1px solid var(--divider);
+}
+
+#divrebound-app .card-head.head-navy {
+  background: var(--navy);
+  border-bottom: none;
+}
+#divrebound-app .card-head.head-navy .card-title {
+  color: #fff;
+}
+#divrebound-app .card-head.head-navy .count-pill {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+#divrebound-app .flag-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 18px;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+#divrebound-app .flag-item:first-child {
+  border-top: none;
+}
+#divrebound-app .flag-icon {
+  font-size: 16px;
+}
+#divrebound-app .rejected .flag-icon {
+  color: var(--danger);
+}
+#divrebound-app .dupe .flag-icon {
+  color: #007a9e;
+}
+#divrebound-app .flag-file {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+#divrebound-app .flag-reason {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+#divrebound-app .flag-meta {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: right;
+}
+
+#divrebound-app .th-tip {
+  position: relative;
+  border-bottom: 1px dotted var(--muted);
+  cursor: help;
+}
+#divrebound-app .th-tip-bubble {
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 0;
+  width: 200px;
+  background: var(--charcoal);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  line-height: 1.45;
+  padding: 9px 11px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(26, 37, 38, 0.25);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 50;
+}
+#divrebound-app .th-tip-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 14px;
+  border: 5px solid transparent;
+  border-bottom-color: var(--charcoal);
+}
+#divrebound-app .th-tip:hover .th-tip-bubble {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+#divrebound-app .year-row td {
+  background: transparent;
+  color: var(--navy);
+  font-weight: 600;
+  font-size: 12.5px;
+  padding: 10px 10px 6px 10px;
+  border-bottom: 1px solid var(--divider);
+}
+#divrebound-app .dupe-row {
+  border-left: 3px solid var(--cyan);
+}
+#divrebound-app .dist-row:hover,
+#divrebound-app .dupe-row:hover {
+  background: var(--bg);
+}
+#divrebound-app .subtotal-row td {
+  font-weight: 600;
+  background: transparent;
+  border-top: 1px solid var(--divider);
+  font-size: 12.5px;
+  color: var(--muted);
+  text-align: right;
+}
+#divrebound-app .subtotal-row td:first-child {
+  text-align: left;
+}
+#divrebound-app .total-row td {
+  font-weight: 700;
+  background: transparent;
+  border-top: 2px solid var(--navy);
+  font-size: 12.5px;
+  color: var(--charcoal);
+  text-align: right;
+}
+#divrebound-app .total-row td:first-child {
+  text-align: left;
+}
+#divrebound-app .editable {
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 3px 0 3px 5px;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--charcoal);
+  width: 100%;
+  text-align: right;
+}
+#divrebound-app #dist-table tbody td:nth-child(4),
+#divrebound-app #dist-table tbody td:nth-child(5),
+#divrebound-app #dist-table tbody td:nth-child(6),
+#divrebound-app #dist-table tbody td:nth-child(7) {
+  text-align: right;
+}
+#divrebound-app #dist-table thead th:nth-child(3),
+#divrebound-app #dist-table thead th:nth-child(4),
+#divrebound-app #dist-table thead th:nth-child(5),
+#divrebound-app #dist-table thead th:nth-child(6),
+#divrebound-app #dist-table thead th:nth-child(7) {
+  text-align: right;
+}
+#divrebound-app .editable:hover,
+#divrebound-app .editable:focus {
+  border-color: var(--navy);
+  background: #fff;
+  outline: none;
+}
+#divrebound-app .date-input {
+  min-width: 98px;
+}
+#divrebound-app .computed-cell {
+  font-family: var(--font-mono);
+  color: var(--muted);
+}
+#divrebound-app .refund-cell {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--charcoal);
+}
+#divrebound-app .row-actions {
+  display: flex;
+  gap: 6px;
+}
+#divrebound-app .icon-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid var(--divider);
+  background: #fff;
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--navy);
+}
+#divrebound-app .icon-btn:hover {
+  background: var(--navy-light);
+}
+#divrebound-app .confirm-check {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--navy);
+  cursor: pointer;
+}
+
+#divrebound-app .refund-banner {
+  margin: 18px;
+  padding: 18px 20px;
+  background: var(--navy);
+  border-radius: 12px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+#divrebound-app .refund-banner .label {
+  font-size: 12px;
+  opacity: 0.85;
+}
+#divrebound-app .refund-banner .amount-dkk {
+  font-size: 30px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  line-height: 1.1;
+}
+#divrebound-app .refund-banner .amount-eur {
+  font-size: 14px;
+  opacity: 0.8;
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+#divrebound-app .refund-banner .formula {
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+}
+#divrebound-app .refund-banner.zero {
+  background: var(--muted);
+}
+
+#divrebound-app .bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+#divrebound-app .progress-text {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+#divrebound-app .progress-text b {
+  color: var(--navy);
+}
+#divrebound-app .next-btn {
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  padding: 11px 22px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+#divrebound-app .next-btn:disabled {
+  background: var(--stone);
+  cursor: not-allowed;
+}
+
+@media (max-width: 760px) {
+  #divrebound-app table {
+    font-size: 11px;
+  }
+  #divrebound-app thead th {
+    padding: 6px 6px;
+  }
+  #divrebound-app tbody td {
+    padding: 6px 6px;
+  }
+}

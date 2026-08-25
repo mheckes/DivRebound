@@ -1,0 +1,287 @@
+/* Screen-spezifische Regeln für "Zusammenfassung & Download" (Schritt 1,
+   letzter Screen). Aus divrebound_step_summary_download_mockup.html portiert,
+   --teal-.../--gold-... auf die offiziellen CI-Variablen --navy/--cyan umbenannt.
+   Klassen, die bereits in base.css definiert sind (.card, .card-head.head-navy,
+   .card-title, .count-pill, .btn-primary, .info-banner, .mono, table/thead/tbody),
+   werden hier nicht erneut definiert. */
+
+#divrebound-app .summary-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--divider);
+}
+#divrebound-app .summary-row:last-child {
+  border-bottom: none;
+}
+#divrebound-app .summary-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+#divrebound-app .summary-value {
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  text-align: right;
+}
+
+#divrebound-app .empty-hint {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ---------- Ausschüttungstabelle + Erstattungssumme ---------- */
+#divrebound-app .dist-table th:nth-child(n + 3),
+#divrebound-app .dist-table td:nth-child(n + 3) {
+  text-align: right;
+}
+#divrebound-app .dist-total-row td {
+  font-weight: 700;
+  border-top: 2px solid var(--navy);
+  color: var(--charcoal);
+}
+
+#divrebound-app .refund-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: var(--navy-light);
+  border-radius: 10px;
+}
+#divrebound-app .refund-summary-label {
+  font-size: 12px;
+  color: var(--navy);
+  font-weight: 600;
+}
+#divrebound-app .refund-summary-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--navy);
+}
+#divrebound-app .refund-summary-eur {
+  font-weight: 400;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-left: 8px;
+}
+
+/* ---------- Dokument-Erstellung ---------- */
+#divrebound-app .field {
+  margin-bottom: 0;
+}
+#divrebound-app .field label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--charcoal);
+  margin-bottom: 5px;
+}
+#divrebound-app .field .hint {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+#divrebound-app .field input {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1.5px solid var(--divider);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  color: var(--charcoal);
+  background: #fff;
+  transition: border-color 0.15s ease;
+}
+#divrebound-app .field input:focus {
+  outline: none;
+  border-color: var(--navy);
+}
+#divrebound-app .field input:disabled {
+  background: var(--bg);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+#divrebound-app #taxoffice-field {
+  margin-top: 14px;
+  transition: opacity 0.15s ease;
+}
+#divrebound-app #taxoffice-field.disabled-look {
+  opacity: 0.55;
+}
+
+#divrebound-app .toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 14px;
+}
+#divrebound-app .toggle-row input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--navy);
+  cursor: pointer;
+}
+
+#divrebound-app .download-btn {
+  width: 100%;
+  background: var(--cyan);
+  color: var(--charcoal);
+  border: none;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-body);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+#divrebound-app .download-btn:hover:not(:disabled) {
+  background: #0090ad;
+}
+#divrebound-app .download-btn:disabled {
+  background: var(--stone);
+  cursor: not-allowed;
+}
+#divrebound-app .filename-preview {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: center;
+  word-break: break-all;
+}
+
+#divrebound-app .download-status {
+  margin-top: 12px;
+  font-size: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+#divrebound-app .download-status:empty {
+  margin-top: 0;
+  padding: 0;
+}
+#divrebound-app .download-status.loading {
+  background: var(--navy-light);
+  color: var(--navy);
+}
+#divrebound-app .download-status.success {
+  background: var(--success-bg);
+  color: var(--success);
+}
+#divrebound-app .download-status.error {
+  background: var(--danger-tint);
+  color: var(--danger);
+}
+
+#divrebound-app .warning-box {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: var(--cyan-light);
+  border: 1px solid var(--cyan);
+  border-radius: 9px;
+  font-size: 12px;
+  color: #005a78;
+  display: flex;
+  gap: 9px;
+}
+#divrebound-app .warning-box b {
+  color: #007a9e;
+}
+
+/* ---------- Status-Panels ("Nächste Schritte" / "Bearbeitung pausiert") ---------- */
+#divrebound-app .status-panel {
+  background: var(--navy-light);
+  border: 1px solid var(--navy);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+}
+#divrebound-app .status-panel-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+#divrebound-app .status-panel-text {
+  font-size: 12.5px;
+  color: var(--charcoal);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+#divrebound-app .status-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+#divrebound-app .status-btn {
+  background: #fff;
+  color: var(--navy);
+  border: 1.5px solid var(--navy);
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+#divrebound-app .status-btn:hover {
+  background: var(--navy);
+  color: #fff;
+}
+
+#divrebound-app .step-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 12.5px;
+  color: var(--charcoal);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+#divrebound-app .step-row:last-child {
+  margin-bottom: 0;
+}
+#divrebound-app .step-num {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+}
+
+#divrebound-app .back-link {
+  font-size: 12.5px;
+  color: var(--navy);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 14px;
+}
+#divrebound-app .back-link:hover {
+  text-decoration: underline;
+}

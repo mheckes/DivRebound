@@ -1,0 +1,139 @@
+/* Screen-spezifische Regeln für "Persönliche Daten" (#/profile) - Ergänzung zu
+   den Basisklassen aus style/base.css (.card, .card-head, .field-row/-label/
+   -input/-hint/-error, .info-banner, .btn-primary, .mono, ...).
+   Quelle: divrebound_profile_mockup.html, dort --teal-.../--gold-..., hier auf die
+   offiziellen CI-Variablen --navy/--cyan aus tokens.css umbenannt. */
+
+#divrebound-app .card-body {
+  padding: 20px 22px;
+}
+
+/* base.css' .field-row ist als einzelne, volle Zeile gedacht (flex-direction:
+   column). Der Mockup stellt je zwei Felder pro Zeile nebeneinander - dafür
+   dient .field-grid als zusätzlicher Flex-Container, der mehrere .field-row
+   nebeneinander anordnet. */
+#divrebound-app .field-grid {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+#divrebound-app .field-grid:last-child {
+  margin-bottom: 0;
+}
+#divrebound-app .field-grid .field-row {
+  flex: 1;
+  min-width: 150px;
+  margin-bottom: 0;
+}
+#divrebound-app .field-grid .field-row.field-row-wide {
+  flex: 2;
+}
+
+#divrebound-app .field-optional {
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 10.5px;
+}
+
+#divrebound-app .field-input:disabled {
+  background: var(--bg);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+/* Datenschutz-Erklärung als <details>-Aufklapper, unterhalb der Karten. */
+#divrebound-app .help-disclosure {
+  border: 1px solid var(--divider);
+  border-radius: 10px;
+  margin-bottom: 18px;
+  overflow: hidden;
+  background: #fff;
+}
+#divrebound-app .help-disclosure > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--navy);
+  background: var(--navy-light);
+}
+#divrebound-app .help-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+#divrebound-app .help-disclosure > summary:hover {
+  background: #daeaec;
+}
+#divrebound-app .help-disclosure .chevron {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+#divrebound-app .help-disclosure[open] .chevron {
+  transform: rotate(90deg);
+}
+#divrebound-app .help-disclosure .info-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+#divrebound-app .help-disclosure-body {
+  border-top: 1px solid var(--divider);
+  padding: 14px;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+#divrebound-app .help-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+#divrebound-app .help-list li {
+  position: relative;
+  padding-left: 14px;
+  margin-bottom: 7px;
+}
+#divrebound-app .help-list li:last-child {
+  margin-bottom: 0;
+}
+#divrebound-app .help-list li::before {
+  content: "–";
+  position: absolute;
+  left: 0;
+  color: var(--stone);
+}
+
+#divrebound-app .save-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+#divrebound-app .save-hint {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+#divrebound-app .save-status {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--success);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+#divrebound-app .save-status.visible {
+  opacity: 1;
+}
+
+@media (max-width: 760px) {
+  #divrebound-app .save-row {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}

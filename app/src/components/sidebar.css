@@ -1,0 +1,223 @@
+#divrebound-app .sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  background: var(--navy);
+  color: #fff;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+#divrebound-app .sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#divrebound-app .sidebar-wordmark {
+  font-family: var(--font-display);
+  font-size: 17px;
+  letter-spacing: 0.01em;
+}
+#divrebound-app .sidebar-wordmark span {
+  color: var(--cyan);
+}
+#divrebound-app .sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#divrebound-app .sidebar-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 9px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+#divrebound-app .sidebar-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+#divrebound-app .sidebar-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+}
+#divrebound-app .sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#divrebound-app .sidebar-section-title {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+#divrebound-app .sidebar-link {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+  display: block;
+  cursor: pointer;
+}
+#divrebound-app .sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+#divrebound-app .sidebar-new {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cyan);
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+#divrebound-app .sidebar-new:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+#divrebound-app .icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+#divrebound-app details.nav-country {
+  margin-bottom: 2px;
+}
+#divrebound-app details.nav-country > summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  color: #fff;
+}
+#divrebound-app details.nav-country > summary::-webkit-details-marker {
+  display: none;
+}
+#divrebound-app details.nav-country > summary:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+#divrebound-app details.nav-country .chevron {
+  transition: transform 0.15s ease;
+}
+#divrebound-app details.nav-country[open] .chevron {
+  transform: rotate(90deg);
+}
+#divrebound-app details.nav-country.disabled > summary {
+  color: rgba(255, 255, 255, 0.35);
+  cursor: default;
+}
+#divrebound-app .tree-stub-tag {
+  margin-left: auto;
+  font-size: 9.5px;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 2px 6px;
+  border-radius: 99px;
+  font-weight: 600;
+}
+#divrebound-app .nav-case-group {
+  margin-left: 8px;
+  padding-left: 14px;
+  border-left: 1.5px solid rgba(255, 255, 255, 0.15);
+}
+#divrebound-app details.nav-case {
+  margin-bottom: 1px;
+}
+#divrebound-app details.nav-case > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  list-style: none;
+}
+#divrebound-app details.nav-case > summary::-webkit-details-marker {
+  display: none;
+}
+#divrebound-app details.nav-case > summary:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+#divrebound-app details.nav-case.active > summary {
+  background: rgba(0, 180, 216, 0.16);
+  color: var(--cyan);
+  font-weight: 600;
+}
+#divrebound-app details.nav-case .chevron {
+  transition: transform 0.15s ease;
+  width: 12px;
+  height: 12px;
+  opacity: 0.6;
+}
+#divrebound-app details.nav-case[open] .chevron {
+  transform: rotate(90deg);
+}
+#divrebound-app .nav-steps {
+  margin-left: 20px;
+  padding-left: 12px;
+  border-left: 1.5px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+#divrebound-app .nav-step {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+}
+#divrebound-app .nav-step:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+#divrebound-app .nav-step.current {
+  color: #fff;
+  font-weight: 600;
+}
+#divrebound-app .nav-step.current .icon {
+  color: var(--cyan);
+}
+#divrebound-app .nav-step.done .icon {
+  color: var(--success);
+}
+
+@media (max-width: 760px) {
+  #divrebound-app .app-shell {
+    flex-direction: column;
+  }
+  #divrebound-app .sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 12px 14px;
+    gap: 12px;
+  }
+  #divrebound-app .sidebar-actions {
+    flex-direction: row;
+  }
+  #divrebound-app .sidebar-section {
+    display: none;
+  }
+  #divrebound-app .sidebar-divider {
+    display: none;
+  }
+}
