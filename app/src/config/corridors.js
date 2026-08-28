@@ -7,7 +7,11 @@ export const corridors = {
     targetCountry: "DK",
     residencyCountries: ["DE", "AT", "CH"],
     residencyFormId: "02.050",
-    onlinePortalUrl: "https://tastselv.skat.dk/",
+    // Bewusst NICHT die allgemeine SKAT-Login-Seite (die verlangt MitID, das
+    // Nicht-Dänen nicht haben) - dieser Direktlink führt zum Formular ohne
+    // MitID-Zwang, siehe skat.dk (Companies/Foundations > Claiming refund of
+    // Danish dividend tax > "How to claim").
+    onlinePortalUrl: "https://udbytterefusion.skat.dk/SelfService/submission/submit/Skattestyrelsen",
     requiresLogin: false,
     maxDistributionsPerClaim: 20,
     limitationPeriodYears: 3,

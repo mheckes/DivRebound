@@ -13,8 +13,8 @@
 import { getState, setState } from "../../store/store.js";
 import * as profileRepo from "../../db/profileRepo.js";
 import { isValidTin, tinHint } from "../../util/validate.js";
-
-const COUNTRY_LABELS = { DE: "Deutschland", AT: "Österreich", CH: "Schweiz" };
+import { normalizeTaxOffice } from "../../util/taxOffice.js";
+import { confirmedFieldClasses } from "../../util/fieldDisplay.js";
 
 let savedTimeoutId = null;
 
@@ -62,8 +62,34 @@ function infoIcon() {
 function renderForm(container, profile) {
   const r = profile.residence;
   const b = profile.bank;
-  const t = r.taxOffice ?? { name: "", address: "", lastConfirmed: "" };
-  const countryLabel = COUNTRY_LABELS[r.country] ?? r.country;
+  const t = normalizeTaxOffice(r.taxOffice);
+
+  // Alle Felder dieser Seite einheitlich: bei bereits vorhandenem Wert wirkt
+  // das Feld wie reiner Text (siehe util/fieldDisplay.js), bei leerem Wert wie
+  // ein normales, zum Ausfüllen einladendes Eingabefeld - nicht nur bei
+  // Finanzamt, sondern konsistent für die ganze "Persönliche Daten"-Seite.
+  const cls = {
+    firstName: confirmedFieldClasses(r.firstName),
+    lastName: confirmedFieldClasses(r.lastName),
+    birthDate: confirmedFieldClasses(r.birthDate),
+    birthPlace: confirmedFieldClasses(r.birthPlace),
+    country: confirmedFieldClasses(r.country),
+    tin: confirmedFieldClasses(r.tin),
+    address: confirmedFieldClasses(r.address),
+    postalCode: confirmedFieldClasses(r.postalCode),
+    city: confirmedFieldClasses(r.city),
+    email: confirmedFieldClasses(r.email),
+    phone: confirmedFieldClasses(r.phone),
+    bankName: confirmedFieldClasses(b.bankName),
+    accountHolderName: confirmedFieldClasses(b.accountHolderName),
+    bic: confirmedFieldClasses(b.bic),
+    iban: confirmedFieldClasses(b.iban),
+    accountHolderAddress: confirmedFieldClasses(b.accountHolderAddress),
+    taxOfficeName: confirmedFieldClasses(t.name),
+    taxOfficeStreet: confirmedFieldClasses(t.street),
+    taxOfficePostalCode: confirmedFieldClasses(t.postalCode),
+    taxOfficeCity: confirmedFieldClasses(t.city),
+  };
 
   container.innerHTML = `
     <div class="content-header">
@@ -75,61 +101,65 @@ function renderForm(container, profile) {
       <div class="card-body">
         <div class="field-grid">
           <div class="field-row">
-            <label class="field-label">Vorname</label>
-            <input class="field-input" data-field="firstName" value="${esc(r.firstName)}">
+            <label class="${cls.firstName.labelClass}">Vorname</label>
+            <input class="${cls.firstName.inputClass}" data-field="firstName" value="${esc(r.firstName)}">
           </div>
           <div class="field-row">
-            <label class="field-label">Nachname</label>
-            <input class="field-input" data-field="lastName" value="${esc(r.lastName)}">
-          </div>
-        </div>
-        <div class="field-grid">
-          <div class="field-row">
-            <label class="field-label">Geburtsdatum</label>
-            <input class="field-input" type="date" data-field="birthDate" value="${esc(r.birthDate)}">
-          </div>
-          <div class="field-row">
-            <label class="field-label">Geburtsort <span class="field-optional">· wie im Reisepass</span></label>
-            <input class="field-input" data-field="birthPlace" value="${esc(r.birthPlace)}">
+            <label class="${cls.lastName.labelClass}">Nachname</label>
+            <input class="${cls.lastName.inputClass}" data-field="lastName" value="${esc(r.lastName)}">
           </div>
         </div>
         <div class="field-grid">
           <div class="field-row">
-            <label class="field-label">Wohnsitzland</label>
-            <input class="field-input" value="${esc(countryLabel)}" disabled>
-            <span class="field-hint">Hier nicht änderbar - dafür ein neues Profil anlegen.</span>
+            <label class="${cls.birthDate.labelClass}">Geburtsdatum</label>
+            <input class="${cls.birthDate.inputClass}" type="date" data-field="birthDate" value="${esc(r.birthDate)}">
           </div>
           <div class="field-row">
-            <label class="field-label">Steuer-ID (TIN)</label>
-            <input class="field-input mono" data-field="tin" value="${esc(r.tin)}">
+            <label class="${cls.birthPlace.labelClass}">Geburtsort <span class="field-optional">· wie im Reisepass</span></label>
+            <input class="${cls.birthPlace.inputClass}" data-field="birthPlace" value="${esc(r.birthPlace)}">
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field-row">
+            <label class="${cls.country.labelClass}">Wohnsitzland</label>
+            <select class="${cls.country.inputClass}" data-field="country">
+              <option value="DE" ${r.country === "DE" ? "selected" : ""}>Deutschland</option>
+              <option value="AT" ${r.country === "AT" ? "selected" : ""} ${r.country !== "AT" ? "disabled" : ""}>Österreich${r.country !== "AT" ? " (bald)" : ""}</option>
+              <option value="CH" ${r.country === "CH" ? "selected" : ""} ${r.country !== "CH" ? "disabled" : ""}>Schweiz${r.country !== "CH" ? " (bald)" : ""}</option>
+            </select>
+            <span class="field-hint">Aktuell ist nur Deutschland neu auswählbar - weitere Länder folgen.</span>
+          </div>
+          <div class="field-row">
+            <label class="${cls.tin.labelClass}">Steuer-ID (TIN)</label>
+            <input class="${cls.tin.inputClass} mono" data-field="tin" value="${esc(r.tin)}">
             <span class="field-hint" data-tin-hint>${esc(tinHint(r.country))}</span>
             <span class="field-error" data-tin-error hidden></span>
           </div>
         </div>
         <div class="field-grid">
           <div class="field-row field-row-wide">
-            <label class="field-label">Adresse</label>
-            <input class="field-input" data-field="address" value="${esc(r.address)}">
+            <label class="${cls.address.labelClass}">Adresse</label>
+            <input class="${cls.address.inputClass}" data-field="address" value="${esc(r.address)}">
           </div>
         </div>
         <div class="field-grid">
           <div class="field-row">
-            <label class="field-label">Postleitzahl</label>
-            <input class="field-input" data-field="postalCode" value="${esc(r.postalCode)}">
+            <label class="${cls.postalCode.labelClass}">Postleitzahl</label>
+            <input class="${cls.postalCode.inputClass}" data-field="postalCode" value="${esc(r.postalCode)}">
           </div>
           <div class="field-row">
-            <label class="field-label">Ort</label>
-            <input class="field-input" data-field="city" value="${esc(r.city)}">
+            <label class="${cls.city.labelClass}">Ort</label>
+            <input class="${cls.city.inputClass}" data-field="city" value="${esc(r.city)}">
           </div>
         </div>
         <div class="field-grid">
           <div class="field-row">
-            <label class="field-label">Email <span class="field-optional">· optional</span></label>
-            <input class="field-input" data-field="email" value="${esc(r.email ?? "")}">
+            <label class="${cls.email.labelClass}">Email <span class="field-optional">· optional</span></label>
+            <input class="${cls.email.inputClass}" data-field="email" value="${esc(r.email ?? "")}">
           </div>
           <div class="field-row">
-            <label class="field-label">Telefon <span class="field-optional">· optional</span></label>
-            <input class="field-input" data-field="phone" placeholder="inkl. Ländervorwahl" value="${esc(r.phone ?? "")}">
+            <label class="${cls.phone.labelClass}">Telefon <span class="field-optional">· optional</span></label>
+            <input class="${cls.phone.inputClass}" data-field="phone" placeholder="inkl. Ländervorwahl" value="${esc(r.phone ?? "")}">
           </div>
         </div>
       </div>
@@ -140,28 +170,28 @@ function renderForm(container, profile) {
       <div class="card-body">
         <div class="field-grid">
           <div class="field-row">
-            <label class="field-label">Name der Bank</label>
-            <input class="field-input" data-field="bankName" value="${esc(b.bankName)}">
+            <label class="${cls.bankName.labelClass}">Name der Bank</label>
+            <input class="${cls.bankName.inputClass}" data-field="bankName" value="${esc(b.bankName)}">
           </div>
           <div class="field-row">
-            <label class="field-label">Kontoinhaber</label>
-            <input class="field-input" data-field="accountHolderName" value="${esc(b.accountHolderName)}">
+            <label class="${cls.accountHolderName.labelClass}">Kontoinhaber</label>
+            <input class="${cls.accountHolderName.inputClass}" data-field="accountHolderName" value="${esc(b.accountHolderName)}">
           </div>
         </div>
         <div class="field-grid">
           <div class="field-row">
-            <label class="field-label">BIC / SWIFT</label>
-            <input class="field-input mono" data-field="bic" value="${esc(b.bic)}">
+            <label class="${cls.bic.labelClass}">BIC / SWIFT</label>
+            <input class="${cls.bic.inputClass} mono" data-field="bic" value="${esc(b.bic)}">
           </div>
           <div class="field-row">
-            <label class="field-label">IBAN</label>
-            <input class="field-input mono" data-field="iban" value="${esc(b.iban)}">
+            <label class="${cls.iban.labelClass}">IBAN</label>
+            <input class="${cls.iban.inputClass} mono" data-field="iban" value="${esc(b.iban)}">
           </div>
         </div>
         <div class="field-grid">
           <div class="field-row field-row-wide">
-            <label class="field-label">Adresse des Kontoinhabers <span class="field-optional">· optional</span></label>
-            <input class="field-input" data-field="accountHolderAddress" value="${esc(b.accountHolderAddress ?? "")}">
+            <label class="${cls.accountHolderAddress.labelClass}">Adresse des Kontoinhabers <span class="field-optional">· optional</span></label>
+            <input class="${cls.accountHolderAddress.inputClass}" data-field="accountHolderAddress" value="${esc(b.accountHolderAddress ?? "")}">
           </div>
         </div>
         <div class="field-hint">Geben Sie hier ein Konto an, das SEPA-Überweisungen empfangen kann und auf dem Sie Ihre Quellensteuer-Erstattung erhalten wollen.</div>
@@ -173,14 +203,24 @@ function renderForm(container, profile) {
       <div class="card-body">
         <div class="field-grid">
           <div class="field-row field-row-wide">
-            <label class="field-label">Name</label>
-            <input class="field-input" data-field="taxOfficeName" placeholder="z.B. Finanzamt München I" value="${esc(t.name)}">
+            <label class="${cls.taxOfficeName.labelClass}">Name</label>
+            <input class="${cls.taxOfficeName.inputClass}" data-field="taxOfficeName" placeholder="z.B. Finanzamt München I" value="${esc(t.name)}">
           </div>
         </div>
         <div class="field-grid">
           <div class="field-row field-row-wide">
-            <label class="field-label">Adresse</label>
-            <input class="field-input" data-field="taxOfficeAddress" placeholder="z.B. Deroystraße 4, 80335 München" value="${esc(t.address)}">
+            <label class="${cls.taxOfficeStreet.labelClass}">Straße</label>
+            <input class="${cls.taxOfficeStreet.inputClass}" data-field="taxOfficeStreet" placeholder="z.B. Deroystraße 4" value="${esc(t.street)}">
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field-row">
+            <label class="${cls.taxOfficePostalCode.labelClass}">Postleitzahl</label>
+            <input class="${cls.taxOfficePostalCode.inputClass}" data-field="taxOfficePostalCode" placeholder="z.B. 80335" value="${esc(t.postalCode)}">
+          </div>
+          <div class="field-row">
+            <label class="${cls.taxOfficeCity.labelClass}">Ort</label>
+            <input class="${cls.taxOfficeCity.inputClass}" data-field="taxOfficeCity" placeholder="z.B. München" value="${esc(t.city)}">
           </div>
         </div>
       </div>
@@ -213,9 +253,15 @@ function renderForm(container, profile) {
 }
 
 function attachListeners(container, profile) {
-  const country = profile.residence.country;
+  let country = profile.residence.country;
   const tinInput = container.querySelector('[data-field="tin"]');
   const tinError = container.querySelector("[data-tin-error]");
+  const tinHintEl = container.querySelector("[data-tin-hint]");
+  const countrySelect = container.querySelector('[data-field="country"]');
+  // .value explizit setzen statt sich allein auf das HTML-"selected"-Attribut
+  // zu verlassen - bei einem per innerHTML frisch eingefügten <select> wird
+  // die tatsächliche Selektion sonst nicht zuverlässig übernommen.
+  countrySelect.value = country;
 
   function validateTin() {
     const value = tinInput.value.trim();
@@ -230,6 +276,15 @@ function attachListeners(container, profile) {
   tinInput.addEventListener("input", validateTin);
   tinInput.addEventListener("blur", validateTin);
 
+  // Wohnsitzland ist jetzt änderbar (nur Deutschland neu wählbar, siehe
+  // <select> oben) - TIN-Format/-Hinweis hängt vom Land ab, muss also live
+  // mitziehen, wenn hier umgestellt wird.
+  countrySelect.addEventListener("change", () => {
+    country = countrySelect.value;
+    tinHintEl.textContent = tinHint(country);
+    validateTin();
+  });
+
   container.querySelector('[data-action="save"]').addEventListener("click", async () => {
     if (!validateTin()) {
       tinInput.focus();
@@ -243,6 +298,7 @@ function attachListeners(container, profile) {
       ...profile,
       residence: {
         ...profile.residence,
+        country: value("country"),
         firstName: value("firstName"),
         lastName: value("lastName"),
         birthDate: value("birthDate"),
@@ -254,9 +310,10 @@ function attachListeners(container, profile) {
         postalCode: value("postalCode"),
         city: value("city"),
         taxOffice: {
-          ...(profile.residence.taxOffice ?? {}),
           name: value("taxOfficeName"),
-          address: value("taxOfficeAddress"),
+          street: value("taxOfficeStreet"),
+          postalCode: value("taxOfficePostalCode"),
+          city: value("taxOfficeCity"),
         },
       },
       bank: {
@@ -272,6 +329,10 @@ function attachListeners(container, profile) {
     await profileRepo.put(updated);
     setState({ currentProfile: updated });
 
+    // Neu rendern, damit gerade erst befüllte Felder sofort in die
+    // "bestätigt"-Optik wechseln (siehe util/fieldDisplay.js) statt bis zum
+    // nächsten Seitenaufruf wie ein noch leeres Feld auszusehen.
+    render(container);
     showSaved(container);
   });
 }

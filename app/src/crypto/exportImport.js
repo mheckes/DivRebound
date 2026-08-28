@@ -39,6 +39,37 @@ async function deriveKey(passphrase, saltBytes) {
 }
 
 /**
+ * Export OHNE Verschlüsselung - auf ausdrücklichen Nutzerwunsch (siehe
+ * openExportOptionsModal in components/modal.js), weil eine Passphrase leicht
+ * vergessen wird und es dafür keine Wiederherstellung gibt. Die Datei enthält
+ * dann Name/Adresse/Geburtsdatum/Steuer-ID/IBAN im Klartext - der Nutzer wird
+ * beim Aktivieren dieser Option explizit gewarnt.
+ * @param {{ investorProfiles: InvestorProfile[], reclaimCases: ReclaimCase[] }} payload
+ * @returns {object} Inhalt für .divrebound.json
+ */
+export function exportPlain(payload) {
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    exportedAt: new Date().toISOString(),
+    encryption: null,
+    payload,
+  };
+}
+
+/** @param {object} fileJson Inhalt aus einer .divrebound.json-Datei */
+export function isEncryptedFile(fileJson) {
+  return Boolean(fileJson?.encryption);
+}
+
+/**
+ * @param {object} fileJson Inhalt aus einer unverschlüsselten .divrebound.json-Datei
+ * @returns {{ investorProfiles: InvestorProfile[], reclaimCases: ReclaimCase[] }}
+ */
+export function importPlain(fileJson) {
+  return fileJson.payload;
+}
+
+/**
  * @param {{ investorProfiles: InvestorProfile[], reclaimCases: ReclaimCase[] }} payload
  * @param {string} passphrase
  * @returns {Promise<object>} Inhalt für .divrebound.json

@@ -3,7 +3,9 @@
   flex-shrink: 0;
   background: var(--navy);
   color: #fff;
-  padding: 20px 16px;
+  /* padding-top identisch zu .content, damit die Wortmarke auf derselben
+     Höhe wie die Inhaltsüberschrift (.content-title) steht. */
+  padding: 24px 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -15,11 +17,9 @@
 }
 #divrebound-app .sidebar-wordmark {
   font-family: var(--font-display);
-  font-size: 17px;
-  letter-spacing: 0.01em;
-}
-#divrebound-app .sidebar-wordmark span {
-  color: var(--cyan);
+  font-size: 22px;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
 }
 #divrebound-app .sidebar-actions {
   display: flex;
@@ -59,13 +59,23 @@
   margin-bottom: 2px;
 }
 #divrebound-app .sidebar-link {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
   text-decoration: none;
-  padding: 6px 8px;
-  border-radius: 6px;
+  padding: 7px 8px;
+  border-radius: 7px;
   display: block;
   cursor: pointer;
+}
+#divrebound-app .sidebar-link.sidebar-link-disabled {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.35);
+  cursor: default;
+}
+#divrebound-app .sidebar-link.sidebar-link-disabled:hover {
+  background: none;
 }
 #divrebound-app .sidebar-link:hover {
   background: rgba(255, 255, 255, 0.1);
@@ -75,7 +85,7 @@
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--cyan);
   padding: 6px 8px;
   border-radius: 6px;
@@ -146,6 +156,31 @@
   color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
   list-style: none;
+}
+#divrebound-app .nav-case-delete {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.1s ease, color 0.1s ease, background 0.1s ease;
+}
+#divrebound-app details.nav-case:hover .nav-case-delete {
+  opacity: 1;
+}
+#divrebound-app .nav-case-delete:hover {
+  color: #fff;
+  background: var(--danger);
 }
 #divrebound-app details.nav-case > summary::-webkit-details-marker {
   display: none;

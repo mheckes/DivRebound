@@ -34,11 +34,16 @@ function render(container, params) {
 
   container.innerHTML = `
     <div class="content-header">
-      <div class="content-breadcrumb">Dänemark <b>›</b> ${caseLabel(reclaimCase)} <b>›</b> Schritt 2</div>
       <h1 class="content-title">SKAT-Formular öffnen</h1>
+      <div class="content-breadcrumb">Dänemark <b>›</b> ${caseLabel(reclaimCase)} <b>›</b> Schritt 2</div>
     </div>
 
     <a class="back-link" id="back-link">← Zurück</a>
+
+    <div class="info-banner">
+      <span class="icon">⚠</span>
+      <div><b>Voraussetzung für Schritt 2:</b> Die vom Finanzamt unterschriebene/bestätigte Wohnsitzbescheinigung aus Schritt 1 muss vorliegen, bevor Sie hier fortfahren.</div>
+    </div>
 
     <div class="card">
       <div class="card-head head-navy">

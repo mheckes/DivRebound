@@ -4,6 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DivRebound</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230F2240'/%3E%3Cpath d='M4 12L9 17' stroke='white' stroke-width='2.6' stroke-linecap='round' fill='none'/%3E%3Cpath d='M9 17L20 5M20 5L14.9 7.1M20 5L18.4 10.3' stroke='%2300B4D8' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"
+    />
+    <style>
+      /* Nur für die eigenständige Auslieferung (index.html) - beim späteren
+         Einbetten in eine fremde Seite kommt kein eigenes index.html/body
+         zum Einsatz, daher hier bewusst kein globaler Reset in den
+         wiederverwendbaren CSS-Dateien unter src/style. Ohne das erzeugt
+         der Standard-Browser-Rand auf <body> (8px) zusammen mit
+         100vh-Höhe im App-Shell einen unnötigen Scrollbalken. */
+      body {
+        margin: 0;
+      }
+    </style>
   </head>
   <body>
     <div id="divrebound-app"></div>

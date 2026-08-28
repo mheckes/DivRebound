@@ -29,10 +29,6 @@ function escapeHtml(str) {
   return String(str ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
-function todayIso() {
-  return new Date().toISOString().slice(0, 10);
-}
-
 function caseLabel(rc) {
   const d = new Date(rc.createdAt);
   return `DivRebound ${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
@@ -134,36 +130,38 @@ export function mount(container, params) {
 function render(container) {
   const knownFields = knownFieldsConfig();
   const knownFilled = knownFields.filter((f) => f.getSnapshot().trim() !== "").length;
-  const taxOffice = profile.residence.taxOffice ?? { name: "", address: "", lastConfirmed: "" };
-  profile.residence.taxOffice = taxOffice;
   const ongoing = !reclaimCase.residencePeriod.until;
   const countryLabel = COUNTRY_NAMES[profile.residence.country] ?? profile.residence.country;
 
   container.innerHTML = `
     <div class="content-header">
-      <div class="content-breadcrumb">Dänemark <b>›</b> ${escapeHtml(caseLabel(reclaimCase))} <b>›</b> Schritt 1</div>
       <h1 class="content-title">Fehlende Angaben ergänzen</h1>
+      <div class="content-breadcrumb">Dänemark <b>›</b> ${escapeHtml(caseLabel(reclaimCase))} <b>›</b> Schritt 1</div>
     </div>
 
     <div class="card">
       <div class="card-head head-navy">
         <span class="card-title">Aus den Abrechnungen übernommen</span>
-        <span class="count-pill">${knownFilled} von ${knownFields.length} Feldern</span>
+        <span class="count-pill" id="known-count-pill">${knownFilled} von ${knownFields.length} Feldern</span>
       </div>
       <div class="card-body" id="known-card-body">
         ${knownFields
-          .map(
-            (f) => `
+          .map((f) => {
+            const value = f.getSnapshot();
+            const hasValue = value.trim() !== "";
+            return `
           <div class="md-known-row">
             <div style="flex:1;">
               <div class="md-known-label">${f.label}</div>
-              <input class="md-known-input mono" data-field="${f.key}" value="${escapeHtml(f.getSnapshot())}">
+              <input class="md-known-input mono" data-field="${f.key}" placeholder="Bitte eintragen" value="${escapeHtml(value)}">
             </div>
-            <span class="badge badge-confirmed">✓ aus Profil übernommen</span>
+            <span class="badge ${hasValue ? "badge-confirmed" : "badge-extracted"}" data-known-badge="${f.key}">
+              ${hasValue ? "✓ übernommen" : "nicht erkannt"}
+            </span>
           </div>
           <div class="md-profile-diff" data-diff="${f.key}" style="display:none;"></div>
-        `
-          )
+        `;
+          })
           .join("")}
       </div>
     </div>
@@ -193,34 +191,42 @@ function render(container) {
     </div>
 
     <div class="card">
-      <div class="card-head head-navy">
-        <span class="card-title">Finanzamt</span>
-      </div>
-      <div class="card-body" id="taxoffice-card-body"></div>
-    </div>
-
-    <div class="card">
       <div class="card-head head-cyan">
         <span class="card-title">Bitte noch ergänzen</span>
         <span class="count-pill" id="missing-pill">3 Felder offen</span>
       </div>
       <div class="card-body">
-        <div class="field-row">
-          <label class="field-label" for="birthdate">Geburtsdatum</label>
-          <input type="date" id="birthdate" class="field-input" value="${escapeHtml(profile.residence.birthDate ?? "")}">
+        <div class="md-required-field">
+          <div class="md-req-row">
+            <div style="flex:1;">
+              <div class="md-known-label">Geburtsdatum</div>
+              <input type="date" id="birthdate" class="md-known-input mono" value="${escapeHtml(profile.residence.birthDate ?? "")}">
+            </div>
+            <span class="badge" data-field-badge="birthdate"></span>
+          </div>
           <div class="field-error" id="birthdate-error"></div>
         </div>
 
-        <div class="field-row">
-          <label class="field-label" for="birthplace">Geburtsort</label>
-          <input type="text" id="birthplace" class="field-input" placeholder="z.B. München" value="${escapeHtml(profile.residence.birthPlace ?? "")}">
+        <div class="md-required-field">
+          <div class="md-req-row">
+            <div style="flex:1;">
+              <div class="md-known-label">Geburtsort</div>
+              <input type="text" id="birthplace" class="md-known-input" placeholder="z.B. München" value="${escapeHtml(profile.residence.birthPlace ?? "")}">
+            </div>
+            <span class="badge" data-field-badge="birthplace"></span>
+          </div>
           <div class="field-hint">Wie im gültigen Reisepass/Personalausweis angegeben.</div>
           <div class="field-error" id="birthplace-error"></div>
         </div>
 
-        <div class="field-row">
-          <label class="field-label" for="tin">Steuer-ID (${escapeHtml(countryLabel)})</label>
-          <input type="text" id="tin" class="field-input mono" placeholder="z.B. ${TIN_PLACEHOLDER[profile.residence.country] ?? ""}" value="${escapeHtml(profile.residence.tin ?? "")}">
+        <div class="md-required-field">
+          <div class="md-req-row">
+            <div style="flex:1;">
+              <div class="md-known-label">Steuer-ID (${escapeHtml(countryLabel)})</div>
+              <input type="text" id="tin" class="md-known-input mono" placeholder="z.B. ${TIN_PLACEHOLDER[profile.residence.country] ?? ""}" value="${escapeHtml(profile.residence.tin ?? "")}">
+            </div>
+            <span class="badge" data-field-badge="tin"></span>
+          </div>
           <div class="field-hint">${escapeHtml(tinHint(profile.residence.country))}</div>
           <div class="field-error" id="tin-error"></div>
         </div>
@@ -235,7 +241,6 @@ function render(container) {
 
   attachKnownCardListeners(container, knownFields);
   attachResidencePeriodListeners(container);
-  renderTaxOffice(container.querySelector("#taxoffice-card-body"));
   attachRequiredFieldListeners(container);
   updateValidation(container);
 
@@ -267,6 +272,15 @@ function render(container) {
 function attachKnownCardListeners(container, knownFields) {
   const body = container.querySelector("#known-card-body");
 
+  function updateKnownBadge(f) {
+    const badge = body.querySelector(`[data-known-badge="${f.key}"]`);
+    const hasValue = f.getSnapshot().trim() !== "";
+    badge.className = `badge ${hasValue ? "badge-confirmed" : "badge-extracted"}`;
+    badge.textContent = hasValue ? "✓ übernommen" : "nicht erkannt";
+    const filledCount = knownFields.filter((x) => x.getSnapshot().trim() !== "").length;
+    container.querySelector("#known-count-pill").textContent = `${filledCount} von ${knownFields.length} Feldern`;
+  }
+
   function updateDiff(f) {
     const el = body.querySelector(`[data-diff="${f.key}"]`);
     const snapshotValue = f.getSnapshot();
@@ -294,6 +308,7 @@ function attachKnownCardListeners(container, knownFields) {
       // Semantik (nur Snapshot ändert sich), wie im Schema für Folgefälle vorgesehen.
       if (!f.getProfile().trim()) f.setProfile(input.value);
       updateDiff(f);
+      updateKnownBadge(f);
     });
   });
 
@@ -332,61 +347,6 @@ function attachResidencePeriodListeners(container) {
   });
 }
 
-function renderTaxOffice(body) {
-  const taxOffice = profile.residence.taxOffice;
-  const hasExisting = Boolean(taxOffice.name?.trim());
-
-  if (hasExisting) {
-    body.innerHTML = `
-      <div style="font-size:14px;margin-bottom:4px;"><b>${escapeHtml(taxOffice.name)}</b> – noch aktuell?</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">${escapeHtml(taxOffice.address)}</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="btn-accent" data-action="confirm">✓ Ja, weiterhin aktuell</button>
-        <button class="btn-secondary" data-action="edit">Nicht mehr aktuell</button>
-      </div>
-    `;
-    body.querySelector('[data-action="confirm"]').addEventListener("click", () => {
-      taxOffice.lastConfirmed = todayIso();
-      renderTaxOffice(body);
-    });
-    body.querySelector('[data-action="edit"]').addEventListener("click", () => {
-      renderTaxOfficeEdit(body, true);
-    });
-  } else {
-    renderTaxOfficeEdit(body, false);
-  }
-}
-
-function renderTaxOfficeEdit(body, canCancel) {
-  const taxOffice = profile.residence.taxOffice;
-  body.innerHTML = `
-    <div class="field-row">
-      <label class="field-label" for="taxoffice-name">Name des Finanzamts</label>
-      <input type="text" id="taxoffice-name" class="field-input" placeholder="z.B. Finanzamt München I" value="${escapeHtml(taxOffice.name)}">
-    </div>
-    <div class="field-row">
-      <label class="field-label" for="taxoffice-address">Adresse</label>
-      <input type="text" id="taxoffice-address" class="field-input" placeholder="Straße, PLZ, Ort" value="${escapeHtml(taxOffice.address)}">
-    </div>
-    <div class="field-hint" style="margin-bottom:14px;">Zu finden auf Ihrem letzten Einkommensteuerbescheid, oder über die BZSt-Finanzamtsuche.</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-      <button class="btn-primary" data-action="save">Speichern</button>
-      ${canCancel ? '<a class="md-back-link" data-action="cancel">Abbrechen</a>' : ""}
-    </div>
-  `;
-  body.querySelector('[data-action="save"]').addEventListener("click", () => {
-    taxOffice.name = body.querySelector("#taxoffice-name").value.trim();
-    taxOffice.address = body.querySelector("#taxoffice-address").value.trim();
-    taxOffice.lastConfirmed = todayIso();
-    renderTaxOffice(body);
-  });
-  if (canCancel) {
-    body.querySelector('[data-action="cancel"]').addEventListener("click", () => {
-      renderTaxOffice(body);
-    });
-  }
-}
-
 function attachRequiredFieldListeners(container) {
   const fieldIds = ["birthdate", "birthplace", "tin"];
   fieldIds.forEach((id) => {
@@ -406,10 +366,21 @@ function attachRequiredFieldListeners(container) {
 
 function updateValidation(container) {
   const fields = [
-    { id: "birthdate", valid: (profile.residence.birthDate ?? "").trim() !== "", errorText: "Bitte ausfüllen." },
-    { id: "birthplace", valid: (profile.residence.birthPlace ?? "").trim() !== "", errorText: "Bitte ausfüllen." },
+    {
+      id: "birthdate",
+      isEmpty: (profile.residence.birthDate ?? "").trim() === "",
+      valid: (profile.residence.birthDate ?? "").trim() !== "",
+      errorText: "Bitte ausfüllen.",
+    },
+    {
+      id: "birthplace",
+      isEmpty: (profile.residence.birthPlace ?? "").trim() === "",
+      valid: (profile.residence.birthPlace ?? "").trim() !== "",
+      errorText: "Bitte ausfüllen.",
+    },
     {
       id: "tin",
+      isEmpty: (profile.residence.tin ?? "").trim() === "",
       valid: isValidTin(profile.residence.country, profile.residence.tin),
       errorText: `Ungültiges Format. ${tinHint(profile.residence.country)}`,
     },
@@ -421,20 +392,26 @@ function updateValidation(container) {
   for (const f of fields) {
     const input = container.querySelector(`#${f.id}`);
     const errorEl = container.querySelector(`#${f.id}-error`);
+    const badge = container.querySelector(`[data-field-badge="${f.id}"]`);
+
     if (f.valid) {
       filledCount++;
-      input.classList.add("valid");
-      input.classList.remove("invalid");
+      badge.className = "badge badge-confirmed";
+      badge.textContent = "✓ übernommen aus Profil";
       errorEl.textContent = "";
     } else {
       allValid = false;
-      input.classList.remove("valid");
-      if (touched.has(f.id)) {
-        input.classList.add("invalid");
-        errorEl.textContent = f.errorText;
+      if (f.isEmpty) {
+        badge.className = "badge badge-extracted";
+        badge.textContent = "noch offen";
+        errorEl.textContent = touched.has(f.id) ? f.errorText : "";
       } else {
-        input.classList.remove("invalid");
-        errorEl.textContent = "";
+        // Ausgefüllt, aber ungültiges Format (z.B. TIN) - eigener Zustand,
+        // damit "übernommen aus Profil" nicht fälschlich bei kaputten Werten
+        // angezeigt wird.
+        badge.className = "badge badge-invalid";
+        badge.textContent = "ungültiges Format";
+        errorEl.textContent = f.errorText;
       }
     }
   }

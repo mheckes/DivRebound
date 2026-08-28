@@ -153,8 +153,8 @@ function render(container) {
 
   container.innerHTML = `
     <div class="content-header">
-      <div class="content-breadcrumb">Dänemark <b>›</b> ${new Date(reclaimCase.createdAt).toLocaleDateString("de-DE", { month: "2-digit", year: "numeric" })} <b>›</b> Schritt 1</div>
       <h1 class="content-title">Positions-/Jahresübersicht</h1>
+      <div class="content-breadcrumb">Dänemark <b>›</b> ${new Date(reclaimCase.createdAt).toLocaleDateString("de-DE", { month: "2-digit", year: "numeric" })} <b>›</b> Schritt 1</div>
     </div>
 
     <div class="topbar-row">
