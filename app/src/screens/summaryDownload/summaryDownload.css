@@ -141,23 +141,34 @@
   background: var(--cyan);
   color: var(--charcoal);
   border: none;
-  padding: 14px 18px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 700;
+  padding: 18px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
   font-family: var(--font-body);
   cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  box-shadow: 0 4px 14px rgba(0, 180, 216, 0.35);
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+#divrebound-app .download-btn svg {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
 }
 #divrebound-app .download-btn:hover:not(:disabled) {
   background: #0090ad;
+  box-shadow: 0 6px 18px rgba(0, 180, 216, 0.45);
+  transform: translateY(-1px);
 }
 #divrebound-app .download-btn:disabled {
   background: var(--stone);
   cursor: not-allowed;
+  box-shadow: none;
 }
 #divrebound-app .filename-preview {
   margin-top: 10px;
@@ -189,21 +200,6 @@
 #divrebound-app .download-status.error {
   background: var(--danger-tint);
   color: var(--danger);
-}
-
-#divrebound-app .warning-box {
-  margin-top: 16px;
-  padding: 12px 14px;
-  background: var(--cyan-light);
-  border: 1px solid var(--cyan);
-  border-radius: 9px;
-  font-size: 12px;
-  color: #005a78;
-  display: flex;
-  gap: 9px;
-}
-#divrebound-app .warning-box b {
-  color: #007a9e;
 }
 
 /* ---------- Status-Panels ("Nächste Schritte" / "Bearbeitung pausiert") ---------- */

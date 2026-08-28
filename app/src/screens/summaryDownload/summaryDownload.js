@@ -17,8 +17,8 @@ import { getState, setState } from "../../store/store.js";
 import { navigate } from "../../router/router.js";
 import * as caseRepo from "../../db/caseRepo.js";
 import { fillResidencyCertificate, buildFileName } from "../../lib/fillResidencyCertificate.js";
-import { exportEncrypted, triggerJsonDownload } from "../../crypto/exportImport.js";
-import { openPassphraseModal } from "../../components/modal.js";
+import { exportEncrypted, exportPlain, triggerJsonDownload } from "../../crypto/exportImport.js";
+import { openExportOptionsModal } from "../../components/modal.js";
 import { corridors } from "../../config/corridors.js";
 import { formatDateDe, formatCurrency, formatNumberDe } from "../../util/format.js";
 
@@ -225,8 +225,8 @@ function render(container) {
 
   container.innerHTML = `
     <div class="content-header">
-      <div class="content-breadcrumb">Dänemark <b>›</b> ${esc(caseLabel(reclaimCase))} <b>›</b> Schritt 1</div>
       <h1 class="content-title">Zusammenfassung & Download</h1>
+      <div class="content-breadcrumb">Dänemark <b>›</b> ${esc(caseLabel(reclaimCase))} <b>›</b> Schritt 1</div>
     </div>
 
     <a class="back-link" data-action="back">← Zurück</a>
@@ -254,26 +254,16 @@ function render(container) {
       </div>
       <div class="card-body">
         <button class="download-btn" data-action="download">
-          ⬇ Wohnsitzbescheinigung herunterladen (PDF)
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 2v6h6"/>
+            <path d="M12 11v6"/>
+            <path d="m9 14 3 3 3-3"/>
+          </svg>
+          Wohnsitzbescheinigung herunterladen (PDF)
         </button>
         <div class="filename-preview">${esc(fileNamePreview)}</div>
         <div id="download-status">${initialStatusHtml}</div>
-
-        <div class="warning-box">
-          <span>⚠</span>
-          <span><b>Wichtig:</b> Diese Bescheinigung wird nicht direkt bei SKAT eingereicht. Ausdrucken, unterschreiben und vom zuständigen ${esc(countryNameGerman(profile.residence.country))}er Finanzamt bestätigen lassen – erst danach folgt in Schritt 2 die Einreichung im SKAT-Portal.</span>
-        </div>
-
-        <label class="toggle-row" style="margin-top:18px;">
-          <input type="checkbox" id="cover-letter">
-          Anschreiben ans Finanzamt zusätzlich erstellen
-        </label>
-
-        <div class="field disabled-look" id="taxoffice-field">
-          <label for="taxoffice">Name &amp; Adresse des Finanzamts</label>
-          <input type="text" id="taxoffice" placeholder="z.B. Finanzamt München I, Deroystraße 4, 80335 München" disabled value="${esc(residence.taxOffice?.name ? `${residence.taxOffice.name}, ${residence.taxOffice.address}` : "")}">
-          <div class="hint">Zu finden z.B. auf Ihrem letzten Einkommensteuerbescheid.</div>
-        </div>
       </div>
     </div>
 
@@ -314,18 +304,6 @@ function attachListeners(container, reclaimCase) {
   container.querySelector('[data-action="reminder"]').addEventListener("click", () => {
     handleDownloadReminder();
   });
-
-  const coverLetterCheckbox = container.querySelector("#cover-letter");
-  coverLetterCheckbox.addEventListener("change", () => toggleTaxOfficeField(container));
-}
-
-function toggleTaxOfficeField(container) {
-  const checked = container.querySelector("#cover-letter").checked;
-  const input = container.querySelector("#taxoffice");
-  const wrapper = container.querySelector("#taxoffice-field");
-  input.disabled = !checked;
-  wrapper.classList.toggle("disabled-look", !checked);
-  if (checked) input.focus();
 }
 
 async function handleDownload(container, btn) {
@@ -374,13 +352,11 @@ async function handleSaveState() {
   const { currentProfile: profile, currentCase: reclaimCase } = getState();
   if (!profile || !reclaimCase) return;
 
-  const passphrase = await openPassphraseModal("export");
-  if (!passphrase) return;
+  const choice = await openExportOptionsModal();
+  if (!choice) return;
 
-  const fileJson = await exportEncrypted(
-    { investorProfiles: [profile], reclaimCases: [reclaimCase] },
-    passphrase
-  );
+  const payload = { investorProfiles: [profile], reclaimCases: [reclaimCase] };
+  const fileJson = choice.encrypt ? await exportEncrypted(payload, choice.passphrase) : exportPlain(payload);
   const fileName = `DivRebound_Daenemark_${yearLabel(reclaimCase)}.divrebound.json`;
   triggerJsonDownload(fileJson, fileName);
 }

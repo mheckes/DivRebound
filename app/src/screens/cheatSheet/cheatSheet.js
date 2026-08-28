@@ -15,8 +15,8 @@ import { getState, setState } from "../../store/store.js";
 import * as caseRepo from "../../db/caseRepo.js";
 import { corridors } from "../../config/corridors.js";
 import { buildSubmissionChunks } from "../../util/chunking.js";
-import { openPassphraseModal } from "../../components/modal.js";
-import { exportEncrypted, triggerJsonDownload } from "../../crypto/exportImport.js";
+import { openExportOptionsModal } from "../../components/modal.js";
+import { exportEncrypted, exportPlain, triggerJsonDownload } from "../../crypto/exportImport.js";
 import { skatTabs, buildSharePages, shareHelpNote } from "./skatFieldMap.js";
 
 function escapeHtml(value) {
@@ -315,9 +315,10 @@ export function mount(container, params) {
 
   async function onSaveHistory() {
     if (reclaimCase.status !== "submitted") return;
-    const passphrase = await openPassphraseModal("export");
-    if (!passphrase) return;
-    const fileJson = await exportEncrypted({ investorProfiles: [profile], reclaimCases: [reclaimCase] }, passphrase);
+    const choice = await openExportOptionsModal();
+    if (!choice) return;
+    const payload = { investorProfiles: [profile], reclaimCases: [reclaimCase] };
+    const fileJson = choice.encrypt ? await exportEncrypted(payload, choice.passphrase) : exportPlain(payload);
     const lastName = profile.residence.lastName || "divrebound";
     triggerJsonDownload(fileJson, `DivRebound_${reclaimCase.targetCountry}_${lastName}_eingereicht.divrebound.json`);
   }
@@ -355,8 +356,8 @@ export function mount(container, params) {
     container.innerHTML = `
       <div class="content-header">
         <div>
-          <div class="content-breadcrumb">Dänemark <b>›</b> ${escapeHtml(caseLabel)} <b>›</b> Schritt 2</div>
           <h1 class="content-title">Cheat Sheet</h1>
+          <div class="content-breadcrumb">Dänemark <b>›</b> ${escapeHtml(caseLabel)} <b>›</b> Schritt 2</div>
         </div>
         <div class="progress-wrap">
           <span>${done} von ${total} übertragen</span>

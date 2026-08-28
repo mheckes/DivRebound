@@ -54,9 +54,7 @@
 }
 #divrebound-app .card-title {
   font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-weight: 600;
   color: var(--navy);
 }
 #divrebound-app .count-pill {
@@ -85,7 +83,7 @@
   padding: 11px 22px;
   border-radius: 9px;
   font-size: 13.5px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   font-family: var(--font-body);
 }
@@ -111,12 +109,26 @@
   padding: 9px 16px;
   border-radius: 9px;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 600;
   font-family: var(--font-body);
   font-size: 12.5px;
 }
 #divrebound-app .btn-accent:hover {
   background: #0090ad;
+}
+#divrebound-app .btn-danger {
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  padding: 11px 22px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+#divrebound-app .btn-danger:hover {
+  background: #8a3830;
 }
 
 #divrebound-app .dropzone {
@@ -229,6 +241,37 @@
 #divrebound-app .field-error {
   font-size: 11px;
   color: var(--danger);
+}
+
+/* "Bestätigtes Feld": wie .field-label/.field-input, aber für Werte, die
+   schon vorhanden sind (z.B. aus einem früheren Fall übernommenes
+   Finanzamt) - wirkt wie reiner Text statt wie ein weiteres noch
+   auszufüllendes leeres Feld, bleibt aber bei Hover/Fokus erkennbar
+   editierbar. Siehe util/fieldDisplay.js für die Zuordnung leer/vorhanden. */
+#divrebound-app .confirmed-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+#divrebound-app .confirmed-input {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 4px 7px;
+  margin: -4px -7px;
+  background: transparent;
+  font-size: 13.5px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--charcoal);
+  width: calc(100% - 2px);
+}
+#divrebound-app .confirmed-input:hover,
+#divrebound-app .confirmed-input:focus {
+  border-color: var(--navy);
+  background: #fff;
+  outline: none;
 }
 
 #divrebound-app table {

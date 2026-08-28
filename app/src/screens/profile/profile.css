@@ -58,7 +58,7 @@
   cursor: pointer;
   list-style: none;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--navy);
   background: var(--navy-light);
 }

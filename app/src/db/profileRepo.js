@@ -53,7 +53,7 @@ export async function createProfile(residenceCountry) {
       address: "",
       postalCode: "",
       city: "",
-      taxOffice: { name: "", address: "", lastConfirmed: "" },
+      taxOffice: { name: "", street: "", postalCode: "", city: "" },
     },
     bank: {
       bankName: "",

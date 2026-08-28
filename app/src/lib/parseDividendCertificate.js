@@ -205,9 +205,20 @@ const SALUTATION_LINE = /^(Herrn|Frau)$/i;
 const NAME_LINE = /^([A-ZÄÖÜ][a-zäöüß]+(?:[\s-][A-ZÄÖÜ][a-zäöüß]+)*)\s+([A-ZÄÖÜ][a-zäöüß]+(?:-[A-ZÄÖÜ][a-zäöüß]+)?)$/;
 const ADDRESS_SEARCH_WINDOW = 3;
 
+// Manche Baader/Smartbroker+-Abrechnungen legen die PLZ/Ort-Zeile UND den
+// Beginn der rechten Spalte (Stamm-Nr./Portfolio/Depot-Nr.) auf dieselbe
+// Y-Koordinate, z.B. "81377 München Stamm-Nr.: 3257973 Portfolio: 1" - der
+// End-of-Line-Anker in POSTAL_CITY_LINE griff dadurch nie, PLZ/Ort blieben
+// unerkannt. Erkennbar am ersten "Label:"-Token (enthält einen Doppelpunkt);
+// alles ab dort wird vor dem Abgleich abgeschnitten. Zeilen ohne so ein Token
+// (der bisher kalibrierte Normalfall) bleiben unverändert.
+function stripTrailingMetadata(line) {
+  return line.replace(/\s+\S*:\S*[\s\S]*$/, "");
+}
+
 function extractAddressBlock(lines) {
   for (let i = 0; i < lines.length; i++) {
-    const postalMatch = lines[i].match(POSTAL_CITY_LINE);
+    const postalMatch = stripTrailingMetadata(lines[i]).match(POSTAL_CITY_LINE);
     if (!postalMatch) continue;
 
     let streetIdx = null;

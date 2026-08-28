@@ -1,5 +1,40 @@
 /* DivRebound Design-System – Quelle: "DivRebound CI Style Guide" (Variante B · Navy/Cyan) */
 
+/* Selbst gehostete Web-Fonts (aus dem CI Style Guide extrahiert, nur die
+   "latin"-Subsets - decken auch deutsche Umlaute/ß ab, da diese im
+   Latin-1-Supplement liegen, nicht im "latin-ext"-Bereich). Bewusst selbst
+   gehostet statt live von fonts.googleapis.com geladen, wie im CI-Dokument
+   selbst als GDPR-Empfehlung vermerkt: keine Übertragung der Besucher-IP an
+   Google. Variable Fonts, daher genügt je eine Deklaration mit Gewichts-Spanne. */
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("./fonts/dm-sans-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "DM Serif Display";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/dm-serif-display-normal-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "DM Serif Display";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/dm-serif-display-italic-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("./fonts/jetbrains-mono-latin.woff2") format("woff2");
+}
+
 #divrebound-app {
   --navy: #0f2240;
   --navy-mid: #1a3a6b;

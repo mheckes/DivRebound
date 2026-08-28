@@ -2,8 +2,16 @@ import { getState, setState, subscribe } from "../store/store.js";
 import { navigate } from "../router/router.js";
 import * as caseRepo from "../db/caseRepo.js";
 import * as profileRepo from "../db/profileRepo.js";
-import { exportEncrypted, importEncrypted, triggerJsonDownload } from "../crypto/exportImport.js";
-import { openPassphraseModal, openInfoModal } from "./modal.js";
+import {
+  exportEncrypted,
+  exportPlain,
+  importEncrypted,
+  importPlain,
+  isEncryptedFile,
+  triggerJsonDownload,
+} from "../crypto/exportImport.js";
+import { openPassphraseModal, openExportOptionsModal, openInfoModal, openConfirmModal } from "./modal.js";
+import { openNewCaseWizard } from "./newCaseWizard.js";
 
 const STATUS_ORDER = [
   "draft",
@@ -51,7 +59,11 @@ function renderCase(reclaimCase, activeCaseId) {
   const s2 = stepStatus(reclaimCase.status, 2);
   return `
     <details class="nav-case ${isActive ? "active" : ""}" ${isActive ? "open" : ""} data-case-id="${reclaimCase.caseId}">
-      <summary>${chevron()} ${caseLabel(reclaimCase)}</summary>
+      <summary>
+        ${chevron()}
+        <span style="flex:1;">${caseLabel(reclaimCase)}</span>
+        <button class="nav-case-delete" data-action="delete-case" data-case-id="${reclaimCase.caseId}" title="Fall löschen">✕</button>
+      </summary>
       <div class="nav-steps">
         <div class="nav-step ${s1}" data-nav="${caseRoute(reclaimCase, 1)}">${stepIcon(s1)} Schritt 1: Wohnsitzbescheinigung</div>
         <div class="nav-step ${s2}" data-nav="${caseRoute(reclaimCase, 2)}">${stepIcon(s2)} Schritt 2: SKAT-Portal</div>
@@ -68,12 +80,11 @@ export function renderSidebar(container) {
     <div class="sidebar-brand">
       <div style="width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,0.13);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M4 8L9.5 15" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
-          <path d="M9.5 15L19 5" stroke="#00B4D8" stroke-width="2.4" stroke-linecap="round"/>
-          <path d="M13.5 5H19V10.5" stroke="#00B4D8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 12L9 17" stroke="white" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M9 17L20 5M20 5L14.9 7.1M20 5L18.4 10.3" stroke="#00B4D8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <div class="sidebar-wordmark">Div<span>Rebound</span></div>
+      <div class="sidebar-wordmark">DivRebound</div>
     </div>
 
     <div class="sidebar-actions">
@@ -84,9 +95,12 @@ export function renderSidebar(container) {
 
     <div class="sidebar-divider"></div>
 
+    <a class="sidebar-link" data-nav="#/home">Home</a>
+
     <div class="sidebar-section">
       <div class="sidebar-section-title">Nutzer</div>
       <a class="sidebar-link" data-nav="#/profile">Persönliche Daten</a>
+      <a class="sidebar-link" data-nav="#/anschreiben">Anschreiben Finanzamt</a>
     </div>
 
     <div class="sidebar-section">
@@ -113,24 +127,43 @@ export function renderSidebar(container) {
     el.addEventListener("click", () => navigate(el.dataset.nav));
   });
 
-  container.querySelector('[data-action="new-case"]').addEventListener("click", async () => {
-    const profile = getState().currentProfile;
-    if (!profile) {
-      navigate("#/onboarding");
-      return;
-    }
-    const reclaimCase = await caseRepo.createCase(profile, "DK");
-    setState({ cases: [...getState().cases, reclaimCase], currentCase: reclaimCase });
-    navigate(`#/dk/${reclaimCase.caseId}/step1`);
+  container.querySelector('[data-action="new-case"]').addEventListener("click", () => {
+    openNewCaseWizard();
+  });
+
+  container.querySelectorAll('[data-action="delete-case"]').forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      e.preventDefault(); // verhindert, dass <summary> das <details> auf-/zuklappt
+      e.stopPropagation();
+      const caseId = btn.dataset.caseId;
+      const reclaimCase = getState().cases.find((c) => c.caseId === caseId);
+      const confirmed = await openConfirmModal(
+        "Fall wirklich löschen?",
+        `„${caseLabel(reclaimCase)}" wird unwiderruflich gelöscht, inklusive aller erfassten Ausschüttungen. Bereits heruntergeladene Dokumente sind davon nicht betroffen.`,
+        { confirmLabel: "Löschen", danger: true }
+      );
+      if (!confirmed) return;
+      await caseRepo.remove(caseId);
+      const remainingCases = getState().cases.filter((c) => c.caseId !== caseId);
+      const wasActive = getState().currentCase?.caseId === caseId;
+      setState({
+        cases: remainingCases,
+        currentCase: wasActive ? null : getState().currentCase,
+      });
+      if (wasActive) {
+        navigate(remainingCases.length > 0 ? `#/dk/${remainingCases[0].caseId}/step1` : "#/home");
+      }
+    });
   });
 
   container.querySelector('[data-action="save"]').addEventListener("click", async () => {
     const profile = getState().currentProfile;
     if (!profile) return;
-    const passphrase = await openPassphraseModal("export");
-    if (!passphrase) return;
+    const choice = await openExportOptionsModal();
+    if (!choice) return;
     const cases = await caseRepo.getByProfileId(profile.profileId);
-    const fileJson = await exportEncrypted({ investorProfiles: [profile], reclaimCases: cases }, passphrase);
+    const payload = { investorProfiles: [profile], reclaimCases: cases };
+    const fileJson = choice.encrypt ? await exportEncrypted(payload, choice.passphrase) : exportPlain(payload);
     triggerJsonDownload(fileJson, `${profile.residence.lastName || "divrebound"}.divrebound.json`);
   });
 
@@ -140,10 +173,18 @@ export function renderSidebar(container) {
     const file = loadInput.files[0];
     if (!file) return;
     const fileJson = JSON.parse(await file.text());
-    const passphrase = await openPassphraseModal("import");
-    if (!passphrase) return;
     try {
-      const payload = await importEncrypted(fileJson, passphrase);
+      let payload;
+      if (isEncryptedFile(fileJson)) {
+        const passphrase = await openPassphraseModal("import");
+        if (!passphrase) {
+          loadInput.value = "";
+          return;
+        }
+        payload = await importEncrypted(fileJson, passphrase);
+      } else {
+        payload = importPlain(fileJson);
+      }
       for (const profile of payload.investorProfiles) await profileRepo.put(profile);
       for (const reclaimCase of payload.reclaimCases) await caseRepo.put(reclaimCase);
       const profile = payload.investorProfiles[0];

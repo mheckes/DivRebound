@@ -73,15 +73,38 @@
   font-weight: 600;
 }
 
-/* Pflichtfeld-Eingaben: visuelles Feedback gültig/ungültig, ergänzt die reine
-   Fehlertext-Anzeige von .field-error. */
-#divrebound-app .field-input.valid {
-  border-color: var(--success);
-  background: var(--success-bg);
+/* "Bitte noch ergänzen": optisch an "Aus den Abrechnungen übernommen"
+   angeglichen (gleiche Zeile/Label/Input-Optik über .md-known-label/-input),
+   nur mit eigenem Wrapper .md-required-field für den Rahmen, weil hier -
+   anders als bei den Abrechnungs-Feldern - noch Hinweistext/Fehlermeldung
+   unter der Zeile stehen. Werte bleiben "fest eingetragen", aber änderbar;
+   der Status wird ausschließlich über das Badge kommuniziert, nicht mehr über
+   eine grün/rot eingefärbte Eingabefläche. */
+#divrebound-app .md-required-field {
+  padding: 9px 0;
+  border-bottom: 1px solid var(--divider);
 }
-#divrebound-app .field-input.invalid {
-  border-color: var(--danger);
+#divrebound-app .md-required-field:last-child {
+  border-bottom: none;
+}
+#divrebound-app .md-req-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+#divrebound-app .badge-invalid {
   background: var(--danger-tint);
+  color: var(--danger);
+}
+#divrebound-app .md-required-field .field-hint,
+#divrebound-app .md-required-field .field-error {
+  margin-top: 4px;
+  padding-left: 2px;
+}
+#divrebound-app .md-required-field .field-error:empty,
+#divrebound-app .md-required-field .field-hint:empty {
+  display: none;
 }
 
 /* Fußzeile mit "Zurück"-Link und "Weiter"-Button. */
