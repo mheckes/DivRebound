@@ -177,7 +177,13 @@ const page2Rows = [
     labelEn: "Tax identification number (TIN)",
     hint: "Steuer-ID",
     group: "m3",
-    resolve: (profile, reclaimCase) => val(reclaimCase.applicantSnapshot.tin),
+    // Bewusst aus dem LIVEN Profil, nicht aus applicantSnapshot: die Steuer-ID
+    // ist an die Person gebunden, nicht an den einzelnen Fall (anders als
+    // Name/Adresse, die im Case gezielt überschreibbar sind, siehe
+    // missingData.js) - applicantSnapshot.tin wird dort nur einmalig als
+    // Fallback kopiert und bliebe sonst dauerhaft veraltet, sobald die
+    // Steuer-ID erst nachträglich im Profil ergänzt/geändert wird.
+    resolve: (profile) => val(profile.residence.tin),
   },
 ];
 
