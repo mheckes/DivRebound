@@ -44,6 +44,34 @@ function infoSvg() {
   return `<svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`;
 }
 
+// Rein dekorative, abstrahierte Skizze eines Browserfensters für den frei
+// bleibenden Bereich rechts neben der (bewusst auf 600px begrenzten, siehe
+// cheatSheet.css) Tabelle - visualisiert nur die Idee "hier daneben öffnest
+// du das echte SKAT-Formular", ohne das tatsächliche SKAT-Layout/-Branding
+// nachzubilden (fremde Behördenseite, kein Grund, deren Design zu kopieren).
+// Wird auf schmalen Bildschirmen per CSS ausgeblendet (siehe .cheat-illustration).
+function browserMockHtml() {
+  return `
+    <div class="cheat-illustration" aria-hidden="true">
+      <div class="browser-mock">
+        <div class="browser-mock-bar">
+          <span class="browser-mock-dot"></span>
+          <span class="browser-mock-dot"></span>
+          <span class="browser-mock-dot"></span>
+          <div class="browser-mock-url"></div>
+        </div>
+        <div class="browser-mock-body">
+          <div class="browser-mock-line browser-mock-title"></div>
+          <div class="browser-mock-field-row"><div class="browser-mock-line browser-mock-label"></div><div class="browser-mock-box"></div></div>
+          <div class="browser-mock-field-row"><div class="browser-mock-line browser-mock-label"></div><div class="browser-mock-box"></div></div>
+          <div class="browser-mock-field-row"><div class="browser-mock-line browser-mock-label"></div><div class="browser-mock-box"></div></div>
+          <div class="browser-mock-btn"></div>
+        </div>
+      </div>
+      <div class="cheat-illustration-caption">Das echte SKAT-Formular öffnen Sie am besten hier daneben in einem zweiten Fenster.</div>
+    </div>`;
+}
+
 function formatCaseLabel(reclaimCase) {
   const d = new Date(reclaimCase.createdAt);
   return `DivRebound ${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
@@ -368,33 +396,39 @@ export function mount(container, params) {
         </div>
       </div>
 
-      <details class="help-disclosure">
-        <summary>${chevronSvg()} ${infoSvg()} Wie diese Seite funktioniert</summary>
-        <div class="help-disclosure-body">
-          <p>Das Cheat Sheet ist eine Hilfestellung zum Ausfüllen des offiziellen SKAT-Formulars. Übertragen Sie die Einträge in den Tab mit dem geöffneten SKAT-Formular. Die Reihenfolge der Felder entspricht 1:1 dem SKAT-Formular. <a href="${
-            corridor.onlinePortalUrl
-          }" target="_blank" rel="noopener">Formular nicht mehr offen? Erneut öffnen ↗</a></p>
-          <p><b>Bitte beachten:</b> Das Formular hat mehrere Seiten — bitte dort auf "Next" klicken und hier ebenfalls zur nächsten Seite weiterklicken.</p>
-        </div>
-      </details>
+      <div class="cheat-layout-row">
+        <div class="cheat-main">
+          <details class="help-disclosure cheat-help-disclosure">
+            <summary>${chevronSvg()} ${infoSvg()} Wie diese Seite funktioniert</summary>
+            <div class="help-disclosure-body">
+              <p>Das Cheat Sheet ist eine Hilfestellung zum Ausfüllen des offiziellen SKAT-Formulars. Übertragen Sie die Einträge in den Tab mit dem geöffneten SKAT-Formular. Die Reihenfolge der Felder entspricht 1:1 dem SKAT-Formular. <a href="${
+                corridor.onlinePortalUrl
+              }" target="_blank" rel="noopener">Formular nicht mehr offen? Erneut öffnen ↗</a></p>
+              <p><b>Bitte beachten:</b> Das Formular hat mehrere Seiten — bitte dort auf "Next" klicken und hier ebenfalls zur nächsten Seite weiterklicken.</p>
+            </div>
+          </details>
 
-      ${chunkSelectorHtml}
+          ${chunkSelectorHtml}
 
-      <div class="page-tabs">${tabsHtml}</div>
+          <div class="page-tabs">${tabsHtml}</div>
 
-      <div class="layout">
-        <div class="pane pane-left">
-          <div class="pane-head">
-            <span class="pane-title">${escapeHtml(activeTabDef.title)}</span>
-            <span style="font-size:10px;color:rgba(255,255,255,.6);">von DivRebound erzeugt</span>
+          <div class="layout">
+            <div class="pane pane-left">
+              <div class="pane-head">
+                <span class="pane-title">${escapeHtml(activeTabDef.title)}</span>
+                <span style="font-size:10px;color:rgba(255,255,255,.6);">von DivRebound erzeugt</span>
+              </div>
+              <div class="page-section active">${paneBodyHtml}</div>
+            </div>
           </div>
-          <div class="page-section active">${paneBodyHtml}</div>
-        </div>
-      </div>
 
-      <div class="bottom-bar">
-        <button class="btn-secondary" id="prev-tab-btn" type="button" ${isFirstTab ? "disabled" : ""}>← Zurück</button>
-        <button class="btn-primary" id="next-tab-btn" type="button" ${isLastTab ? "disabled" : ""}>Weiter →</button>
+          <div class="cheat-bottom-bar">
+            <button class="btn-secondary" id="prev-tab-btn" type="button" ${isFirstTab ? "disabled" : ""}>← Zurück</button>
+            <button class="btn-primary" id="next-tab-btn" type="button" ${isLastTab ? "disabled" : ""}>Weiter →</button>
+          </div>
+        </div>
+
+        ${browserMockHtml()}
       </div>
     `;
 

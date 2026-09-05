@@ -140,6 +140,17 @@
   margin-bottom: 16px;
   flex-wrap: wrap;
 }
+
+/* Eigene Klasse statt des globalen .bottom-bar, damit andere Screens (die
+   die volle Breite nutzen) unberührt bleiben - Breite kommt von .cheat-main. */
+#divrebound-app .cheat-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
 #divrebound-app .page-tab {
   padding: 8px 13px;
   border-radius: 8px;
@@ -172,7 +183,107 @@
 
 #divrebound-app .layout {
   display: block;
+}
+
+/* Zweispaltiges Layout: links die feste 600px-Übertragungshilfe (Tabelle etc.
+   - deshalb bewusst nicht auf 100% gestreckt, siehe .cheat-main), rechts
+   bleibt bewusst Platz frei für ein zweites Browserfenster mit dem echten
+   SKAT-Formular. Die Skizze darin (.cheat-illustration) visualisiert nur
+   diese Idee, siehe browserMockHtml() in cheatSheet.js. */
+#divrebound-app .cheat-layout-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+}
+#divrebound-app .cheat-main {
+  flex: 0 0 600px;
   max-width: 600px;
+  min-width: 0;
+}
+
+#divrebound-app .cheat-illustration {
+  flex: 1;
+  min-width: 240px;
+  padding-top: 12px;
+  opacity: 0.6;
+}
+/* Auf schmalen Bildschirmen (z.B. neben der Sidebar wenig Platz) gibt es
+   ohnehin keinen freien Raum neben der 600px-Spalte - dann lieber ganz
+   ausblenden statt hässlich darunter umzubrechen. */
+@media (max-width: 1080px) {
+  #divrebound-app .cheat-illustration {
+    display: none;
+  }
+}
+#divrebound-app .browser-mock {
+  background: var(--bg);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 320px;
+}
+#divrebound-app .browser-mock-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 12px;
+  background: #fff;
+  border-bottom: 1px solid var(--divider);
+}
+#divrebound-app .browser-mock-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--divider);
+  flex-shrink: 0;
+}
+#divrebound-app .browser-mock-url {
+  flex: 1;
+  height: 12px;
+  margin-left: 10px;
+  border-radius: 6px;
+  background: var(--bg);
+}
+#divrebound-app .browser-mock-body {
+  padding: 18px 16px;
+}
+#divrebound-app .browser-mock-line {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--divider);
+}
+#divrebound-app .browser-mock-title {
+  width: 60%;
+  height: 11px;
+  margin-bottom: 18px;
+}
+#divrebound-app .browser-mock-field-row {
+  margin-bottom: 12px;
+}
+#divrebound-app .browser-mock-label {
+  width: 40%;
+  margin-bottom: 6px;
+  background: var(--stone);
+}
+#divrebound-app .browser-mock-box {
+  height: 20px;
+  border-radius: 5px;
+  background: #fff;
+  border: 1px solid var(--divider);
+}
+#divrebound-app .browser-mock-btn {
+  width: 84px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--stone);
+  margin-top: 16px;
+}
+#divrebound-app .cheat-illustration-caption {
+  max-width: 320px;
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 #divrebound-app .pane {
