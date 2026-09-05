@@ -34,6 +34,26 @@
   font-weight: 400;
   color: var(--muted);
   font-size: 10.5px;
+  /* Bleibt auch innerhalb eines .confirmed-label (text-transform:uppercase,
+     siehe base.css) in normaler Groß-/Kleinschreibung lesbar - der Zusatztext
+     ist ein Hinweissatz, keine Feldbezeichnung. */
+  text-transform: none;
+}
+
+/* Auf dieser Seite sollen ALLE Feldbeschriftungen einheitlich aussehen -
+   unabhängig davon, ob das Feld schon einen Wert hat (.confirmed-label) oder
+   noch leer ist (.field-label): grau, in Großbuchstaben, nicht fett - wie in
+   "Fehlende Angaben ergänzen" (siehe .md-known-label in missingData.css).
+   Bewusst hier auf .profile-page eingegrenzt statt die Basisklassen selbst zu
+   ändern, damit andere Screens (z.B. Anschreiben Finanzamt), die dieselben
+   Basisklassen nutzen, unverändert bleiben. */
+#divrebound-app .profile-page .field-label,
+#divrebound-app .profile-page .confirmed-label {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 #divrebound-app .field-input:disabled {

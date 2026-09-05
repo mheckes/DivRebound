@@ -3,23 +3,20 @@
 // abgeschlossen ist und ggf. Wochen später, nachdem das Finanzamt bestätigt hat
 // (Case-Status zu diesem Zeitpunkt: "awaiting_tax_office" oder später - siehe
 // divrebound_data_schema.md CaseStatus). Nutzer öffnet das echte SKAT-Portal in
-// einem neuen Tab, gleicht das Ergebnis gegen eine kurze Checkliste ab und
-// bestätigt das im Wizard. Erst mit dieser Bestätigung wechselt der Case auf
-// "skat_form_verified" (Weiter zu Schritt 2, Teil 2: das Cheat Sheet).
+// einem neuen Tab und gleicht das Ergebnis gegen eine kurze Checkliste ab -
+// eine explizite Ja/Nein-Bestätigung ist bewusst NICHT mehr nötig, um
+// weiterzukommen (nur eine reine Selbstprüfung anhand der Checkliste).
 //
-// Layout/Copy/Interaktionsmodell 1:1 aus divrebound_step_form_verification_mockup.html
-// übernommen (--teal-*/--gold-* dort entspricht --navy/--cyan hier).
+// Layout/Copy 1:1 aus divrebound_step_form_verification_mockup.html
+// übernommen (--teal-*/--gold-* dort entspricht --navy/--cyan hier), die
+// frühere Ja/Nein-Bestätigung samt Troubleshooting-Panel wurde entfernt.
 
 import { getState, setState } from "../../store/store.js";
 import { navigate } from "../../router/router.js";
 import * as caseRepo from "../../db/caseRepo.js";
 import { corridors } from "../../config/corridors.js";
 
-/** @type {true | false | null} Antwort auf "Sehen Sie das Formular wie oben beschrieben?" */
-let answer = null;
-
 export function mount(container, params) {
-  answer = null;
   render(container, params);
 }
 
@@ -55,8 +52,13 @@ function render(container, params) {
           nebeneinander an, so dass die Einträge einfach übertragen werden können.
         </div>
 
-        <button class="open-btn" id="open-btn" type="button">
-          ↗ SKAT-Formular in neuem Tab öffnen
+        <button class="download-btn" id="open-btn" type="button">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          SKAT-Formular in neuem Tab öffnen
         </button>
 
         <div class="checklist">
@@ -69,51 +71,16 @@ function render(container, params) {
             Sie füllen das Formular ohne MitID aus. (Ein dänischer Login mit MitID ist nicht erforderlich.)
           </div>
         </div>
-
-        <div class="confirm-question">Sehen Sie das Formular wie oben beschrieben?</div>
-        <div class="confirm-buttons">
-          <button class="confirm-btn" id="btn-yes" type="button">✓ Ja</button>
-          <button class="confirm-btn" id="btn-no" type="button">✕ Nein</button>
-        </div>
-
-        <div class="trouble-panel" id="trouble-panel">
-          <b>Troubleshooting:</b>
-          <ul>
-            <li>Sprache oben rechts auf Englisch umstellen, falls Dänisch unübersichtlich ist</li>
-            <li>Weiterhin Probleme? <a href="https://skat.dk/kontakt" target="_blank" rel="noopener">Kontakt zu SKAT aufnehmen</a></li>
-          </ul>
-        </div>
       </div>
     </div>
 
     <div class="bottom-bar">
       <span></span>
-      <button class="btn-primary" id="next-btn" disabled type="button">Weiter zum Cheat Sheet →</button>
+      <button class="btn-primary" id="next-btn" type="button">Weiter zum Cheat Sheet →</button>
     </div>
   `;
 
-  applyAnswerState(container);
   attachListeners(container, params, reclaimCase);
-}
-
-function applyAnswerState(container) {
-  const yesBtn = container.querySelector("#btn-yes");
-  const noBtn = container.querySelector("#btn-no");
-  const trouble = container.querySelector("#trouble-panel");
-  const nextBtn = container.querySelector("#next-btn");
-
-  yesBtn.classList.remove("selected-yes");
-  noBtn.classList.remove("selected-no");
-  trouble.classList.remove("visible");
-  nextBtn.disabled = true;
-
-  if (answer === true) {
-    yesBtn.classList.add("selected-yes");
-    nextBtn.disabled = false;
-  } else if (answer === false) {
-    noBtn.classList.add("selected-no");
-    trouble.classList.add("visible");
-  }
 }
 
 function attachListeners(container, params, reclaimCase) {
@@ -125,18 +92,8 @@ function attachListeners(container, params, reclaimCase) {
     window.open(corridors.DK.onlinePortalUrl, "_blank", "noopener");
   });
 
-  container.querySelector("#btn-yes").addEventListener("click", () => {
-    answer = true;
-    applyAnswerState(container);
-  });
-
-  container.querySelector("#btn-no").addEventListener("click", () => {
-    answer = false;
-    applyAnswerState(container);
-  });
-
   container.querySelector("#next-btn").addEventListener("click", async () => {
-    if (answer !== true || !reclaimCase) return;
+    if (!reclaimCase) return;
 
     reclaimCase.status = "skat_form_verified";
     await caseRepo.put(reclaimCase);

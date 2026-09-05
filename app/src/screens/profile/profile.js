@@ -52,7 +52,7 @@ function buildBlankProfile() {
       city: "",
       taxOffice: { name: "", street: "", postalCode: "", city: "" },
     },
-    bank: { bankName: "", accountHolderName: "", accountHolderAddress: "", iban: "", bic: "" },
+    bank: { bankName: "", accountHolderName: "", iban: "", bic: "" },
     createdAt: now,
     updatedAt: now,
   };
@@ -105,7 +105,6 @@ function renderForm(container, profile) {
     accountHolderName: confirmedFieldClasses(b.accountHolderName),
     bic: confirmedFieldClasses(b.bic),
     iban: confirmedFieldClasses(b.iban),
-    accountHolderAddress: confirmedFieldClasses(b.accountHolderAddress),
     taxOfficeName: confirmedFieldClasses(t.name),
     taxOfficeStreet: confirmedFieldClasses(t.street),
     taxOfficePostalCode: confirmedFieldClasses(t.postalCode),
@@ -113,6 +112,7 @@ function renderForm(container, profile) {
   };
 
   container.innerHTML = `
+    <div class="profile-page">
     <div class="content-header">
       <h1 class="content-title">Persönliche Daten</h1>
     </div>
@@ -148,9 +148,8 @@ function renderForm(container, profile) {
             </select>
           </div>
           <div class="field-row">
-            <label class="${cls.tin.labelClass}">Steuer-ID (TIN)</label>
+            <label class="${cls.tin.labelClass}">Steuer-ID (TIN) <span class="field-optional" data-tin-hint>· ${esc(tinHint(r.country))}</span></label>
             <input class="${cls.tin.inputClass} mono" data-field="tin" value="${esc(r.tin)}">
-            <span class="field-hint" data-tin-hint>${esc(tinHint(r.country))}</span>
             <span class="field-error" data-tin-error hidden></span>
           </div>
         </div>
@@ -212,12 +211,6 @@ function renderForm(container, profile) {
             <input class="${cls.iban.inputClass} mono" data-field="iban" value="${esc(b.iban)}">
           </div>
         </div>
-        <div class="field-grid">
-          <div class="field-row field-row-wide">
-            <label class="${cls.accountHolderAddress.labelClass}">Adresse des Kontoinhabers <span class="field-optional">· optional</span></label>
-            <input class="${cls.accountHolderAddress.inputClass}" data-field="accountHolderAddress" value="${esc(b.accountHolderAddress ?? "")}">
-          </div>
-        </div>
         <div class="field-hint">Geben Sie hier ein Konto an, das SEPA-Überweisungen empfangen kann und auf dem Sie Ihre Quellensteuer-Erstattung erhalten wollen.</div>
       </div>
     </div>
@@ -233,7 +226,7 @@ function renderForm(container, profile) {
         </div>
         <div class="field-grid">
           <div class="field-row field-row-wide">
-            <label class="${cls.taxOfficeStreet.labelClass}">Straße</label>
+            <label class="${cls.taxOfficeStreet.labelClass}">Straße und Hausnummer</label>
             <input class="${cls.taxOfficeStreet.inputClass}" data-field="taxOfficeStreet" placeholder="z.B. Deroystraße 4" value="${esc(t.street)}">
           </div>
         </div>
@@ -271,6 +264,7 @@ function renderForm(container, profile) {
       <span class="save-hint">Aktualisierung gilt für neu angelegte Fälle. Laufende Fälle bei Bedarf direkt dort anpassen.</span>
       <button class="btn-primary" data-action="save" type="button">Speichern</button>
     </div>
+    </div>
   `;
 
   attachListeners(container, profile);
@@ -305,7 +299,7 @@ function attachListeners(container, profile) {
   // mitziehen, wenn hier umgestellt wird.
   countrySelect.addEventListener("change", () => {
     country = countrySelect.value;
-    tinHintEl.textContent = tinHint(country);
+    tinHintEl.textContent = `· ${tinHint(country)}`;
     validateTin();
   });
 
@@ -349,7 +343,6 @@ function attachListeners(container, profile) {
         ...profile.bank,
         bankName: value("bankName"),
         accountHolderName: value("accountHolderName"),
-        accountHolderAddress: value("accountHolderAddress"),
         iban: value("iban"),
         bic: value("bic"),
       },

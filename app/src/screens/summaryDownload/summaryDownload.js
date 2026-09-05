@@ -49,6 +49,10 @@ function countryNameGerman(code) {
   return COUNTRY_NAMES_DE[code] ?? code ?? "";
 }
 
+function chevronSvg() {
+  return `<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+}
+
 function caseLabel(reclaimCase) {
   const d = new Date(reclaimCase.createdAt);
   return `DivRebound ${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
@@ -103,15 +107,18 @@ function renderDistributionsCard(reclaimCase, profile) {
 
   if (confirmed.length === 0) {
     return `
-      <div class="card">
-        <div class="card-head head-navy">
-          <span class="card-title">Bestätigte Ausschüttungen</span>
+      <details class="card">
+        <summary class="card-head head-navy">
+          <span style="display:flex;align-items:center;">
+            ${chevronSvg()}
+            <span class="card-title">Bestätigte Ausschüttungen</span>
+          </span>
           <span class="count-pill">0 von ${reclaimCase.distributions.length}</span>
-        </div>
+        </summary>
         <div class="card-body">
           <p class="empty-hint">Noch keine bestätigten Ausschüttungen. Bitte in Schritt 1 zuerst mindestens eine Ausschüttung bestätigen.</p>
         </div>
-      </div>`;
+      </details>`;
   }
 
   let totalGross = 0;
@@ -138,11 +145,14 @@ function renderDistributionsCard(reclaimCase, profile) {
     .join("");
 
   return `
-    <div class="card">
-      <div class="card-head head-navy">
-        <span class="card-title">Bestätigte Ausschüttungen</span>
+    <details class="card">
+      <summary class="card-head head-navy">
+        <span style="display:flex;align-items:center;">
+          ${chevronSvg()}
+          <span class="card-title">Bestätigte Ausschüttungen</span>
+        </span>
         <span class="count-pill">${confirmed.length} von ${reclaimCase.distributions.length}</span>
-      </div>
+      </summary>
       <div class="card-body">
         <div style="overflow-x:auto;">
           <table class="dist-table">
@@ -174,7 +184,7 @@ function renderDistributionsCard(reclaimCase, profile) {
           </span>
         </div>
       </div>
-    </div>`;
+    </details>`;
 }
 
 function renderDownloadStatusHtml(kind, data) {
@@ -231,10 +241,13 @@ function render(container) {
 
     <a class="back-link" data-action="back">← Zurück</a>
 
-    <div class="card">
-      <div class="card-head head-navy">
-        <span class="card-title">Angaben für die Wohnsitzbescheinigung</span>
-      </div>
+    <details class="card">
+      <summary class="card-head head-navy">
+        <span style="display:flex;align-items:center;">
+          ${chevronSvg()}
+          <span class="card-title">Angaben für die Wohnsitzbescheinigung</span>
+        </span>
+      </summary>
       <div class="card-body">
         <div class="summary-row"><span class="summary-label">Name</span><span class="summary-value">${esc(fullName)}</span></div>
         <div class="summary-row"><span class="summary-label">Adresse</span><span class="summary-value">${esc(fullAddress)}</span></div>
@@ -244,7 +257,7 @@ function render(container) {
         <div class="summary-row"><span class="summary-label">Wohnsitzland (DBA)</span><span class="summary-value">${esc(countryNameGerman(profile.residence.country))}</span></div>
         <div class="summary-row"><span class="summary-label">Ansässig seit</span><span class="summary-value">${esc(formatResidencePeriod(reclaimCase.residencePeriod))}</span></div>
       </div>
-    </div>
+    </details>
 
     ${renderDistributionsCard(reclaimCase, profile)}
 
@@ -267,10 +280,14 @@ function render(container) {
       </div>
     </div>
 
-    <div class="status-panel">
-      <div class="status-panel-title">Nächste Schritte</div>
-      <div class="step-row"><span class="step-num">1</span><span>Ausdrucken, unterschreiben und an das zuständige Finanzamt per Post senden.</span></div>
-      <div class="step-row"><span class="step-num">2</span><span>Nach der Bestätigung durch das Finanzamt geht es in Schritt 2 weiter.</span></div>
+    <div class="card">
+      <div class="card-head head-navy">
+        <span class="card-title">Nächste Schritte</span>
+      </div>
+      <div class="card-body">
+        <div class="step-row"><span class="step-num">1</span><span>Ausdrucken, unterschreiben und an das zuständige Finanzamt per Post senden.</span></div>
+        <div class="step-row"><span class="step-num">2</span><span>Nach der Bestätigung durch das Finanzamt geht es in Schritt 2 weiter.</span></div>
+      </div>
     </div>
 
     <div class="status-panel">

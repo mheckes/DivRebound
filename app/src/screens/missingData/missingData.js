@@ -174,12 +174,12 @@ function render(container) {
         <div class="field-hint" style="margin-bottom:14px;">"Von" wurde aus dem frühesten Zahltag Ihrer Ausschüttungen abgeleitet – bitte prüfen.</div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;">
           <div class="field-row" style="flex:1;min-width:140px;">
-            <label class="field-label" for="res-from">Von</label>
+            <label class="md-known-label" for="res-from">Von</label>
             <input type="date" id="res-from" class="field-input mono" value="${escapeHtml(reclaimCase.residencePeriod.from ?? "")}">
             <span class="badge badge-dupe" id="res-from-derived-badge" style="display:${fromIsDerived ? "inline-block" : "none"};width:fit-content;">↺ aus Abrechnungen abgeleitet</span>
           </div>
           <div class="field-row" style="flex:1;min-width:140px;">
-            <label class="field-label" for="res-until">Bis</label>
+            <label class="md-known-label" for="res-until">Bis</label>
             <input type="date" id="res-until" class="field-input mono" value="${escapeHtml(reclaimCase.residencePeriod.until ?? "")}" ${ongoing ? "disabled" : ""}>
             <label style="font-weight:400;font-size:11.5px;display:flex;align-items:center;gap:6px;margin-top:2px;cursor:pointer;">
               <input type="checkbox" id="res-ongoing" ${ongoing ? "checked" : ""} style="width:14px;height:14px;accent-color:var(--navy);">
@@ -191,7 +191,7 @@ function render(container) {
     </div>
 
     <div class="card">
-      <div class="card-head head-cyan">
+      <div class="card-head head-navy">
         <span class="card-title">Bitte noch ergänzen</span>
         <span class="count-pill" id="missing-pill">3 Felder offen</span>
       </div>
@@ -210,24 +210,22 @@ function render(container) {
         <div class="md-required-field">
           <div class="md-req-row">
             <div style="flex:1;">
-              <div class="md-known-label">Geburtsort</div>
+              <div class="md-known-label">Geburtsort <span class="field-optional">· wie im Reisepass</span></div>
               <input type="text" id="birthplace" class="md-known-input" placeholder="z.B. München" value="${escapeHtml(profile.residence.birthPlace ?? "")}">
             </div>
             <span class="badge" data-field-badge="birthplace"></span>
           </div>
-          <div class="field-hint">Wie im gültigen Reisepass/Personalausweis angegeben.</div>
           <div class="field-error" id="birthplace-error"></div>
         </div>
 
         <div class="md-required-field">
           <div class="md-req-row">
             <div style="flex:1;">
-              <div class="md-known-label">Steuer-ID (${escapeHtml(countryLabel)})</div>
+              <div class="md-known-label">Steuer-ID (${escapeHtml(countryLabel)}) <span class="field-optional">· ${escapeHtml(tinHint(profile.residence.country))}</span></div>
               <input type="text" id="tin" class="md-known-input mono" placeholder="z.B. ${TIN_PLACEHOLDER[profile.residence.country] ?? ""}" value="${escapeHtml(profile.residence.tin ?? "")}">
             </div>
             <span class="badge" data-field-badge="tin"></span>
           </div>
-          <div class="field-hint">${escapeHtml(tinHint(profile.residence.country))}</div>
           <div class="field-error" id="tin-error"></div>
         </div>
       </div>

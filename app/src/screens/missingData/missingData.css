@@ -6,19 +6,6 @@
    NICHT wiederholt. Eigene Klassen mit "md-"-Präfix (missingData), damit sie
    nicht mit generisch benannten Klassen anderer Screens kollidieren. */
 
-/* Head-Variante "gold" aus dem Mockup (--gold -> --cyan gemäß CI-Umbenennung) -
-   in base.css gibt es bislang nur .head-navy. */
-#divrebound-app .card-head.head-cyan {
-  background: var(--cyan);
-}
-#divrebound-app .card-head.head-cyan .card-title {
-  color: var(--charcoal);
-}
-#divrebound-app .card-head.head-cyan .count-pill {
-  background: rgba(255, 255, 255, 0.4);
-  color: var(--charcoal);
-}
-
 /* count-pill auf dunklem head-navy-Hintergrund braucht helle Farben -
    base.css definiert das bislang nicht mit. */
 #divrebound-app .card-head.head-navy .count-pill {

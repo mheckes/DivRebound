@@ -352,6 +352,9 @@ export function mount(container, params) {
 
     const activeTabDef = tabs.find((t) => t.id === activeTabId) ?? tabs[0];
     const paneBodyHtml = renderPaneBody(activeTabDef, tickedIds);
+    const activeTabIndex = tabs.findIndex((t) => t.id === activeTabDef.id);
+    const isFirstTab = activeTabIndex <= 0;
+    const isLastTab = activeTabIndex >= tabs.length - 1;
 
     container.innerHTML = `
       <div class="content-header">
@@ -388,6 +391,11 @@ export function mount(container, params) {
           <div class="page-section active">${paneBodyHtml}</div>
         </div>
       </div>
+
+      <div class="bottom-bar">
+        <button class="btn-secondary" id="prev-tab-btn" type="button" ${isFirstTab ? "disabled" : ""}>← Zurück</button>
+        <button class="btn-primary" id="next-tab-btn" type="button" ${isLastTab ? "disabled" : ""}>Weiter →</button>
+      </div>
     `;
 
     container.querySelectorAll('input[type="checkbox"][data-row-id]').forEach((cb) => {
@@ -420,6 +428,19 @@ export function mount(container, params) {
         activeTabId = "p1";
         render();
       });
+    });
+
+    container.querySelector("#prev-tab-btn").addEventListener("click", () => {
+      if (activeTabIndex > 0) {
+        activeTabId = tabs[activeTabIndex - 1].id;
+        render();
+      }
+    });
+    container.querySelector("#next-tab-btn").addEventListener("click", () => {
+      if (activeTabIndex < tabs.length - 1) {
+        activeTabId = tabs[activeTabIndex + 1].id;
+        render();
+      }
     });
 
     if (activeTabDef.dynamic) {

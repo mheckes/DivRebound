@@ -83,7 +83,7 @@ function render(container) {
         </div>
         <div class="field-grid">
           <div class="field-row field-row-wide">
-            <label class="${taxStreet.labelClass}">Straße</label>
+            <label class="${taxStreet.labelClass}">Straße und Hausnummer</label>
             <input class="${taxStreet.inputClass}" data-field="taxOfficeStreet" placeholder="z.B. Deroystraße 4" value="${esc(t.street)}">
           </div>
         </div>

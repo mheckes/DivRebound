@@ -58,7 +58,6 @@ export async function createProfile(residenceCountry) {
     bank: {
       bankName: "",
       accountHolderName: "",
-      accountHolderAddress: "",
       iban: "",
       bic: "",
     },

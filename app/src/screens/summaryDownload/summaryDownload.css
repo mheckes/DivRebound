@@ -45,6 +45,54 @@
   border-top: 2px solid var(--navy);
   color: var(--charcoal);
 }
+/* .dist-total-row hat wegen colspan="2" auf der ersten Zelle nur 4 statt 5
+   <td>, d.h. nth-child zählt dort anders als in den Datenzeilen - ohne diese
+   Regel würde die Brutto-Summe (das 2. <td> dieser Zeile) fälschlich
+   linksbündig statt wie die Spalte darüber rechtsbündig stehen. */
+#divrebound-app .dist-total-row td:nth-child(n + 2) {
+  text-align: right;
+}
+
+/* ---------- Zusammenklappbare Karten (Wiederholungen aus Schritt 1) ---------- */
+/* "Angaben für die Wohnsitzbescheinigung" und "Bestätigte Ausschüttungen"
+   wiederholen nur, was der Nutzer schon auf den vorigen zwei Screens gesehen
+   hat - hier standardmäßig eingeklappt, damit sie nicht wie neue Information
+   wirken, aber bei Bedarf (z.B. kurz vor dem Ausdrucken) trotzdem einsehbar
+   bleiben, statt sie ganz zu entfernen. */
+#divrebound-app summary.card-head {
+  cursor: pointer;
+  list-style: none;
+}
+#divrebound-app summary.card-head::-webkit-details-marker {
+  display: none;
+}
+#divrebound-app summary.card-head .chevron {
+  width: 14px;
+  height: 14px;
+  color: #fff;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+  margin-right: 8px;
+}
+#divrebound-app details[open] > summary.card-head .chevron {
+  transform: rotate(90deg);
+}
+
+/* Eingeklappt bewusst dezent statt in voller Navy-Optik (wie die bestehenden
+   .help-disclosure-Aufklapper) - erst beim Ausklappen wirkt die Karte wie ein
+   "echter" Inhaltsblock. Vermeidet, dass die Seite von mehreren dunklen
+   Balken dominiert wird, obwohl zwei davon nur Wiederholungen sind. */
+#divrebound-app details.card:not([open]) > summary.card-head {
+  background: var(--navy-light);
+}
+#divrebound-app details.card:not([open]) > summary.card-head .card-title,
+#divrebound-app details.card:not([open]) > summary.card-head .chevron {
+  color: var(--navy);
+}
+#divrebound-app details.card:not([open]) > summary.card-head .count-pill {
+  background: rgba(15, 34, 64, 0.12);
+  color: var(--navy);
+}
 
 #divrebound-app .refund-summary {
   display: flex;
