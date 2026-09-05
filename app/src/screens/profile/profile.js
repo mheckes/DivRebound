@@ -9,6 +9,15 @@
 // rührt NIE an ReclaimCase.applicantSnapshot - dieser wird bei Case-Anlage einmalig
 // kopiert und danach bewusst eingefroren. Profiländerungen hier wirken sich nur auf
 // künftig neu angelegte Cases aus, nie rückwirkend auf bestehende.
+//
+// Ist noch kein Profil vorhanden (Nutzer kommt direkt hierher statt zuerst
+// über "Neuer DivRebound"), wird ein leeres Profil nur im Speicher gehalten
+// und erst beim Klick auf "Speichern" tatsächlich persistiert (profileRepo.put
+// legt es dann per Upsert neu an) - kein Blocker mehr, der zwingend den
+// Popup-Dialog voraussetzt. Die Privatanleger-Bestätigung ist bewusst NICHT
+// Teil dieses Screens - die bleibt ausschließlich im Popup-Dialog
+// (components/newCaseWizard.js), der sie beim ersten angelegten Fall nachträgt,
+// falls das Profil schon vorher hier ohne diese Bestätigung entstanden ist.
 
 import { getState, setState } from "../../store/store.js";
 import * as profileRepo from "../../db/profileRepo.js";
@@ -22,25 +31,36 @@ export function mount(container) {
   render(container);
 }
 
-function render(container) {
-  const profile = getState().currentProfile;
-  if (!profile) {
-    renderEmpty(container);
-    return;
-  }
-  renderForm(container, profile);
+function buildBlankProfile() {
+  const now = new Date().toISOString();
+  return {
+    schemaVersion: "1.0",
+    profileId: crypto.randomUUID(),
+    investorType: "private",
+    heldInPrivateAssets: true,
+    residence: {
+      country: "DE",
+      firstName: "",
+      lastName: "",
+      birthDate: "",
+      birthPlace: "",
+      tin: "",
+      email: "",
+      phone: "",
+      address: "",
+      postalCode: "",
+      city: "",
+      taxOffice: { name: "", street: "", postalCode: "", city: "" },
+    },
+    bank: { bankName: "", accountHolderName: "", accountHolderAddress: "", iban: "", bic: "" },
+    createdAt: now,
+    updatedAt: now,
+  };
 }
 
-function renderEmpty(container) {
-  container.innerHTML = `
-    <div class="content-header">
-      <h1 class="content-title">Persönliche Daten</h1>
-    </div>
-    <div class="info-banner">
-      <span class="icon">ℹ</span>
-      <div>Es ist kein Profil vorhanden. Lege zunächst über den Einstiegs-Dialog ein Profil an.</div>
-    </div>
-  `;
+function render(container) {
+  const profile = getState().currentProfile ?? buildBlankProfile();
+  renderForm(container, profile);
 }
 
 function esc(value) {
@@ -69,6 +89,7 @@ function renderForm(container, profile) {
   // ein normales, zum Ausfüllen einladendes Eingabefeld - nicht nur bei
   // Finanzamt, sondern konsistent für die ganze "Persönliche Daten"-Seite.
   const cls = {
+    heldInPrivateAssets: confirmedFieldClasses(profile.heldInPrivateAssets),
     firstName: confirmedFieldClasses(r.firstName),
     lastName: confirmedFieldClasses(r.lastName),
     birthDate: confirmedFieldClasses(r.birthDate),
@@ -121,13 +142,10 @@ function renderForm(container, profile) {
         </div>
         <div class="field-grid">
           <div class="field-row">
-            <label class="${cls.country.labelClass}">Wohnsitzland</label>
-            <select class="${cls.country.inputClass}" data-field="country">
-              <option value="DE" ${r.country === "DE" ? "selected" : ""}>Deutschland</option>
-              <option value="AT" ${r.country === "AT" ? "selected" : ""} ${r.country !== "AT" ? "disabled" : ""}>Österreich${r.country !== "AT" ? " (bald)" : ""}</option>
-              <option value="CH" ${r.country === "CH" ? "selected" : ""} ${r.country !== "CH" ? "disabled" : ""}>Schweiz${r.country !== "CH" ? " (bald)" : ""}</option>
+            <label class="${cls.heldInPrivateAssets.labelClass}">Hältst du deine Aktien im Privatvermögen?</label>
+            <select class="${cls.heldInPrivateAssets.inputClass}" data-field="heldInPrivateAssets">
+              <option value="yes" selected>Ja</option>
             </select>
-            <span class="field-hint">Aktuell ist nur Deutschland neu auswählbar - weitere Länder folgen.</span>
           </div>
           <div class="field-row">
             <label class="${cls.tin.labelClass}">Steuer-ID (TIN)</label>
@@ -137,8 +155,14 @@ function renderForm(container, profile) {
           </div>
         </div>
         <div class="field-grid">
-          <div class="field-row field-row-wide">
-            <label class="${cls.address.labelClass}">Adresse</label>
+          <div class="field-row">
+            <label class="${cls.country.labelClass}">Wohnsitzland</label>
+            <select class="${cls.country.inputClass}" data-field="country">
+              <option value="DE" selected>Deutschland</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <label class="${cls.address.labelClass}">Straße und Hausnummer</label>
             <input class="${cls.address.inputClass}" data-field="address" value="${esc(r.address)}">
           </div>
         </div>
@@ -296,6 +320,11 @@ function attachListeners(container, profile) {
     /** @type {InvestorProfile} */
     const updated = {
       ...profile,
+      // Nur "Ja" wählbar (siehe <select> oben, wie beim Wohnsitzland aktuell
+      // nur Deutschland) - DivRebound deckt im MVP ausschließlich Aktien im
+      // Privatvermögen ab, echte Bestätigung findet weiterhin im Popup-Dialog
+      // beim Anlegen eines Falls statt (siehe components/newCaseWizard.js).
+      heldInPrivateAssets: true,
       residence: {
         ...profile.residence,
         country: value("country"),

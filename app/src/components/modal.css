@@ -90,16 +90,3 @@
   color: var(--muted);
   background: var(--divider);
 }
-#divrebound-app .wizard-locked-answer {
-  font-size: 12.5px;
-  color: var(--success);
-  font-weight: 600;
-  padding: 8px 10px;
-  background: var(--success-bg);
-  border-radius: 8px;
-}
-#divrebound-app .wizard-locked-hint {
-  font-weight: 400;
-  color: var(--muted);
-  margin-left: 4px;
-}

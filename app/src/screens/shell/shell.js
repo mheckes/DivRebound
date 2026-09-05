@@ -157,13 +157,17 @@ function render(container) {
       <div class="content-breadcrumb">Dänemark <b>›</b> ${new Date(reclaimCase.createdAt).toLocaleDateString("de-DE", { month: "2-digit", year: "numeric" })} <b>›</b> Schritt 1</div>
     </div>
 
-    <div class="topbar-row">
-      <button class="btn-accent" data-action="pick-file">＋ Weitere Abrechnung(en) hochladen</button>
-    </div>
     <div class="dropzone" id="dropzone">
       <input type="file" id="file-input" multiple accept="application/pdf" hidden />
-      <div class="dz-icon">⬆</div>
-      <div class="dz-main">…oder Dividendenabrechnung(en) hierher ziehen</div>
+      <div class="dz-icon">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 2v6h6"/>
+          <path d="M12 17v-6"/>
+          <path d="m9 14 3-3 3 3"/>
+        </svg>
+      </div>
+      <div class="dz-main">Dividendenabrechnung(en) hochladen oder hierher ziehen</div>
       <div class="dz-sub">PDF · Mehrfachauswahl möglich · z.B. mehrere Jahre oder mehrere Aktien auf einmal</div>
     </div>
 
@@ -299,7 +303,6 @@ function render(container) {
 
 function attachListeners(container, reclaimCase, corridor) {
   const fileInput = container.querySelector("#file-input");
-  container.querySelector('[data-action="pick-file"]').addEventListener("click", () => fileInput.click());
   fileInput.addEventListener("change", () => handleFiles(container, fileInput.files));
 
   const dropzone = container.querySelector("#dropzone");

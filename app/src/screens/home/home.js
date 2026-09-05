@@ -1,8 +1,10 @@
 // Startseite (#/home): Kachel-Übersicht als zentraler, immer erreichbarer
 // Einstiegspunkt - auch bevor überhaupt ein Profil existiert (siehe main.js
-// Bootstrap). Profil+erster Fall werden nicht mehr über eine separate
-// Onboarding-Seite angelegt, sondern über den Popup-Dialog in
-// components/newCaseWizard.js, ausgelöst durch die "Neuer DivRebound"-Kachel.
+// Bootstrap). Zwei gleichwertige Wege, ein Profil anzulegen: über die
+// "Neuer DivRebound"-Kachel (Popup-Dialog in components/newCaseWizard.js,
+// legt Profil+ersten Fall zusammen an) ODER direkt über "Nutzerprofil
+// bearbeiten" (screens/profile/profile.js legt bei Bedarf ein leeres Profil
+// an, ganz ohne Fall) - je nachdem, was der Nutzer zuerst tun möchte.
 
 import { getState } from "../../store/store.js";
 import { navigate } from "../../router/router.js";
@@ -80,10 +82,10 @@ function render(container) {
         <div class="home-tile-desc">Eine neue Quellensteuer-Rückforderung starten.</div>
       </div>
 
-      <div class="home-tile ${profile ? "" : "home-tile-disabled"}" ${profile ? 'data-nav="#/profile"' : ""}>
+      <div class="home-tile" data-nav="#/profile">
         <div class="home-tile-icon">👤</div>
         <div class="home-tile-title">Nutzerprofil bearbeiten</div>
-        <div class="home-tile-desc">${profile ? "Persönliche Daten, Bankverbindung und Finanzamt verwalten." : "Noch kein Profil vorhanden — erst über „Neuer DivRebound“ anlegen."}</div>
+        <div class="home-tile-desc">Persönliche Daten, Bankverbindung und Finanzamt verwalten.</div>
       </div>
 
       <div class="home-tile ${mostRecent ? "" : "home-tile-disabled"}" ${mostRecent ? `data-nav="${continueRoute(mostRecent)}"` : ""}>

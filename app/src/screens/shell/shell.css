@@ -2,12 +2,6 @@
    erster Screen). Gemeinsame Klassen (.card, .badge*, table, .mono, ...)
    kommen aus style/base.css. */
 
-#divrebound-app .topbar-row {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 10px;
-}
-
 #divrebound-app .issues-summary {
   border: 1px solid var(--danger);
   border-radius: 12px;

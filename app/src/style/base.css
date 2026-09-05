@@ -152,8 +152,13 @@
   border-style: solid;
 }
 #divrebound-app .dropzone .dz-icon {
-  font-size: 20px;
-  margin-bottom: 4px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+#divrebound-app .dropzone .dz-icon svg {
+  width: 34px;
+  height: 34px;
 }
 #divrebound-app .dropzone .dz-main {
   font-weight: 700;
@@ -216,6 +221,7 @@
 }
 #divrebound-app .field-label {
   font-size: 12.5px;
+  line-height: 15px;
   font-weight: 600;
   color: var(--charcoal);
 }
@@ -228,6 +234,7 @@
   border: 1px solid var(--divider);
   border-radius: 8px;
   padding: 9px 12px;
+  height: 40px;
   font-size: 13px;
   font-family: var(--font-body);
   color: var(--charcoal);
@@ -250,22 +257,22 @@
    editierbar. Siehe util/fieldDisplay.js für die Zuordnung leer/vorhanden. */
 #divrebound-app .confirmed-label {
   font-size: 11px;
+  line-height: 15px;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--charcoal);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
 #divrebound-app .confirmed-input {
   border: 1px solid transparent;
-  border-radius: 6px;
-  padding: 4px 7px;
-  margin: -4px -7px;
+  border-radius: 8px;
+  padding: 9px 12px;
+  height: 40px;
   background: transparent;
-  font-size: 13.5px;
+  font-size: 13px;
   font-family: var(--font-body);
   font-weight: 600;
   color: var(--charcoal);
-  width: calc(100% - 2px);
 }
 #divrebound-app .confirmed-input:hover,
 #divrebound-app .confirmed-input:focus {
