@@ -1,0 +1,18 @@
+---
+layout: layouts/default.html
+---
+<div class="about">
+  <header class="about-head">
+    <img class="about-photo" src="{{ photo }}" alt="{{ photoAlt }}" width="640" height="800">
+    <div class="about-intro">
+      <h1>{{ title }}</h1>
+      <p class="about-lead">{{ lead }}</p>
+      <div class="about-facts">
+        {%- for fact in facts %}<span class="chip-fact">{{ fact }}</span>{% endfor -%}
+      </div>
+    </div>
+  </header>
+  <div class="about-body">
+    {{ content }}
+  </div>
+</div>

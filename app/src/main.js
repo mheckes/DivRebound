@@ -35,11 +35,16 @@ import * as cheatSheet from "./screens/cheatSheet/cheatSheet.js";
 import * as profileScreen from "./screens/profile/profile.js";
 import * as coverLetter from "./screens/coverLetter/coverLetter.js";
 
+import { websiteHome } from "./config/siteLinks.js";
+
 const app = document.getElementById("divrebound-app");
 app.innerHTML = `
   <div class="app-shell">
     <div class="sidebar" id="sidebar-root"></div>
-    <div class="content" id="content-root"></div>
+    <div class="content">
+      <a class="site-bridge-btn" href="${websiteHome}">← Zur Website</a>
+      <div id="content-root"></div>
+    </div>
   </div>
 `;
 const sidebarRoot = document.getElementById("sidebar-root");
@@ -95,6 +100,14 @@ route("#/dk/:caseId/step2/cheatsheet", async (p) => {
 });
 
 async function bootstrap() {
+  // Marker für die Website: Wer die App schon einmal geöffnet hat, sieht dort
+  // im Header "Zurück zur App" statt "Zur DivRebound App" (site/assets/js/site.js).
+  try {
+    localStorage.setItem("divrebound.lastVisit", new Date().toISOString());
+  } catch {
+    // localStorage gesperrt: Website zeigt dann einfach den Standardtext.
+  }
+
   mountSidebar(sidebarRoot);
 
   const profiles = await profileRepo.getAll();

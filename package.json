@@ -1,0 +1,17 @@
+{
+  "name": "divrebound-site",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "eleventy --serve",
+    "build:site": "eleventy",
+    "build:app": "npm --prefix app run build -- --outDir ../dist/app --emptyOutDir",
+    "build": "npm run build:site && npm run build:app",
+    "preview": "npm --prefix app run preview -- --outDir ../dist --base /DivRebound/ --port 4174 --strictPort"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.6",
+    "js-yaml": "^4.1.0"
+  }
+}

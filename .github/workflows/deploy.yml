@@ -23,14 +23,18 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: app/package-lock.json
+          cache-dependency-path: |
+            package-lock.json
+            app/package-lock.json
+      # Website (Eleventy, Repo-Root) und App (Vite, app/) - beide landen in dist/,
+      # die App unter dist/app/ (siehe package.json "build").
+      - run: npm ci
       - run: npm ci
         working-directory: app
       - run: npm run build
-        working-directory: app
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: app/dist
+          path: dist
 
   deploy:
     needs: build

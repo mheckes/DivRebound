@@ -234,7 +234,31 @@
   color: var(--success);
 }
 
+/* Links zur Website (Über mich · Impressum · Datenschutz), immer am Fuß der
+   Seitenleiste - Pflichtangaben müssen auch aus der App erreichbar sein. */
+#divrebound-app .sidebar-foot {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  font-size: 12px;
+}
+#divrebound-app .sidebar-foot a {
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+}
+#divrebound-app .sidebar-foot a:hover {
+  color: #fff;
+}
+
 @media (max-width: 760px) {
+  #divrebound-app .sidebar-foot {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
   #divrebound-app .app-shell {
     flex-direction: column;
   }

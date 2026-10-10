@@ -29,13 +29,25 @@ lässt sich die App rein statisch hosten (z. B. GitHub Pages) und skaliert koste
 
 ## Lokal starten
 
+Website und App liegen im selben Repo und werden gemeinsam veröffentlicht:
+Website unter `/DivRebound/` (Eleventy, `site/`), App unter `/DivRebound/app/` (Vite, `app/`).
+
+Nur die App entwickeln:
+
 ```bash
 cd app
 npm install
 npm run dev
 ```
 
-Production-Build:
+Nur die Website entwickeln (Repo-Root):
+
+```bash
+npm install
+npm run dev
+```
+
+Gesamt-Build (Website + App nach `dist/`) und Vorschau unter http://localhost:4174/DivRebound/:
 
 ```bash
 npm run build
@@ -44,13 +56,23 @@ npm run preview
 
 ## Deployment
 
-Der Build wird automatisch per GitHub Actions (`.github/workflows/deploy.yml`) auf GitHub Pages
+Der Gesamt-Build wird automatisch per GitHub Actions (`.github/workflows/deploy.yml`) auf GitHub Pages
 veröffentlicht, bei jedem Push auf `main`.
+
+## Website pflegen
+
+- Navigation (Header, Footer, Links in der App-Seitenleiste): `site/_data/nav.json`
+- Länder-Tabelle und Europakarte: `site/_data/countries.yml`
+- Neue Seite: Markdown-Datei in `site/` anlegen und in `nav.json` eintragen
+- Farben und Fonts: `app/src/style/tokens.css` (gilt für App und Website)
+- Eigene Domain: in `eleventy.config.js` `pathPrefix` auf `"/"` setzen, in `app/vite.config.js` `base` auf `"/app/"`
 
 ## Projektstruktur
 
 ```
 app/                          Vite-App (der eigentliche, lauffähige Code)
+site/                         Website (Eleventy): Seiten, Layouts, Daten, Assets
+docs/                         Architekturkonzept und klickbarer Prototyp der Website
 Mock Up Status 08-2026/       Referenz: HTML-Mockups, Datenmodell, Prozessfluss
 DivRebound CI/                Referenz: Corporate-Design-Guide
 Dänemark/                     Formularvorlage 02.050 (dänische Wohnsitzbescheinigung)

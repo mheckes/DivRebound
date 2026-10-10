@@ -35,11 +35,15 @@
   src: url("./fonts/jetbrains-mono-latin.woff2") format("woff2");
 }
 
+/* Auch auf :root, damit die Website (bekommt beim Build eine Kopie dieser
+   Datei, siehe eleventy.config.js) dieselben Tokens nutzt. */
+:root,
 #divrebound-app {
   --navy: #0f2240;
   --navy-mid: #1a3a6b;
   --navy-light: #e8eef7;
   --cyan: #00b4d8;
+  --cyan-dark: #007a9e;
   --cyan-light: #e0f7fc;
   --bg: #f2f4f7;
   --surface: #ffffff;

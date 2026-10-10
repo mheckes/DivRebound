@@ -1,0 +1,30 @@
+# Länder-Tabelle und Europakarte auf der Startseite.
+# Quelle: Stiftung Warentest Finanztest 10/2026, S. 83, Datenbasis BZSt, Stand 10. Mai 2026.
+# Nur Dividenden, nur Regelsatz, Angaben in Prozentpunkten.
+#
+# rate        Quellensteuersatz im Sitzland
+# creditable  in Deutschland anrechenbar
+# potential   Erstattungspotenzial (rate - creditable)
+# status      live | planned | no
+# code        ISO-Code, nur nötig für Länder auf der Europakarte (mit companies)
+# companies   Beispielunternehmen (nur Namen, keine Logos)
+#
+# Die Einfärbung der Länder in der Karte steckt in site/_includes/europa-karte.svg
+# (Klassen c-show / c-other); die Beschriftungen und Länderkarten kommen von hier.
+
+- {name: Belgien,    rate: 30,   creditable: 0,    potential: 30,   status: planned}
+- {name: Irland,     rate: 25,   creditable: 0,    potential: 25,   status: planned}
+- {name: Finnland,   rate: 35,   creditable: 15,   potential: 20,   status: planned}
+- {name: Schweiz,    rate: 35,   creditable: 15,   potential: 20,   status: planned, code: CH, companies: [Nestlé, Roche, Zurich Insurance, Swiss Re]}
+- {name: Israel,     rate: 25,   creditable: 10,   potential: 15,   status: planned}
+- {name: Schweden,   rate: 30,   creditable: 15,   potential: 15,   status: planned, code: SE, companies: [Volvo, Svenska Handelsbanken, Investor AB]}
+- {name: Portugal,   rate: 28,   creditable: 15,   potential: 13,   status: planned}
+- {name: Österreich, rate: 27.5, creditable: 15,   potential: 12.5, status: no}
+- {name: Frankreich, rate: 25,   creditable: 12.8, potential: 12.2, status: no}
+- {name: Dänemark,   rate: 27,   creditable: 15,   potential: 12,   status: live,    code: DK, companies: [Novo Nordisk, Maersk, Carlsberg]}
+- {name: Italien,    rate: 26,   creditable: 15,   potential: 11,   status: planned, code: IT, companies: [Enel, Generali, Eni, UniCredit]}
+- {name: Kanada,     rate: 25,   creditable: 15,   potential: 10,   status: planned}
+- {name: Norwegen,   rate: 25,   creditable: 15,   potential: 10,   status: planned}
+- {name: Südkorea,   rate: 20,   creditable: 15,   potential: 5,    status: planned}
+- {name: Polen,      rate: 19,   creditable: 15,   potential: 4,    status: planned}
+- {name: Spanien,    rate: 19,   creditable: 15,   potential: 4,    status: planned, code: ES, companies: [Iberdrola, Banco Santander, BBVA, Telefónica]}

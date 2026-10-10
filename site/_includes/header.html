@@ -1,0 +1,14 @@
+<header class="site-header">
+  <a class="brand" href="/" aria-label="DivRebound Startseite">
+    <span class="brand-icon">{% include "logo-mark.svg" %}</span>
+    <span class="brand-name">Div<span>Rebound</span></span>
+  </a>
+  <nav class="main-nav" aria-label="Hauptnavigation">
+    <div class="nav-links">
+      {%- for item in nav.main %}
+      <a href="{{ item.url }}"{% if page.url == item.url %} class="active" aria-current="page"{% endif %}>{{ item.title }}</a>
+      {%- endfor %}
+    </div>
+    <a class="btn-cta" href="{{ nav.cta.url }}" data-app-cta data-returning="{{ nav.cta.titleReturning }}">{{ nav.cta.title }}</a>
+  </nav>
+</header>

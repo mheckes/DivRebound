@@ -12,6 +12,7 @@ import {
 } from "../crypto/exportImport.js";
 import { openPassphraseModal, openExportOptionsModal, openInfoModal, openConfirmModal } from "./modal.js";
 import { openNewCaseWizard } from "./newCaseWizard.js";
+import { legalLinks } from "../config/siteLinks.js";
 
 const STATUS_ORDER = [
   "draft",
@@ -121,6 +122,10 @@ export function renderSidebar(container) {
         <summary>${chevron()} Italien <span class="tree-stub-tag">bald</span></summary>
       </details>
     </div>
+
+    <nav class="sidebar-foot" aria-label="Rechtliches">
+      ${legalLinks.map((l) => `<a href="${l.href}">${l.title}</a>`).join("")}
+    </nav>
   `;
 
   container.querySelectorAll("[data-nav]").forEach((el) => {
