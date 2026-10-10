@@ -90,6 +90,19 @@ const page2Rows = [
     resolve: () => val("Tax identification number (TIN)"),
   },
   {
+    id: "m9",
+    labelEn: "Tax identification number (TIN)",
+    hint: "Steuer-ID",
+    group: "m3",
+    // Bewusst aus dem LIVEN Profil, nicht aus applicantSnapshot: die Steuer-ID
+    // ist an die Person gebunden, nicht an den einzelnen Fall (anders als
+    // Name/Adresse, die im Case gezielt überschreibbar sind, siehe
+    // missingData.js) - applicantSnapshot.tin wird dort nur einmalig als
+    // Fallback kopiert und bliebe sonst dauerhaft veraltet, sobald die
+    // Steuer-ID erst nachträglich im Profil ergänzt/geändert wird.
+    resolve: (profile) => val(profile.residence.tin),
+  },
+  {
     id: "m4",
     labelEn: "Where does the shareholder live (country)?",
     hint: "Wohnsitzland",
@@ -171,19 +184,6 @@ const page2Rows = [
       const raw = profile.residence.phone ?? "";
       return val(raw, normalizePhoneForSkat(raw));
     },
-  },
-  {
-    id: "m9",
-    labelEn: "Tax identification number (TIN)",
-    hint: "Steuer-ID",
-    group: "m3",
-    // Bewusst aus dem LIVEN Profil, nicht aus applicantSnapshot: die Steuer-ID
-    // ist an die Person gebunden, nicht an den einzelnen Fall (anders als
-    // Name/Adresse, die im Case gezielt überschreibbar sind, siehe
-    // missingData.js) - applicantSnapshot.tin wird dort nur einmalig als
-    // Fallback kopiert und bliebe sonst dauerhaft veraltet, sobald die
-    // Steuer-ID erst nachträglich im Profil ergänzt/geändert wird.
-    resolve: (profile) => val(profile.residence.tin),
   },
 ];
 

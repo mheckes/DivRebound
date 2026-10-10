@@ -18,6 +18,12 @@
       "runtimeExecutable": "C:\\Users\\hecke\\.dev-cache\\run-divrebound-site.cmd",
       "runtimeArgs": [],
       "port": 4174
+    },
+    {
+      "name": "divrebound-site-appdev",
+      "runtimeExecutable": "C:\\Users\\hecke\\.dev-cache\\run-divrebound-site-appdev.cmd",
+      "runtimeArgs": [],
+      "port": 5174
     }
   ]
 }
