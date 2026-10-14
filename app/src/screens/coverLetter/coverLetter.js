@@ -1,25 +1,31 @@
 // Screen "Anschreiben Finanzamt" (#/anschreiben). Eigenständiger Menüpunkt
 // (siehe components/sidebar.js, Abschnitt "Nutzer") statt Teil des DivRebound-
-// Wizards, weil das Anschreiben - wie schon die Finanzamt-Daten selbst -
-// profilweit gilt und nicht an einen einzelnen Fall gebunden ist. Bestätigt/
-// ergänzt zunächst die Finanzamt-Daten (Name/Straße/PLZ/Ort, identische Felder
-// wie im Profil-Screen), erzeugt darunter per Klick das Anschreiben als PDF
-// (analog zum Download-Button für die Wohnsitzbescheinigung in
-// summaryDownload.js).
+// Wizards, weil das Anschreiben profilweit gilt und nicht an einen einzelnen
+// Fall gebunden ist. Zeigt zur Bestätigung die Anschrift des Finanzamts und
+// erzeugt darunter per Klick das Anschreiben als PDF (analog zum Download-Button
+// für die Wohnsitzbescheinigung in summaryDownload.js).
+//
+// Die Anschrift ist KEINE eigene Kopie: dieselben Felder wie in "Persönliche
+// Daten" (util/profileFields.js), automatisch ins Profil gespeichert
+// (util/autosave.js) - eine Änderung hier ist eine Änderung dort.
 //
 // Liest/schreibt wie profile.js ausschließlich das live InvestorProfile, nie
 // ReclaimCase.applicantSnapshot (siehe divrebound_data_schema.md §2).
 
-import { getState, setState } from "../../store/store.js";
-import * as profileRepo from "../../db/profileRepo.js";
+import { getState } from "../../store/store.js";
 import { buildTaxOfficeLetter, buildLetterFileName } from "../../lib/buildTaxOfficeLetter.js";
 import { normalizeTaxOffice } from "../../util/taxOffice.js";
 import { confirmedFieldClasses } from "../../util/fieldDisplay.js";
-
-let savedTimeoutId = null;
+import { PROFILE_FIELDS } from "../../util/profileFields.js";
+import { bindProfileAutosave } from "../../util/autosave.js";
 
 export function mount(container) {
   render(container);
+  if (!getState().currentProfile) return;
+  return bindProfileAutosave(container, {
+    getProfile: () => getState().currentProfile,
+    onSaved: (profile) => updateDownloadState(container, profile),
+  });
 }
 
 function esc(value) {
@@ -49,6 +55,22 @@ function renderDownloadStatusHtml(kind, data) {
   return "";
 }
 
+function isTaxOfficeComplete(profile) {
+  const t = normalizeTaxOffice(profile.residence.taxOffice);
+  return Boolean(t.name.trim() && t.street.trim() && t.postalCode.trim() && t.city.trim());
+}
+
+function field(profile, key, label, { wide, placeholder } = {}) {
+  const value = PROFILE_FIELDS[key].read(profile);
+  const c = confirmedFieldClasses(value);
+  return `
+    <div class="field-row ${wide ? "field-row-wide" : ""}">
+      <label class="${c.labelClass}">${label}</label>
+      <input class="${c.inputClass}" data-field="${key}" placeholder="${esc(placeholder ?? "")}" value="${esc(value)}">
+      <span class="field-error" data-error-for="${key}" hidden></span>
+    </div>`;
+}
+
 function render(container) {
   const profile = getState().currentProfile;
   if (!profile) {
@@ -59,15 +81,10 @@ function render(container) {
     return;
   }
 
-  const t = normalizeTaxOffice(profile.residence.taxOffice);
-  const hasTaxOffice = Boolean(t.name.trim() && t.street.trim() && t.postalCode.trim() && t.city.trim());
-  const taxName = confirmedFieldClasses(t.name);
-  const taxStreet = confirmedFieldClasses(t.street);
-  const taxPostalCode = confirmedFieldClasses(t.postalCode);
-  const taxCity = confirmedFieldClasses(t.city);
   const fileNamePreview = buildLetterFileName(profile);
 
   container.innerHTML = `
+    <div class="profile-page">
     <div class="content-header">
       <h1 class="content-title">Anschreiben Finanzamt</h1>
     </div>
@@ -76,38 +93,23 @@ function render(container) {
       <div class="card-head head-navy"><span class="card-title">Zuständiges Finanzamt</span></div>
       <div class="card-body">
         <div class="field-grid">
-          <div class="field-row field-row-wide">
-            <label class="${taxName.labelClass}">Name</label>
-            <input class="${taxName.inputClass}" data-field="taxOfficeName" placeholder="z.B. Finanzamt München I" value="${esc(t.name)}">
-          </div>
+          ${field(profile, "taxOfficeName", "Name", { wide: true, placeholder: "z.B. Finanzamt München I" })}
         </div>
         <div class="field-grid">
-          <div class="field-row field-row-wide">
-            <label class="${taxStreet.labelClass}">Straße und Hausnummer</label>
-            <input class="${taxStreet.inputClass}" data-field="taxOfficeStreet" placeholder="z.B. Deroystraße 4" value="${esc(t.street)}">
-          </div>
+          ${field(profile, "taxOfficeStreet", "Straße und Hausnummer", { wide: true, placeholder: "z.B. Deroystraße 4" })}
         </div>
         <div class="field-grid">
-          <div class="field-row">
-            <label class="${taxPostalCode.labelClass}">Postleitzahl</label>
-            <input class="${taxPostalCode.inputClass}" data-field="taxOfficePostalCode" placeholder="z.B. 80335" value="${esc(t.postalCode)}">
-          </div>
-          <div class="field-row">
-            <label class="${taxCity.labelClass}">Ort</label>
-            <input class="${taxCity.inputClass}" data-field="taxOfficeCity" placeholder="z.B. München" value="${esc(t.city)}">
-          </div>
+          ${field(profile, "taxOfficePostalCode", "Postleitzahl", { placeholder: "z.B. 80335" })}
+          ${field(profile, "taxOfficeCity", "Ort", { placeholder: "z.B. München" })}
         </div>
-        <div class="save-row">
-          <span class="save-status" data-save-status hidden>✓ Gespeichert</span>
-          <button class="btn-primary" data-action="save" type="button">Speichern</button>
-        </div>
+        <div class="field-hint">Bitte prüfen. Aus Ihren persönlichen Daten – Änderungen hier werden automatisch dort gespeichert.</div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Dokument erstellen</span></div>
       <div class="card-body">
-        <button class="download-btn" data-action="download" ${hasTaxOffice ? "" : "disabled"}>
+        <button class="download-btn" data-action="download">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <path d="M14 2v6h6"/>
@@ -116,43 +118,25 @@ function render(container) {
           </svg>
           Anschreiben herunterladen (PDF)
         </button>
-        ${hasTaxOffice ? "" : `<div class="field-hint" style="text-align:center;margin-top:8px;">Bitte zuerst die vollständigen Finanzamt-Daten oben eintragen.</div>`}
+        <div class="field-hint" data-incomplete-hint style="text-align:center;margin-top:8px;">Bitte zuerst die vollständige Anschrift des Finanzamts oben eintragen.</div>
         <div class="filename-preview">${esc(fileNamePreview)}</div>
         <div id="download-status"></div>
       </div>
     </div>
+    </div>
   `;
 
-  attachListeners(container, profile);
+  const downloadBtn = container.querySelector('[data-action="download"]');
+  downloadBtn.addEventListener("click", () => handleDownload(container, downloadBtn));
+  updateDownloadState(container, profile);
 }
 
-function attachListeners(container, profile) {
-  container.querySelector('[data-action="save"]').addEventListener("click", async () => {
-    const value = (field) => container.querySelector(`[data-field="${field}"]`).value.trim();
-
-    const updated = {
-      ...profile,
-      residence: {
-        ...profile.residence,
-        taxOffice: {
-          name: value("taxOfficeName"),
-          street: value("taxOfficeStreet"),
-          postalCode: value("taxOfficePostalCode"),
-          city: value("taxOfficeCity"),
-        },
-      },
-    };
-
-    await profileRepo.put(updated);
-    setState({ currentProfile: updated });
-    render(container);
-    showSaved(container);
-  });
-
-  const downloadBtn = container.querySelector('[data-action="download"]');
-  if (downloadBtn) {
-    downloadBtn.addEventListener("click", () => handleDownload(container, downloadBtn));
-  }
+function updateDownloadState(container, profile) {
+  const complete = isTaxOfficeComplete(profile);
+  const btn = container.querySelector('[data-action="download"]');
+  const hint = container.querySelector("[data-incomplete-hint]");
+  if (btn) btn.disabled = !complete;
+  if (hint) hint.hidden = complete;
 }
 
 async function handleDownload(container, btn) {
@@ -172,18 +156,6 @@ async function handleDownload(container, btn) {
     console.error("[coverLetter] Anschreiben-Erstellung fehlgeschlagen:", err);
     statusEl.innerHTML = renderDownloadStatusHtml("error", { message: err.message });
   } finally {
-    btn.disabled = false;
+    updateDownloadState(container, getState().currentProfile);
   }
-}
-
-function showSaved(container) {
-  const status = container.querySelector("[data-save-status]");
-  if (!status) return;
-  status.hidden = false;
-  status.classList.add("visible");
-  clearTimeout(savedTimeoutId);
-  savedTimeoutId = setTimeout(() => {
-    status.hidden = true;
-    status.classList.remove("visible");
-  }, 2500);
 }

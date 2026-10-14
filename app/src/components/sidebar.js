@@ -2,6 +2,7 @@ import { getState, setState, subscribe } from "../store/store.js";
 import { navigate } from "../router/router.js";
 import * as caseRepo from "../db/caseRepo.js";
 import * as profileRepo from "../db/profileRepo.js";
+import * as transactionRepo from "../db/transactionRepo.js";
 import {
   exportEncrypted,
   exportPlain,
@@ -115,8 +116,11 @@ export function renderSidebar(container) {
         </div>
       </details>
 
-      <details class="nav-country disabled">
-        <summary>${chevron()} Schweiz <span class="tree-stub-tag">bald</span></summary>
+      <details class="nav-country" open>
+        <summary>${chevron()} Schweiz</summary>
+        <div class="nav-case-group">
+          <div class="nav-holdings" data-nav="#/ch/bestand">Wertpapierbestand</div>
+        </div>
       </details>
       <details class="nav-country disabled">
         <summary>${chevron()} Italien <span class="tree-stub-tag">bald</span></summary>
@@ -167,7 +171,8 @@ export function renderSidebar(container) {
     const choice = await openExportOptionsModal();
     if (!choice) return;
     const cases = await caseRepo.getByProfileId(profile.profileId);
-    const payload = { investorProfiles: [profile], reclaimCases: cases };
+    const transactions = await transactionRepo.getByProfileId(profile.profileId);
+    const payload = { investorProfiles: [profile], reclaimCases: cases, transactions };
     const fileJson = choice.encrypt ? await exportEncrypted(payload, choice.passphrase) : exportPlain(payload);
     triggerJsonDownload(fileJson, `${profile.residence.lastName || "divrebound"}.divrebound.json`);
   });
@@ -192,6 +197,8 @@ export function renderSidebar(container) {
       }
       for (const profile of payload.investorProfiles) await profileRepo.put(profile);
       for (const reclaimCase of payload.reclaimCases) await caseRepo.put(reclaimCase);
+      // Ältere Dateien (vor dem Wertpapierbestand Schweiz) haben keine Transaktionen.
+      for (const transaction of payload.transactions ?? []) await transactionRepo.put(transaction);
       const profile = payload.investorProfiles[0];
       setState({ currentProfile: profile, cases: payload.reclaimCases, currentCase: null });
       navigate("#/profile");

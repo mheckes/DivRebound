@@ -116,8 +116,7 @@ Regeln:
 
 - Neue Karte **„Steuerliche Angaben“**: Steuer-ID (TIN), **Steuernummer (neu)** und das **zuständige Finanzamt mit Anschrift** (Name, Straße, PLZ, Ort). Steuer-ID und Finanzamt wandern aus den bisherigen Karten hierher; die eigene Karte „Finanzamt“ entfällt.
 - **„Anschreiben Finanzamt“** zeigt die Finanzamt-Anschrift weiterhin zur Bestätigung vor dem Download – mit denselben Feldern aus derselben Quelle (Profil). Eine Änderung dort ist eine Änderung im Profil; es gibt keine zweite Kopie der Daten und keinen eigenen Speichern-Button mehr.
-- Feldhinweise nennen, wofür eine Angabe gebraucht wird, z. B. „benötigt für die Schweiz“ (Steuernummer, E-Mail, Telefon) oder „benötigt für Dänemark“ (BIC). E-Mail und Telefon sind damit nicht mehr pauschal „optional“.
-- Erklärung unter der Karte: Die Steuernummer steht auf dem Einkommensteuerbescheid und ist nicht dasselbe wie die 11-stellige Steuer-ID.
+- Keine Hinweise, wofür ein Feld gebraucht wird, und keine „neu“-Kennzeichnung. Beispielwerte als Platzhalter: Steuer-ID „z.B. 86095742719“, Steuernummer „z.B. 143/123/45678“.
 - Datenmodell: `profile.residence.taxNumber` (String, leer erlaubt), Export/Import unverändert über das Profil.
 - Der „Speichern“-Button entfällt (2c). Hinweis am Seitenende statt „Aktualisierung gilt für neu angelegte Fälle“: „Änderungen werden beim Verlassen eines Felds automatisch gespeichert und gelten für alle offenen DivRebounds. Bereits erzeugte Formulare bleiben unverändert – der Fall weist Sie dann darauf hin.“ (Regel 2–4 oben).
 
@@ -244,7 +243,7 @@ Die Bestandsübersicht ist auch außerhalb eines Falls erreichbar: Sidebar **Que
 
 **Schweiz**
 1. CH-Corridor-Config inkl. `flow`, `requirements`
-1a. „Persönliche Daten“: Karte „Steuerliche Angaben“ mit Steuernummer (neu) und Finanzamt-Anschrift, Hinweise „benötigt für …“ (Abschnitt 2b); „Anschreiben Finanzamt“ liest die Anschrift aus dem Profil
+1a. „Persönliche Daten“: Karte „Steuerliche Angaben“ mit Steuernummer und Finanzamt-Anschrift (Abschnitt 2b); „Anschreiben Finanzamt“ liest die Anschrift aus dem Profil
 1b. Automatisches Speichern app-weit inkl. Rückgängig, Validierung und Verlassen-Warnung (Abschnitt 2c)
 2. Store `transactions` + Repository (Duplikat- und Lückenprüfung)
 3. FIFO-Berechnung (`computeEntitlements(transactions, distributions)`) mit Tests: Referenzfall Jungfraubahn, Fall A, Fall B, Kauf/Verkauf am Ex-Tag, zwei Termine im selben Jahr, zwei Depots

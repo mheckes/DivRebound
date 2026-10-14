@@ -1,0 +1,176 @@
+/* Screen "Wertpapierbestand Schweiz" (#/ch/bestand). Basisklassen (.card,
+   .dropzone, .badge*, table, .field-*) aus style/base.css und profile.css. */
+
+#divrebound-app .holdings-page {
+  max-width: 900px;
+}
+#divrebound-app .holdings-lead {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0 0 16px;
+  max-width: 680px;
+}
+#divrebound-app .holdings-sub {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+#divrebound-app .holdings-page .dropzone {
+  margin-bottom: 0;
+}
+#divrebound-app .holdings-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 11.5px;
+  margin: 12px 0;
+}
+#divrebound-app .holdings-or::before,
+#divrebound-app .holdings-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--divider);
+}
+
+#divrebound-app .holdings-manual {
+  border-top: 1px solid var(--divider);
+  background: #fafbfc;
+  padding: 18px 22px;
+}
+#divrebound-app .holdings-manual .field-label {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+#divrebound-app .holdings-manual .field-error {
+  display: block;
+  margin-top: 8px;
+}
+#divrebound-app .holdings-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+#divrebound-app .holdings-table-wrap {
+  overflow-x: auto;
+}
+#divrebound-app .holdings-page td.num,
+#divrebound-app .holdings-page th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+#divrebound-app .holdings-file {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
+}
+#divrebound-app .holdings-warning {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #8a5a00;
+}
+#divrebound-app .holdings-depot-row td {
+  background: var(--navy-light);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--navy);
+}
+#divrebound-app .holdings-isin-row {
+  cursor: pointer;
+}
+#divrebound-app .holdings-isin-row:hover td {
+  background: #fafbfc;
+}
+#divrebound-app .holdings-caret {
+  display: inline-block;
+  width: 12px;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+#divrebound-app .holdings-caret.open {
+  transform: rotate(90deg);
+}
+#divrebound-app .holdings-lot-row td {
+  background: #fafbfc;
+  font-size: 12px;
+  color: var(--muted);
+}
+#divrebound-app .holdings-lot-row td:first-child {
+  padding-left: 32px;
+}
+#divrebound-app .holdings-lot-row.gone td {
+  color: var(--stone);
+}
+#divrebound-app .holdings-lot-row.gone td.mono,
+#divrebound-app .holdings-lot-row.gone td.num {
+  text-decoration: line-through;
+}
+#divrebound-app .holdings-lot-note {
+  font-size: 11px;
+  color: var(--muted);
+}
+#divrebound-app .holdings-empty {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+#divrebound-app details.holdings-tx-card > summary {
+  cursor: pointer;
+  list-style: none;
+}
+#divrebound-app details.holdings-tx-card > summary::-webkit-details-marker {
+  display: none;
+}
+#divrebound-app details.holdings-tx-card > summary .card-title::before {
+  content: "›  ";
+}
+#divrebound-app details.holdings-tx-card[open] > summary .card-title::before {
+  content: "⌄  ";
+}
+#divrebound-app .holdings-source {
+  font-size: 11.5px;
+  color: var(--muted);
+  max-width: 260px;
+  overflow-wrap: anywhere;
+}
+#divrebound-app .holdings-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #007a9e;
+  font-weight: 600;
+  font-size: 11.5px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+#divrebound-app .holdings-delete {
+  background: none;
+  border: none;
+  color: var(--stone);
+  cursor: pointer;
+  font-size: 13px;
+}
+#divrebound-app .holdings-delete:hover {
+  color: var(--danger);
+}
+#divrebound-app .holdings-page td .field-input[type="date"] {
+  height: 32px;
+  padding: 4px 8px;
+}
+
+#divrebound-app .badge-warn {
+  background: #fff4d6;
+  color: #8a5a00;
+}
+#divrebound-app .badge-danger {
+  background: var(--danger-tint);
+  color: var(--danger);
+}

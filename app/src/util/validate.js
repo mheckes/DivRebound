@@ -21,6 +21,18 @@ export function tinHint(country) {
   );
 }
 
+/**
+ * Deutsche Steuernummer: je nach Bundesland unterschiedlich geschrieben
+ * ("143/123/45678", "21/815/08150", 13-stellig im Bundesschema). Geprüft wird
+ * deshalb nur grob: Ziffern mit "/" oder Leerzeichen, 10 bis 13 Ziffern.
+ */
+export function isValidTaxNumber(value) {
+  const v = (value ?? "").trim();
+  if (!/^[\d/ ]+$/.test(v)) return false;
+  const digits = v.replace(/\D/g, "").length;
+  return digits >= 10 && digits <= 13;
+}
+
 export function isinMatchesCorridor(isin, isinPrefix) {
   return typeof isin === "string" && isin.startsWith(isinPrefix);
 }

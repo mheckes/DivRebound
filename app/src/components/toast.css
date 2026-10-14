@@ -1,0 +1,49 @@
+#divrebound-app .toast {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translate(-50%, 20px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: calc(100vw - 32px);
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--navy);
+  color: #fff;
+  font-size: 12.5px;
+  font-family: var(--font-body);
+  box-shadow: 0 6px 20px rgba(15, 34, 64, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 1000;
+}
+#divrebound-app .toast.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+#divrebound-app .toast-action {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--cyan);
+  font-weight: 700;
+  font-size: 12.5px;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+/* Feld mit ungültiger, nicht gespeicherter Eingabe (util/autosave.js) */
+#divrebound-app .field-input.is-invalid,
+#divrebound-app .confirmed-input.is-invalid {
+  border-color: var(--danger);
+  background: #fff;
+}
+
+/* Fester Hinweis statt Speichern-Button */
+#divrebound-app .autosave-note {
+  font-size: 11.5px;
+  color: var(--success);
+}

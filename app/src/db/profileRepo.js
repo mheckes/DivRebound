@@ -48,6 +48,7 @@ export async function createProfile(residenceCountry) {
       birthDate: "",
       birthPlace: "",
       tin: "",
+      taxNumber: "",
       email: "",
       phone: "",
       address: "",

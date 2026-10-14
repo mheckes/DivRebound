@@ -52,7 +52,34 @@ export function navigate(hash) {
   window.location.hash = hash;
 }
 
+// Optionale Abfrage vor jedem Seitenwechsel (z. B. "ungültige Eingabe wurde
+// nicht gespeichert"). Liefert sie false, wird der Hash zurückgesetzt und die
+// aktuelle Seite bleibt stehen.
+let navigationGuard = null;
+let lastHash = null;
+let revertingHash = false;
+
+/** @param {(() => boolean) | null} guard */
+export function setNavigationGuard(guard) {
+  navigationGuard = guard;
+}
+
+function onHashChange() {
+  if (revertingHash) {
+    revertingHash = false;
+    return;
+  }
+  if (navigationGuard && lastHash !== null && !navigationGuard()) {
+    revertingHash = true;
+    window.location.hash = lastHash;
+    return;
+  }
+  lastHash = currentHash();
+  renderRoute();
+}
+
 export function startRouter() {
-  window.addEventListener("hashchange", renderRoute);
+  window.addEventListener("hashchange", onHashChange);
+  lastHash = currentHash();
   renderRoute();
 }
