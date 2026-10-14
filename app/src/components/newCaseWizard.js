@@ -17,7 +17,7 @@ const ASSETS_OPTIONS = [{ code: "yes", label: "Ja", available: true }];
 const RESIDENCE_OPTIONS = [{ code: "DE", label: "Deutschland", available: true }];
 const TARGET_OPTIONS = [
   { code: "DK", label: "Dänemark", available: true },
-  { code: "CH", label: "Schweiz", available: false },
+  { code: "CH", label: "Schweiz", available: true },
   { code: "IT", label: "Italien", available: false },
 ];
 
@@ -122,7 +122,7 @@ export function openNewCaseWizard() {
       setState({ cases: [...getState().cases, reclaimCase], currentCase: reclaimCase });
 
       close({ profile, reclaimCase });
-      navigate(`#/dk/${reclaimCase.caseId}/step1`);
+      navigate(targetCountry === "CH" ? `#/ch/${reclaimCase.caseId}/1` : `#/dk/${reclaimCase.caseId}/step1`);
     });
   });
 }

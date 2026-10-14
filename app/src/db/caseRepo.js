@@ -42,6 +42,29 @@ export async function remove(caseId) {
  * @param {string} targetCountry
  * @returns {Promise<ReclaimCase>}
  */
+/**
+ * Schweiz-spezifischer Teil eines Falls (docs/konzept-schweiz.md §3.2). Käufe
+ * und Verkäufe liegen NICHT hier, sondern profilweit im Store "transactions";
+ * die Einträge fürs ePortal werden daraus jedes Mal neu berechnet.
+ */
+export function createSwissCaseData() {
+  return {
+    portalAccess: false,
+    /** @type {{ distributionId: string, isin: string, issuerName: string, vorgangsNr: string|null, exDate: string|null, exDateDerived: boolean, paymentDate: string|null, grossPerShare: number|null, vouchers: { fileName: string, quantity: number|null, documentRef: string|null }[], dividendStatement: string|null }[]} */
+    distributions: [],
+    /** Jahre/ISINs, für die der Nutzer "bereits erstattet / keine Dividende" bestätigt hat */
+    dismissedHints: [],
+    /** im ePortal-Spickzettel abgehakte Zeilen */
+    checkedRows: [],
+    claimId: "",
+    /** Anzahl erledigter Punkte der Status-Zeitleiste (0-5) */
+    timelineStep: 0,
+    uploadChecks: [],
+    completedAt: null,
+    receivedRefund: { date: "", amountEur: "" },
+  };
+}
+
 export async function createCase(profile, targetCountry) {
   const now = new Date().toISOString();
   const { residence, bank } = profile;
@@ -76,6 +99,7 @@ export async function createCase(profile, targetCountry) {
     createdAt: now,
     updatedAt: now,
   };
+  if (targetCountry === "CH") reclaimCase.ch = createSwissCaseData();
   await put(reclaimCase);
   return reclaimCase;
 }

@@ -55,7 +55,7 @@ function wrapLines(text, font, size, maxWidth) {
  * @param {InvestorProfile} profile
  * @returns {Promise<Uint8Array>}
  */
-export async function buildTaxOfficeLetter(profile) {
+export async function buildTaxOfficeLetter(profile, { reference } = {}) {
   const { residence } = profile;
   const taxOffice = normalizeTaxOffice(residence.taxOffice);
 
@@ -122,7 +122,10 @@ export async function buildTaxOfficeLetter(profile) {
   const paragraphs = [
     "hiermit beantrage ich die Ausstellung einer Wohnsitzbescheinigung, die ich zur Rückerstattung ausländischer Quellensteuer auf Kapitalerträge benötige.",
     "Anbei erhalten Sie die entsprechenden amtlichen Formulare. Ich bitte Sie höflich, den jeweils vorgesehenen Abschnitt für das Finanzamt auszufüllen, zu stempeln und zu unterschreiben.",
+    // Optional, z.B. Antrags-ID des Schweizer ePortals - bleibt sonst länderneutral.
+    reference ? `Es handelt sich um: ${reference}.` : null,
     residence.tin ? `Meine Steuer-Identifikationsnummer lautet: ${residence.tin}.` : null,
+    residence.taxNumber ? `Meine Steuernummer lautet: ${residence.taxNumber}.` : null,
     "Ich bitte um Rücksendung der Formulare an meine oben genannte Adresse.",
     "Für Rückfragen stehe ich Ihnen gerne zur Verfügung.",
   ].filter(Boolean);

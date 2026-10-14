@@ -247,6 +247,33 @@
   color: var(--success);
 }
 
+/* Nummerierte Schritte (Schweiz, später auch Dänemark): Ziffer im Kreis,
+   erledigt = grüner Kreis mit ✓, aktuell = cyan umrandet. */
+#divrebound-app .nav-step-num {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  font-size: 9.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+#divrebound-app .nav-step.done .nav-step-num {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+#divrebound-app .nav-step.current .nav-step-num {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+#divrebound-app .nav-step-numbered.current {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 /* Links zur Website (Über mich · Impressum · Datenschutz), immer am Fuß der
    Seitenleiste - Pflichtangaben müssen auch aus der App erreichbar sein. */
 #divrebound-app .sidebar-foot {

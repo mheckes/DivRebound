@@ -4,6 +4,11 @@
 // Erfassung per PDF-Upload (lib/parseBrokerStatement.js) oder manuell;
 // Bestand und Tranchen kommen aus lib/holdings.js (FIFO pro Depot und ISIN).
 // Mockup: Mock Up Schweiz 10-2026/divrebound_ch_mockup.html, Schritt 2.
+//
+// Zwei Einstiege: eigenständig über die Sidebar ("Schweiz › Wertpapierbestand")
+// und eingebettet als Schritt 2 eines DivRebound (params.reclaimCase). Im Fall
+// fragt die Seite bei vorhandenem Bestand zuerst "Hat sich seit … etwas
+// geändert?" und zeigt die Erfassung erst bei "Ja" (Konzept §6).
 
 import { getState } from "../../store/store.js";
 import * as transactionRepo from "../../db/transactionRepo.js";
@@ -13,6 +18,9 @@ import { corridors } from "../../config/corridors.js";
 import { formatDateDe } from "../../util/format.js";
 import { openConfirmModal } from "../../components/modal.js";
 import { showToast } from "../../components/toast.js";
+import { navigate } from "../../router/router.js";
+import { chStepRoute } from "../../config/caseSteps.js";
+import { stepHeader, stepNavHtml, bindStepNav, markStepDone } from "../chCase/chShared.js";
 
 const corridor = corridors.CH;
 const ISIN_PATTERN = /^[A-Z]{2}[A-Z0-9]{9}\d$/;
@@ -23,11 +31,17 @@ let transactions = [];
 let lastImport = [];
 let manualFormOpen = false;
 const collapsed = new Set();
+/** gesetzt, wenn die Seite als Schritt 2 eines DivRebound läuft */
+let embeddedCase = null;
+let captureOpen = false;
 
-export async function mount(container) {
+/** @param {HTMLElement} container @param {{ reclaimCase?: ReclaimCase }} [params] */
+export async function mount(container, params = {}) {
   const profile = getState().currentProfile;
   lastImport = [];
   manualFormOpen = false;
+  embeddedCase = params.reclaimCase ?? null;
+  captureOpen = false;
   transactions = profile ? await transactionRepo.getByProfileId(profile.profileId) : [];
   render(container);
 }
@@ -51,19 +65,58 @@ function render(container) {
 
   const lastTx = [...transactions].sort((a, b) => (b.tradeDate ?? "").localeCompare(a.tradeDate ?? ""))[0];
 
-  container.innerHTML = `
-    <div class="holdings-page">
-    <div class="content-header">
+  // Im Fall bei vorhandenem Bestand zuerst fragen, ob sich etwas geändert hat.
+  const askForChanges = Boolean(embeddedCase && lastTx && !captureOpen);
+  const header = embeddedCase
+    ? stepHeader(embeddedCase, 2)
+    : `<div class="content-header">
       <h1 class="content-title">Wertpapierbestand Schweiz</h1>
       <div class="content-breadcrumb">Schweiz <b>›</b> Wertpapierbestand</div>
-    </div>
+    </div>`;
+
+  container.innerHTML = `
+    <div class="holdings-page">
+    ${header}
 
     ${
-      lastTx
+      askForChanges
+        ? `<div class="holdings-question">
+            <h3>Hat sich seit dem ${esc(formatDateDe(lastTx.tradeDate))} etwas geändert?</h3>
+            <p>Ihr Wertpapierbestand ist bereits erfasst. Die zuletzt erfasste Transaktion ist ein ${lastTx.type === "buy" ? "Kauf" : "Verkauf"} vom <b>${esc(formatDateDe(lastTx.tradeDate))}</b>. Gab es seitdem Käufe oder Verkäufe Schweizer Aktien – oder fehlen noch ältere?</p>
+            <div class="holdings-actions">
+              <button class="btn-accent" data-action="no-changes" type="button">Nein, Bestand ist aktuell</button>
+              <button class="btn-secondary holdings-question-secondary" data-action="open-capture" type="button">Ja, Änderungen erfassen</button>
+            </div>
+          </div>`
+        : lastTx
         ? `<div class="info-banner"><span class="icon">ℹ</span><div>Zuletzt erfasst: ${lastTx.type === "buy" ? "Kauf" : "Verkauf"} vom <b>${esc(formatDateDe(lastTx.tradeDate))}</b>. Ergänzen Sie hier Käufe und Verkäufe, die seitdem dazugekommen sind oder noch fehlen.</div></div>`
         : `<p class="holdings-lead">Erfassen Sie <b>alle Käufe und Verkäufe</b> Ihrer Schweizer Aktien, lückenlos ab dem ersten Kauf. Am einfachsten per Upload der Abrechnungen: DivRebound liest Handelstag, Stückzahl und ISIN aus. Beim nächsten DivRebound ergänzen Sie nur noch, was neu dazugekommen ist.</p>`
     }
 
+    ${askForChanges ? "" : renderCaptureCard()}
+
+    ${renderLastImport()}
+    ${renderHoldings()}
+    ${renderTransactions()}
+
+    <details class="help-disclosure">
+      <summary>Wie DivRebound den Bestand berechnet (FIFO)</summary>
+      <div class="help-disclosure-body">
+        <p>Bei Teilverkäufen gilt: <b>zuerst gekaufte Aktien werden zuerst verkauft</b>. Ist eine Tranche ganz verkauft, entfällt sie. Ist sie teilweise verkauft, bleibt ihr ursprüngliches Erwerbsdatum, nur die Stückzahl sinkt. Gerechnet wird getrennt pro Depot.</p>
+        <p><b>Abgleich:</b> Legen Sie die Tabelle neben Ihren aktuellen Depotauszug. Weicht eine Stückzahl ab, fehlt eine Abrechnung. Zusätzlich prüft DivRebound später, ob die Stückzahlen auf den Tax Vouchern zum berechneten Bestand passen.</p>
+        <p><b>Erwerbsdatum</b> ist immer der Handelstag (steht auf der Abrechnung unter „Details zur Ausführung“), nicht das Auftragsdatum und nicht die Valuta.</p>
+      </div>
+    </details>
+    ${embeddedCase ? stepNavHtml(2) : ""}
+    </div>
+  `;
+
+  attachListeners(container);
+  if (embeddedCase) bindStepNav(container, embeddedCase, 2);
+}
+
+function renderCaptureCard() {
+  return `
     <div class="card">
       <div class="card-head"><span class="card-title">Käufe und Verkäufe erfassen</span><span class="holdings-sub">Dateien verlassen Ihren Rechner nicht</span></div>
       <div class="card-body">
@@ -79,24 +132,7 @@ function render(container) {
         </div>
       </div>
       ${renderManualForm()}
-    </div>
-
-    ${renderLastImport()}
-    ${renderHoldings()}
-    ${renderTransactions()}
-
-    <details class="help-disclosure">
-      <summary>Wie DivRebound den Bestand berechnet (FIFO)</summary>
-      <div class="help-disclosure-body">
-        <p>Bei Teilverkäufen gilt: <b>zuerst gekaufte Aktien werden zuerst verkauft</b>. Ist eine Tranche ganz verkauft, entfällt sie. Ist sie teilweise verkauft, bleibt ihr ursprüngliches Erwerbsdatum, nur die Stückzahl sinkt. Gerechnet wird getrennt pro Depot.</p>
-        <p><b>Abgleich:</b> Legen Sie die Tabelle neben Ihren aktuellen Depotauszug. Weicht eine Stückzahl ab, fehlt eine Abrechnung. Zusätzlich prüft DivRebound später, ob die Stückzahlen auf den Tax Vouchern zum berechneten Bestand passen.</p>
-        <p><b>Erwerbsdatum</b> ist immer der Handelstag (steht auf der Abrechnung unter „Details zur Ausführung“), nicht das Auftragsdatum und nicht die Valuta.</p>
-      </div>
-    </details>
-    </div>
-  `;
-
-  attachListeners(container);
+    </div>`;
 }
 
 function renderManualForm() {
@@ -241,8 +277,22 @@ function renderTransactions() {
 }
 
 function attachListeners(container) {
+  container.querySelector('[data-action="open-capture"]')?.addEventListener("click", () => {
+    captureOpen = true;
+    render(container);
+  });
+  container.querySelector('[data-action="no-changes"]')?.addEventListener("click", async () => {
+    await markStepDone(embeddedCase, 2);
+    navigate(chStepRoute(embeddedCase.caseId, 3));
+  });
+
   const dropzone = container.querySelector("#dropzone");
   const fileInput = container.querySelector("#file-input");
+  if (dropzone) attachUploadListeners(container, dropzone, fileInput);
+  attachTableListeners(container);
+}
+
+function attachUploadListeners(container, dropzone, fileInput) {
   dropzone.addEventListener("click", () => fileInput.click());
   fileInput.addEventListener("change", () => handleFiles(container, fileInput.files));
   for (const evt of ["dragenter", "dragover"]) {
@@ -258,6 +308,9 @@ function attachListeners(container) {
     });
   }
   dropzone.addEventListener("drop", (e) => handleFiles(container, e.dataTransfer.files));
+}
+
+function attachTableListeners(container) {
 
   container.querySelectorAll('[data-action="toggle-manual"]').forEach((btn) =>
     btn.addEventListener("click", () => {

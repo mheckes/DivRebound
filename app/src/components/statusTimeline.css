@@ -1,0 +1,89 @@
+#divrebound-app .status-timeline-hint {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+#divrebound-app .status-timeline {
+  display: flex;
+  padding: 18px 14px 16px;
+}
+#divrebound-app .status-timeline-step {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: center;
+}
+#divrebound-app .status-timeline-step::before {
+  content: "";
+  position: absolute;
+  top: 11px;
+  left: -50%;
+  width: 100%;
+  height: 2px;
+  background: var(--divider);
+}
+#divrebound-app .status-timeline-step:first-child::before {
+  display: none;
+}
+#divrebound-app .status-timeline-dot {
+  position: relative;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--divider);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+#divrebound-app .status-timeline-where {
+  font-size: 10px;
+  color: var(--stone);
+}
+#divrebound-app .status-timeline-step.done,
+#divrebound-app .status-timeline-step.done .status-timeline-label {
+  color: var(--success);
+}
+#divrebound-app .status-timeline-step.done .status-timeline-dot {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+#divrebound-app .status-timeline-step.done::before,
+#divrebound-app .status-timeline-step.now::before {
+  background: var(--success);
+}
+#divrebound-app .status-timeline-step.now {
+  color: var(--navy);
+  font-weight: 700;
+}
+#divrebound-app .status-timeline-step.now .status-timeline-dot {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+@media (max-width: 760px) {
+  #divrebound-app .status-timeline {
+    flex-wrap: wrap;
+    row-gap: 14px;
+  }
+  #divrebound-app .status-timeline-step {
+    flex: 1 0 33%;
+  }
+  #divrebound-app .status-timeline-step::before {
+    display: none;
+  }
+}

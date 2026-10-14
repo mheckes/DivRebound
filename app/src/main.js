@@ -11,6 +11,8 @@ import "./screens/formVerification/formVerification.css";
 import "./screens/cheatSheet/cheatSheet.css";
 import "./screens/profile/profile.css";
 import "./screens/holdings/holdings.css";
+import "./screens/chCase/chCase.css";
+import "./components/statusTimeline.css";
 
 import * as pdfjsLib from "pdfjs-dist";
 // Muss vor dem ersten parseDividendCertificate()-Aufruf gesetzt sein, sonst
@@ -38,6 +40,7 @@ import * as cheatSheet from "./screens/cheatSheet/cheatSheet.js";
 import * as profileScreen from "./screens/profile/profile.js";
 import * as coverLetter from "./screens/coverLetter/coverLetter.js";
 import * as holdingsScreen from "./screens/holdings/holdings.js";
+import * as chCase from "./screens/chCase/chCase.js";
 
 import { websiteHome } from "./config/siteLinks.js";
 
@@ -83,6 +86,10 @@ route("#/home", () => mountScreen(home, {}));
 route("#/profile", () => mountScreen(profileScreen, {}));
 route("#/anschreiben", () => mountScreen(coverLetter, {}));
 route("#/ch/bestand", () => mountScreen(holdingsScreen, {}));
+route("#/ch/:caseId/:step", async (p) => {
+  await ensureCaseSelected(p.caseId);
+  mountScreen(chCase, p);
+});
 route("#/dk/:caseId/step1", async (p) => {
   await ensureCaseSelected(p.caseId);
   mountScreen(shell, p);

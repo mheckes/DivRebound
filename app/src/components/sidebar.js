@@ -14,6 +14,7 @@ import {
 import { openPassphraseModal, openExportOptionsModal, openInfoModal, openConfirmModal } from "./modal.js";
 import { openNewCaseWizard } from "./newCaseWizard.js";
 import { legalLinks } from "../config/siteLinks.js";
+import { CH_STEPS, chStepRoute } from "../config/caseSteps.js";
 
 const STATUS_ORDER = [
   "draft",
@@ -73,10 +74,36 @@ function renderCase(reclaimCase, activeCaseId) {
     </details>`;
 }
 
+// Schweiz: nummerierte Schritte (Ziffer im Kreis, erledigt = ✓), siehe
+// docs/konzept-schweiz.md §1a. Erledigt ist ein Schritt, wenn er mit "Weiter"
+// verlassen wurde (reclaimCase.ch.stepsDone) bzw. der Fall abgeschlossen ist.
+function renderSwissCase(reclaimCase, activeCaseId) {
+  const isActive = reclaimCase.caseId === activeCaseId;
+  const currentStep = isActive ? Number(window.location.hash.match(/^#\/ch\/[^/]+\/(\d)$/)?.[1] ?? 0) : 0;
+  const done = new Set(reclaimCase.ch?.stepsDone ?? []);
+  const completed = Boolean(reclaimCase.ch?.completedAt);
+  return `
+    <details class="nav-case ${isActive ? "active" : ""}" ${isActive ? "open" : ""} data-case-id="${reclaimCase.caseId}">
+      <summary>
+        ${chevron()}
+        <span style="flex:1;">${caseLabel(reclaimCase)}</span>
+        <button class="nav-case-delete" data-action="delete-case" data-case-id="${reclaimCase.caseId}" title="Fall löschen">✕</button>
+      </summary>
+      <div class="nav-steps">
+        ${CH_STEPS.map((s) => {
+          const isDone = completed || done.has(s.n);
+          const cls = s.n === currentStep ? "current" : isDone ? "done" : "";
+          return `<div class="nav-step nav-step-numbered ${cls}" data-nav="${chStepRoute(reclaimCase.caseId, s.n)}"><span class="nav-step-num">${isDone && s.n !== currentStep ? "✓" : s.n}</span>${s.title}</div>`;
+        }).join("")}
+      </div>
+    </details>`;
+}
+
 export function renderSidebar(container) {
   const state = getState();
   const activeCaseId = state.currentCase?.caseId ?? null;
   const dkCases = state.cases.filter((c) => c.targetCountry === "DK");
+  const chCases = state.cases.filter((c) => c.targetCountry === "CH");
 
   container.innerHTML = `
     <div class="sidebar-brand">
@@ -120,6 +147,7 @@ export function renderSidebar(container) {
         <summary>${chevron()} Schweiz</summary>
         <div class="nav-case-group">
           <div class="nav-holdings" data-nav="#/ch/bestand">Wertpapierbestand</div>
+          ${chCases.map((c) => renderSwissCase(c, activeCaseId)).join("")}
         </div>
       </details>
       <details class="nav-country disabled">
@@ -160,7 +188,9 @@ export function renderSidebar(container) {
         currentCase: wasActive ? null : getState().currentCase,
       });
       if (wasActive) {
-        navigate(remainingCases.length > 0 ? `#/dk/${remainingCases[0].caseId}/step1` : "#/home");
+        // Nicht mehr auf den ersten verbliebenen Fall springen: der kann aus
+        // einem anderen Land sein (eigene Routen je Land).
+        navigate("#/home");
       }
     });
   });
