@@ -14,7 +14,7 @@ import {
 import { openPassphraseModal, openExportOptionsModal, openInfoModal, openConfirmModal } from "./modal.js";
 import { openNewCaseWizard } from "./newCaseWizard.js";
 import { legalLinks } from "../config/siteLinks.js";
-import { CH_STEPS, chStepRoute } from "../config/caseSteps.js";
+import { CH_STEPS, chStepRoute, DK_STEPS, dkStepRoute, dkStepFromHash } from "../config/caseSteps.js";
 
 const STATUS_ORDER = [
   "draft",
@@ -25,28 +25,6 @@ const STATUS_ORDER = [
   "submitted",
 ];
 
-function stepStatus(status, step) {
-  const idx = STATUS_ORDER.indexOf(status);
-  if (step === 1) return idx >= 1 ? "done" : "current";
-  if (idx >= 5) return "done";
-  return idx >= 2 ? "current" : "todo";
-}
-
-function stepIcon(status) {
-  if (status === "done") {
-    return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
-  }
-  if (status === "current") {
-    return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/></svg>`;
-  }
-  return `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
-}
-
-function caseRoute(reclaimCase, step) {
-  if (step === 1) return `#/dk/${reclaimCase.caseId}/step1`;
-  return `#/dk/${reclaimCase.caseId}/step2/verify`;
-}
-
 function caseLabel(reclaimCase) {
   const d = new Date(reclaimCase.createdAt);
   return `DivRebound ${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
@@ -56,10 +34,16 @@ function chevron() {
   return `<svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 }
 
+// Dänemark: nummerierte Schritte wie bei der Schweiz (docs/konzept-schweiz.md §1a).
+// Erledigt: mit "Weiter" verlassen (reclaimCase.dkStepsDone), aus dem Status
+// abgeleitet (Formular erzeugt = Schritte 1-4, eingereicht = alle) oder vor dem
+// gerade geöffneten Schritt.
 function renderCase(reclaimCase, activeCaseId) {
   const isActive = reclaimCase.caseId === activeCaseId;
-  const s1 = stepStatus(reclaimCase.status, 1);
-  const s2 = stepStatus(reclaimCase.status, 2);
+  const currentStep = isActive ? dkStepFromHash(window.location.hash) : 0;
+  const statusIdx = STATUS_ORDER.indexOf(reclaimCase.status);
+  const done = new Set(reclaimCase.dkStepsDone ?? []);
+  const isDone = (n) => done.has(n) || (statusIdx >= 2 && n <= 4) || statusIdx >= 5 || (currentStep > 0 && n < currentStep);
   return `
     <details class="nav-case ${isActive ? "active" : ""}" ${isActive ? "open" : ""} data-case-id="${reclaimCase.caseId}">
       <summary>
@@ -68,8 +52,10 @@ function renderCase(reclaimCase, activeCaseId) {
         <button class="nav-case-delete" data-action="delete-case" data-case-id="${reclaimCase.caseId}" title="Fall löschen">✕</button>
       </summary>
       <div class="nav-steps">
-        <div class="nav-step ${s1}" data-nav="${caseRoute(reclaimCase, 1)}">${stepIcon(s1)} Schritt 1: Wohnsitzbescheinigung</div>
-        <div class="nav-step ${s2}" data-nav="${caseRoute(reclaimCase, 2)}">${stepIcon(s2)} Schritt 2: SKAT-Portal</div>
+        ${DK_STEPS.map((s) => {
+          const cls = s.n === currentStep ? "current" : isDone(s.n) ? "done" : "";
+          return `<div class="nav-step nav-step-numbered ${cls}" data-nav="${dkStepRoute(reclaimCase.caseId, s.n)}"><span class="nav-step-num">${cls === "done" ? "✓" : s.n}</span>${s.title}</div>`;
+        }).join("")}
       </div>
     </details>`;
 }

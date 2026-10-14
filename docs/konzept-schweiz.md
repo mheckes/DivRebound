@@ -15,6 +15,7 @@
 | Ansässigkeitsländer | Vorerst nur **Deutschland** (DBA DE-CH, Formular DIP-0085). Österreich zurückgestellt |
 | Erfassungseinheit im Portal | **Ein Eintrag pro Kauf-Tranche und pro Dividendentermin** (ISIN, Erwerbsdatum, Stückzahl). Das Portal ergänzt Bruttodividende und Rückerstattung selbst |
 | Teilverkäufe | **FIFO.** Ganz verkaufte Tranchen entfallen (Fall A), teilweise verkaufte Tranchen behalten ihr Erwerbsdatum mit reduzierter Stückzahl (Fall B) |
+| Depots | **Werden nicht unterschieden** (Vereinfachung, Feedback 14.10.2026): Alle Käufe und Verkäufe einer Aktie bilden einen gemeinsamen Bestand, keine Depot-Pflege. Die Depot-Nr. aus Abrechnungen wird nur noch mitgespeichert. Grenzfall: dieselbe Aktie in zwei Depots mit Teilverkäufen – dann kann FIFO über alle Depots von der Depot-Sicht der Bank abweichen. |
 | Stichtag | Bestand am Ende des Handelstags **vor dem Ex-Tag**. Kauf am Ex-Tag gibt keinen Anspruch, Verkauf am Ex-Tag behält ihn. Im Portal steht das Fälligkeitsdatum |
 | Erwerbsdatum | **Handelstag** der Abrechnung, nicht Auftragsdatum, nicht Valuta (Referenz: Kauf 27.04.2026 hatte Auftragsdatum 17.04. und Valuta 29.04.) |
 | Mehrere Ausschüttungen pro Jahr | Selten, aber möglich (Halbjahres- oder Sonderdividenden). Jeder Termin ist ein eigener Block im Portal |
@@ -154,7 +155,7 @@ Transaction {
 }
 ```
 
-- **FIFO pro Depot und ISIN.** Hält jemand dieselbe Aktie in zwei Depots, wird pro Depot getrennt gerechnet.
+- **FIFO pro ISIN über alle Depots** (siehe §0 „Depots“). `lib/holdings.js` kann weiterhin pro Depot rechnen, die App übergibt aber keine Depot-Nr.
 - **Duplikatprüfung** über `broker + documentRef` (bei Baader: Vorgangs-Nr. + Referenz-Nr.). Derselbe Upload zweimal ändert nichts.
 - **Lückenprüfung:** Verkauf größer als FIFO-Bestand → Warnung „Abrechnungen fehlen“, Möglichkeit, einen Anfangsbestand mit Erwerbsdatum manuell zu erfassen.
 

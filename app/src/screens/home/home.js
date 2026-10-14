@@ -11,6 +11,7 @@ import { navigate } from "../../router/router.js";
 import { corridors } from "../../config/corridors.js";
 import { formatNumberDe } from "../../util/format.js";
 import { openNewCaseWizard } from "../../components/newCaseWizard.js";
+import { CH_STEPS, chStepRoute } from "../../config/caseSteps.js";
 
 const STATUS_LABELS = {
   draft: "In Bearbeitung — Ausschüttungen erfassen",
@@ -21,7 +22,24 @@ const STATUS_LABELS = {
   submitted: "Eingereicht",
 };
 
+// Schweiz: erster noch nicht erledigter Schritt (bzw. der letzte, wenn abgeschlossen).
+function nextSwissStep(reclaimCase) {
+  if (reclaimCase.ch?.completedAt) return CH_STEPS[CH_STEPS.length - 1];
+  const done = new Set(reclaimCase.ch?.stepsDone ?? []);
+  return CH_STEPS.find((s) => !done.has(s.n)) ?? CH_STEPS[CH_STEPS.length - 1];
+}
+
+function statusLabel(reclaimCase) {
+  if (reclaimCase.targetCountry === "CH") {
+    return reclaimCase.ch?.completedAt ? "Abgeschlossen" : `Schritt ${nextSwissStep(reclaimCase).n}: ${nextSwissStep(reclaimCase).title}`;
+  }
+  return STATUS_LABELS[reclaimCase.status] ?? reclaimCase.status;
+}
+
+const COUNTRY_LABELS = { DK: "Dänemark", CH: "Schweiz" };
+
 function continueRoute(reclaimCase) {
+  if (reclaimCase.targetCountry === "CH") return chStepRoute(reclaimCase.caseId, nextSwissStep(reclaimCase).n);
   switch (reclaimCase.status) {
     case "residency_form_generated":
     case "awaiting_tax_office":
@@ -32,7 +50,10 @@ function continueRoute(reclaimCase) {
     case "submitted":
       return `#/dk/${reclaimCase.caseId}/step2/cheatsheet`;
     default:
-      return `#/dk/${reclaimCase.caseId}/step1`;
+      // Noch nichts erfasst und Schritt 1 nicht abgeschlossen: bei "Unterlagen prüfen" beginnen.
+      return !reclaimCase.dkStepsDone?.includes(1) && reclaimCase.distributions.length === 0
+        ? `#/dk/${reclaimCase.caseId}/checklist`
+        : `#/dk/${reclaimCase.caseId}/step1`;
   }
 }
 
@@ -53,7 +74,12 @@ function escapeHtml(str) {
 function render(container) {
   const state = getState();
   const profile = state.currentProfile;
-  const cases = state.cases.filter((c) => c.targetCountry === "DK");
+  const allCases = state.cases;
+  const cases = allCases.filter((c) => c.targetCountry === "DK");
+  const swissCases = allCases.filter((c) => c.targetCountry === "CH");
+  const completedCount = cases.filter((c) => c.status === "submitted").length + swissCases.filter((c) => c.ch?.completedAt).length;
+  // Tatsächlich erhaltene Erstattungen (optional im letzten Schritt eingetragen)
+  const receivedEur = swissCases.reduce((sum, c) => sum + (Number(String(c.ch?.receivedRefund?.amountEur ?? "").replace(",", ".")) || 0), 0);
   const corridor = corridors.DK;
 
   const totalRefund = profile
@@ -66,7 +92,7 @@ function render(container) {
         0
       )
     : 0;
-  const mostRecent = [...cases].sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""))[0] ?? null;
+  const mostRecent = [...allCases].sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""))[0] ?? null;
   const greetingName = profile?.residence?.firstName ? `, ${escapeHtml(profile.residence.firstName)}` : "";
 
   container.innerHTML = `
@@ -94,7 +120,7 @@ function render(container) {
         <div class="home-tile-desc">
           ${
             mostRecent
-              ? `${escapeHtml(caseLabel(mostRecent))} — ${escapeHtml(STATUS_LABELS[mostRecent.status] ?? mostRecent.status)}`
+              ? `${escapeHtml(COUNTRY_LABELS[mostRecent.targetCountry] ?? "")} · ${escapeHtml(caseLabel(mostRecent))} — ${escapeHtml(statusLabel(mostRecent))}`
               : "Noch kein Fall angelegt."
           }
         </div>
@@ -104,8 +130,9 @@ function render(container) {
         <div class="home-tile-icon">📊</div>
         <div class="home-tile-title">Statistik</div>
         <div class="home-tile-desc">
-          ${cases.length} DivRebound${cases.length === 1 ? "" : "s"} angelegt<br>
-          ${formatNumberDe(totalRefund)} DKK bestätigte Erstattung (über alle Fälle)
+          ${allCases.length} DivRebound${allCases.length === 1 ? "" : "s"} angelegt, davon ${completedCount} abgeschlossen<br>
+          ${cases.length ? `${formatNumberDe(totalRefund)} DKK bestätigte Erstattung Dänemark<br>` : ""}
+          ${receivedEur ? `${formatNumberDe(receivedEur)} EUR erhalten (Schweiz)` : ""}
         </div>
       </div>
     </div>

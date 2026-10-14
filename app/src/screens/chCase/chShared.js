@@ -74,7 +74,8 @@ export function entitlementsFor(reclaimCase, transactions, profile) {
       voucherQuantities: d.vouchers.length ? d.vouchers.map((v) => v.quantity ?? 0) : undefined,
     }));
   return computeEntitlements(
-    transactions.filter((t) => t.tradeDate),
+    // Depots werden nicht unterschieden (Vereinfachung): ein Bestand je Aktie.
+    transactions.filter((t) => t.tradeDate).map((t) => ({ ...t, depotId: "" })),
     dists,
     { refundRate: refundRate(profile) }
   );

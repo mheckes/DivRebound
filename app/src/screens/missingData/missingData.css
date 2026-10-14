@@ -1,114 +1,48 @@
-/* Screen-spezifische Ergänzungen für "Fehlende Angaben ergänzen"
-   (#/dk/:caseId/step1/missing-data). Alles, was schon über style/base.css
-   abgedeckt ist (.card, .card-head.head-navy, .card-title, .count-pill,
-   .btn-primary/.btn-secondary/.btn-accent, .info-banner, .field-row/-label/
-   -hint/-input/-error, .badge/.badge-confirmed/.badge-dupe, .mono), wird hier
-   NICHT wiederholt. Eigene Klassen mit "md-"-Präfix (missingData), damit sie
-   nicht mit generisch benannten Klassen anderer Screens kollidieren. */
+/* Screen-spezifische Ergänzungen für "Fehlende Angaben"
+   (#/dk/:caseId/step1/missing-data). Basisklassen aus style/base.css, die
+   Zeilen der fehlenden Felder aus components/checklist.js (Styles in
+   screens/chCase/chCase.css). Eigene Klassen mit "md-"-Präfix (missingData). */
 
 /* count-pill auf dunklem head-navy-Hintergrund braucht helle Farben -
-   base.css definiert das bislang nicht mit. */
+   base.css definiert das bislang nicht mit. Wird auch von anderen Screens
+   genutzt (z.B. Checklisten, Wertpapierbestand). */
 #divrebound-app .card-head.head-navy .count-pill {
   background: rgba(255, 255, 255, 0.18);
   color: #fff;
 }
 
-/* "Aus den Abrechnungen übernommen": Zeile mit editierbarem, unauffälligem
-   Inline-Feld + Quellen-Badge, plus optionaler Profil-Abweichungs-Hinweis. */
-#divrebound-app .md-known-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 9px 0;
-  border-bottom: 1px solid var(--divider);
-}
-#divrebound-app .md-known-row:last-child {
-  border-bottom: none;
-}
-#divrebound-app .md-known-label {
-  font-size: 11px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-bottom: 3px;
-}
-#divrebound-app .md-known-input {
-  border: 1px solid transparent;
-  border-radius: 6px;
-  padding: 4px 7px;
-  background: transparent;
-  font-size: 13.5px;
-  color: var(--charcoal);
-  width: 100%;
+/* Zeitraum der Ansässigkeit (aus den Zahltagen abgeleitet, nur bestätigen) */
+#divrebound-app .md-period-title {
   font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 4px;
 }
-#divrebound-app .md-known-input:hover,
-#divrebound-app .md-known-input:focus {
-  border-color: var(--navy);
-  background: #fff;
-  outline: none;
-}
-#divrebound-app .md-profile-diff {
-  font-size: 11px;
-  color: var(--muted);
-  margin: -4px 0 9px 0;
-  padding-left: 2px;
-}
-#divrebound-app .md-profile-diff a {
-  color: var(--navy);
-  font-weight: 600;
-}
-
-/* "Bitte noch ergänzen": optisch an "Aus den Abrechnungen übernommen"
-   angeglichen (gleiche Zeile/Label/Input-Optik über .md-known-label/-input),
-   nur mit eigenem Wrapper .md-required-field für den Rahmen, weil hier -
-   anders als bei den Abrechnungs-Feldern - noch Hinweistext/Fehlermeldung
-   unter der Zeile stehen. Werte bleiben "fest eingetragen", aber änderbar;
-   der Status wird ausschließlich über das Badge kommuniziert, nicht mehr über
-   eine grün/rot eingefärbte Eingabefläche. */
-#divrebound-app .md-required-field {
-  padding: 9px 0;
-  border-bottom: 1px solid var(--divider);
-}
-#divrebound-app .md-required-field:last-child {
-  border-bottom: none;
-}
-#divrebound-app .md-req-row {
+#divrebound-app .md-period {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-#divrebound-app .badge-invalid {
-  background: var(--danger-tint);
-  color: var(--danger);
-}
-#divrebound-app .md-required-field .field-hint,
-#divrebound-app .md-required-field .field-error {
-  margin-top: 4px;
-  padding-left: 2px;
-}
-#divrebound-app .md-required-field .field-error:empty,
-#divrebound-app .md-required-field .field-hint:empty {
-  display: none;
-}
-
-/* Fußzeile mit "Zurück"-Link und "Weiter"-Button. */
-#divrebound-app .md-bottom-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 8px;
+  gap: 16px;
   flex-wrap: wrap;
-  gap: 12px;
+  align-items: flex-start;
 }
-#divrebound-app .md-back-link {
-  font-size: 12.5px;
-  color: var(--navy);
+#divrebound-app .md-period .field-row {
+  flex: 1;
+  min-width: 160px;
+  margin-bottom: 0;
+}
+#divrebound-app .md-ongoing {
+  font-size: 11.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
   cursor: pointer;
-  text-decoration: none;
 }
-#divrebound-app .md-back-link:hover {
-  text-decoration: underline;
+
+/* Hinweis, wenn keine Pflichtangabe mehr fehlt */
+#divrebound-app .md-all-done {
+  background: var(--success-bg);
+  border: 1px solid var(--success);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: #064e3b;
 }

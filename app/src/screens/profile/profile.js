@@ -170,7 +170,6 @@ function render(container, profile) {
           ${field(profile, "taxOfficePostalCode", "Postleitzahl", { placeholder: "z.B. 80335" })}
           ${field(profile, "taxOfficeCity", "Ort", { placeholder: "z.B. München" })}
         </div>
-        <div class="field-hint">An dieses Finanzamt gehen die Wohnsitzbescheinigung (Dänemark) und der Antrag (Schweiz) zur Bestätigung.</div>
       </div>
     </div>
 

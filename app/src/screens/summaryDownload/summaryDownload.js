@@ -1,7 +1,9 @@
-// Schritt 1, letzter Screen: Zusammenfassung + Wohnsitzbescheinigung (Formular
-// 02.050) erzeugen. Ab hier ist Prozess A ("Wohnsitzbescheinigung besorgen")
-// aus Nutzersicht abgeschlossen - danach wartet der Fall auf die Bestätigung
-// durch das Finanzamt (Medienbruch, siehe status-panel unten).
+// Dänemark, Schritt 4 "Formular & Finanzamt" (vormals "Zusammenfassung &
+// Download"): Wohnsitzbescheinigung (Formular 02.050) und Anschreiben erzeugen.
+// Gleicher Aufbau wie bei der Schweiz (docs/konzept-schweiz.md §1a):
+// Status-Zeitleiste, Formular, Anschreiben, nächste Schritte, "Bearbeitung
+// pausiert", Zusammenfassung. Danach wartet der Fall auf die Bestätigung durch
+// das Finanzamt (Medienbruch).
 //
 // Anzeige der Personendaten bewusst NICHT aus reclaimCase.applicantSnapshot,
 // sondern durchgängig aus dem live InvestorProfile: fillResidencyCertificate.js
@@ -21,6 +23,9 @@ import { exportEncrypted, exportPlain, triggerJsonDownload } from "../../crypto/
 import { openExportOptionsModal } from "../../components/modal.js";
 import { corridors } from "../../config/corridors.js";
 import { formatDateDe, formatCurrency, formatNumberDe } from "../../util/format.js";
+import { buildTaxOfficeLetter } from "../../lib/buildTaxOfficeLetter.js";
+import { normalizeTaxOffice } from "../../util/taxOffice.js";
+import { dkTimelineHtml, bindDkTimeline } from "./dkTimeline.js";
 
 // Gleiche Reihenfolge wie in components/sidebar.js - dort nicht exportiert,
 // daher hier lokal noch einmal definiert.
@@ -116,7 +121,7 @@ function renderDistributionsCard(reclaimCase, profile) {
           <span class="count-pill">0 von ${reclaimCase.distributions.length}</span>
         </summary>
         <div class="card-body">
-          <p class="empty-hint">Noch keine bestätigten Ausschüttungen. Bitte in Schritt 1 zuerst mindestens eine Ausschüttung bestätigen.</p>
+          <p class="empty-hint">Noch keine bestätigten Ausschüttungen. Bitte in Schritt 2 zuerst mindestens eine Ausschüttung bestätigen.</p>
         </div>
       </details>`;
   }
@@ -214,7 +219,7 @@ function render(container) {
 
   if (!reclaimCase || !profile) {
     container.innerHTML = `
-      <div class="content-header"><h1 class="content-title">Zusammenfassung & Download</h1></div>
+      <div class="content-header"><h1 class="content-title">Formular &amp; Finanzamt</h1></div>
       <div class="info-banner"><span class="icon">ℹ</span><div>Kein Fall ausgewählt.</div></div>`;
     return;
   }
@@ -232,38 +237,23 @@ function render(container) {
 
   const priorDoc = lastGeneratedCertificate(reclaimCase);
   const initialStatusHtml = priorDoc ? renderDownloadStatusHtml("prior", priorDoc) : "";
+  const taxOffice = normalizeTaxOffice(residence.taxOffice);
+  const taxOfficeComplete = Boolean(taxOffice.name && taxOffice.street && taxOffice.postalCode && taxOffice.city);
 
   container.innerHTML = `
     <div class="content-header">
-      <h1 class="content-title">Zusammenfassung & Download</h1>
-      <div class="content-breadcrumb">Dänemark <b>›</b> ${esc(caseLabel(reclaimCase))} <b>›</b> Schritt 1</div>
+      <h1 class="content-title">Formular &amp; Finanzamt</h1>
+      <div class="content-breadcrumb">Dänemark <b>›</b> ${esc(caseLabel(reclaimCase))} <b>›</b> 4 von 5</div>
     </div>
 
-    <a class="back-link" data-action="back">← Zurück</a>
+    <p class="ch-lead">Die Wohnsitzbescheinigung (Formular 02.050) muss vom deutschen Finanzamt bestätigt werden. DivRebound füllt sie für Sie aus. Drucken Sie sie aus, unterschreiben Sie sie und senden Sie sie mit dem Anschreiben an Ihr Finanzamt.</p>
 
-    <details class="card">
-      <summary class="card-head head-navy">
-        <span style="display:flex;align-items:center;">
-          ${chevronSvg()}
-          <span class="card-title">Angaben für die Wohnsitzbescheinigung</span>
-        </span>
-      </summary>
-      <div class="card-body">
-        <div class="summary-row"><span class="summary-label">Name</span><span class="summary-value">${esc(fullName)}</span></div>
-        <div class="summary-row"><span class="summary-label">Adresse</span><span class="summary-value">${esc(fullAddress)}</span></div>
-        <div class="summary-row"><span class="summary-label">Geburtsdatum</span><span class="summary-value">${esc(formatDateDe(profile.residence.birthDate))}</span></div>
-        <div class="summary-row"><span class="summary-label">Geburtsort</span><span class="summary-value">${esc(profile.residence.birthPlace)}</span></div>
-        <div class="summary-row"><span class="summary-label">Steuer-ID</span><span class="summary-value">${esc(residence.tin)}</span></div>
-        <div class="summary-row"><span class="summary-label">Wohnsitzland (DBA)</span><span class="summary-value">${esc(countryNameGerman(profile.residence.country))}</span></div>
-        <div class="summary-row"><span class="summary-label">Ansässig seit</span><span class="summary-value">${esc(formatResidencePeriod(reclaimCase.residencePeriod))}</span></div>
-      </div>
-    </details>
-
-    ${renderDistributionsCard(reclaimCase, profile)}
+    ${dkTimelineHtml(reclaimCase)}
 
     <div class="card">
       <div class="card-head head-navy">
-        <span class="card-title">Dokument erstellen</span>
+        <span class="card-title">Formular</span>
+        <span class="ch-head-sub">wird von DivRebound erzeugt</span>
       </div>
       <div class="card-body">
         <button class="download-btn" data-action="download">
@@ -282,11 +272,32 @@ function render(container) {
 
     <div class="card">
       <div class="card-head head-navy">
+        <span class="card-title">Anschreiben an das Finanzamt</span>
+        <span class="ch-head-sub">${esc(normalizeTaxOffice(residence.taxOffice).name || "Finanzamt fehlt")}</span>
+      </div>
+      <div class="card-body">
+        <p class="ch-text">Bitte um Bestätigung der Ansässigkeit auf der beigefügten Wohnsitzbescheinigung, mit Steuer-ID.</p>
+        <button class="download-btn" data-action="letter" ${taxOfficeComplete ? "" : "disabled"}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 2v6h6"/>
+            <path d="M12 11v6"/>
+            <path d="m9 14 3 3 3-3"/>
+          </svg>
+          Anschreiben herunterladen (PDF)
+        </button>
+        ${taxOfficeComplete ? "" : `<div class="field-hint" style="margin-top:8px;">Bitte zuerst die Anschrift des Finanzamts in <a href="#/dk/${reclaimCase.caseId}/checklist">Schritt 1</a> ergänzen.</div>`}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head head-navy">
         <span class="card-title">Nächste Schritte</span>
       </div>
       <div class="card-body">
-        <div class="step-row"><span class="step-num">1</span><span>Ausdrucken, unterschreiben und an das zuständige Finanzamt per Post senden.</span></div>
-        <div class="step-row"><span class="step-num">2</span><span>Nach der Bestätigung durch das Finanzamt geht es in Schritt 2 weiter.</span></div>
+        <div class="step-row"><span class="step-num">1</span><span>Wohnsitzbescheinigung ausdrucken, unterschreiben und mit dem Anschreiben per Post an das Finanzamt senden.</span></div>
+        <div class="step-row"><span class="step-num">2</span><span>Das Finanzamt bestätigt (Stempel und Unterschrift) und schickt die Bescheinigung zurück.</span></div>
+        <div class="step-row"><span class="step-num">3</span><span>Danach geht es weiter mit <a href="#/dk/${reclaimCase.caseId}/step2/verify">Schritt 5: SKAT-Portal ausfüllen</a> – dort laden Sie die bestätigte Bescheinigung hoch.</span></div>
       </div>
     </div>
 
@@ -300,6 +311,31 @@ function render(container) {
         <button class="status-btn" data-action="reminder">📅 Erinnerung herunterladen (.ics)</button>
       </div>
     </div>
+
+    <details class="card">
+      <summary class="card-head">
+        <span style="display:flex;align-items:center;">
+          ${chevronSvg()}
+          <span class="card-title">Zusammenfassung: Angaben für die Wohnsitzbescheinigung</span>
+        </span>
+      </summary>
+      <div class="card-body">
+        <div class="summary-row"><span class="summary-label">Name</span><span class="summary-value">${esc(fullName)}</span></div>
+        <div class="summary-row"><span class="summary-label">Adresse</span><span class="summary-value">${esc(fullAddress)}</span></div>
+        <div class="summary-row"><span class="summary-label">Geburtsdatum</span><span class="summary-value">${esc(formatDateDe(profile.residence.birthDate))}</span></div>
+        <div class="summary-row"><span class="summary-label">Geburtsort</span><span class="summary-value">${esc(profile.residence.birthPlace)}</span></div>
+        <div class="summary-row"><span class="summary-label">Steuer-ID</span><span class="summary-value">${esc(residence.tin)}</span></div>
+        <div class="summary-row"><span class="summary-label">Wohnsitzland (DBA)</span><span class="summary-value">${esc(countryNameGerman(profile.residence.country))}</span></div>
+        <div class="summary-row"><span class="summary-label">Ansässig seit</span><span class="summary-value">${esc(formatResidencePeriod(reclaimCase.residencePeriod))}</span></div>
+      </div>
+    </details>
+
+    ${renderDistributionsCard(reclaimCase, profile)}
+
+    <div class="ch-step-nav">
+      <button class="btn-secondary" data-action="back" type="button">← Zurück</button>
+      <button class="btn-primary" data-action="next" type="button">Weiter: SKAT-Portal ausfüllen →</button>
+    </div>
   `;
 
   attachListeners(container, reclaimCase);
@@ -308,6 +344,17 @@ function render(container) {
 function attachListeners(container, reclaimCase) {
   container.querySelector('[data-action="back"]').addEventListener("click", () => {
     navigate(`#/dk/${reclaimCase.caseId}/step1/missing-data`);
+  });
+  container.querySelector('[data-action="next"]').addEventListener("click", () => {
+    navigate(`#/dk/${reclaimCase.caseId}/step2/verify`);
+  });
+
+  bindDkTimeline(container, reclaimCase, () => render(container));
+
+  container.querySelector('[data-action="letter"]').addEventListener("click", async () => {
+    const profile = getState().currentProfile;
+    const bytes = await buildTaxOfficeLetter(profile, { reference: "Wohnsitzbescheinigung (Formular 02.050) zur Erstattung dänischer Quellensteuer" });
+    downloadBlob(bytes, `Anschreiben_Finanzamt_${profile.residence.lastName || "DivRebound"}_Daenemark_${yearLabel(reclaimCase)}.pdf`, "application/pdf");
   });
 
   container.querySelector('[data-action="download"]').addEventListener("click", (e) => {
@@ -355,7 +402,9 @@ async function handleDownload(container, btn) {
     const cases = getState().cases.map((c) => (c.caseId === reclaimCase.caseId ? reclaimCase : c));
     setState({ currentCase: reclaimCase, cases });
 
-    statusEl.innerHTML = renderDownloadStatusHtml("success", { fileName, generatedAt });
+    // Neu rendern, damit die Zeitleiste "Formular erstellt" zeigt.
+    render(container);
+    container.querySelector("#download-status").innerHTML = renderDownloadStatusHtml("success", { fileName, generatedAt });
   } catch (err) {
     console.error("[summaryDownload] Formularerstellung fehlgeschlagen:", err);
     statusEl.innerHTML = renderDownloadStatusHtml("error", { message: err.message });

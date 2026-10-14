@@ -153,8 +153,8 @@ function render(container) {
 
   container.innerHTML = `
     <div class="content-header">
-      <h1 class="content-title">Positions-/Jahresübersicht</h1>
-      <div class="content-breadcrumb">Dänemark <b>›</b> ${new Date(reclaimCase.createdAt).toLocaleDateString("de-DE", { month: "2-digit", year: "numeric" })} <b>›</b> Schritt 1</div>
+      <h1 class="content-title">Dividendenabrechnungen</h1>
+      <div class="content-breadcrumb">Dänemark <b>›</b> DivRebound ${new Date(reclaimCase.createdAt).toLocaleDateString("de-DE", { month: "2-digit", year: "numeric" })} <b>›</b> 2 von 5</div>
     </div>
 
     <div class="dropzone" id="dropzone">

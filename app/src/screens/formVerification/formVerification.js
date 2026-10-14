@@ -1,4 +1,6 @@
-// Schritt 2, Teil 1: "Formular-Verifizierung". Einstieg in Prozess B
+// Dänemark, Schritt 5 "SKAT-Portal ausfüllen", Teil 1 (vormals Schritt 2):
+// "Formular-Verifizierung" mit derselben Status-Zeitleiste wie Schritt 4
+// (dkTimeline.js). Einstieg in Prozess B
 // (SKAT-Portal-Einreichung), erreicht nachdem Prozess A (Wohnsitzbescheinigung)
 // abgeschlossen ist und ggf. Wochen später, nachdem das Finanzamt bestätigt hat
 // (Case-Status zu diesem Zeitpunkt: "awaiting_tax_office" oder später - siehe
@@ -15,6 +17,7 @@ import { getState, setState } from "../../store/store.js";
 import { navigate } from "../../router/router.js";
 import * as caseRepo from "../../db/caseRepo.js";
 import { corridors } from "../../config/corridors.js";
+import { dkTimelineHtml, bindDkTimeline } from "../summaryDownload/dkTimeline.js";
 
 export function mount(container, params) {
   render(container, params);
@@ -31,15 +34,17 @@ function render(container, params) {
 
   container.innerHTML = `
     <div class="content-header">
-      <h1 class="content-title">SKAT-Formular öffnen</h1>
-      <div class="content-breadcrumb">Dänemark <b>›</b> ${caseLabel(reclaimCase)} <b>›</b> Schritt 2</div>
+      <h1 class="content-title">SKAT-Portal ausfüllen</h1>
+      <div class="content-breadcrumb">Dänemark <b>›</b> ${caseLabel(reclaimCase)} <b>›</b> 5 von 5</div>
     </div>
 
     <a class="back-link" id="back-link">← Zurück</a>
 
+    ${reclaimCase ? dkTimelineHtml(reclaimCase) : ""}
+
     <div class="info-banner">
       <span class="icon">⚠</span>
-      <div><b>Voraussetzung für Schritt 2:</b> Die vom Finanzamt unterschriebene/bestätigte Wohnsitzbescheinigung aus Schritt 1 muss vorliegen, bevor Sie hier fortfahren.</div>
+      <div><b>Voraussetzung:</b> Die vom Finanzamt bestätigte Wohnsitzbescheinigung aus Schritt 4 muss vorliegen, bevor Sie hier fortfahren – Sie laden sie im SKAT-Formular hoch.</div>
     </div>
 
     <div class="card">
@@ -85,8 +90,9 @@ function render(container, params) {
 
 function attachListeners(container, params, reclaimCase) {
   container.querySelector("#back-link").addEventListener("click", () => {
-    navigate(`#/dk/${params.caseId}/step1`);
+    navigate(`#/dk/${params.caseId}/step1/summary`);
   });
+  if (reclaimCase) bindDkTimeline(container, reclaimCase, () => render(container, params));
 
   container.querySelector("#open-btn").addEventListener("click", () => {
     window.open(corridors.DK.onlinePortalUrl, "_blank", "noopener");

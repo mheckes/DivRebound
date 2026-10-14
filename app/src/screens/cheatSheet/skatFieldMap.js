@@ -205,7 +205,7 @@ const page4Rows = [
       const doc = (reclaimCase.generatedDocuments ?? []).find((d) => d.type === "residency_certificate");
       return doc
         ? val(doc.fileName, doc.fileName)
-        : val("Noch nicht erzeugt – siehe Schritt 1", "", true);
+        : val("Noch nicht erzeugt – siehe Schritt 4", "", true);
     },
   },
   {

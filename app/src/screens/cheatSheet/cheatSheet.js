@@ -97,7 +97,7 @@ export function mount(container, params) {
   if (!reclaimCase.distributions || reclaimCase.distributions.length === 0) {
     container.innerHTML = `
       <div class="content-header"><h1 class="content-title">Cheat Sheet</h1></div>
-      <p class="field-hint">Für diesen Fall sind noch keine Ausschüttungen erfasst - bitte zuerst Schritt 1 abschließen.</p>
+      <p class="field-hint">Für diesen Fall sind noch keine Ausschüttungen erfasst - bitte zuerst Schritt 2 abschließen.</p>
     `;
     return;
   }
@@ -387,8 +387,8 @@ export function mount(container, params) {
     container.innerHTML = `
       <div class="content-header">
         <div>
-          <h1 class="content-title">Cheat Sheet</h1>
-          <div class="content-breadcrumb">Dänemark <b>›</b> ${escapeHtml(caseLabel)} <b>›</b> Schritt 2</div>
+          <h1 class="content-title">SKAT-Portal ausfüllen</h1>
+          <div class="content-breadcrumb">Dänemark <b>›</b> ${escapeHtml(caseLabel)} <b>›</b> 5 von 5</div>
         </div>
         <div class="progress-wrap">
           <span>${done} von ${total} übertragen</span>

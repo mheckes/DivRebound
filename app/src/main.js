@@ -41,6 +41,7 @@ import * as profileScreen from "./screens/profile/profile.js";
 import * as coverLetter from "./screens/coverLetter/coverLetter.js";
 import * as holdingsScreen from "./screens/holdings/holdings.js";
 import * as chCase from "./screens/chCase/chCase.js";
+import * as dkChecklist from "./screens/dkChecklist/dkChecklist.js";
 
 import { websiteHome } from "./config/siteLinks.js";
 
@@ -89,6 +90,10 @@ route("#/ch/bestand", () => mountScreen(holdingsScreen, {}));
 route("#/ch/:caseId/:step", async (p) => {
   await ensureCaseSelected(p.caseId);
   mountScreen(chCase, p);
+});
+route("#/dk/:caseId/checklist", async (p) => {
+  await ensureCaseSelected(p.caseId);
+  mountScreen(dkChecklist, p);
 });
 route("#/dk/:caseId/step1", async (p) => {
   await ensureCaseSelected(p.caseId);

@@ -43,7 +43,7 @@
 /* Auf dieser Seite sollen ALLE Feldbeschriftungen einheitlich aussehen -
    unabhängig davon, ob das Feld schon einen Wert hat (.confirmed-label) oder
    noch leer ist (.field-label): grau, in Großbuchstaben, nicht fett - wie in
-   "Fehlende Angaben ergänzen" (siehe .md-known-label in missingData.css).
+   den Checklisten "Unterlagen prüfen".
    Bewusst hier auf .profile-page eingegrenzt statt die Basisklassen selbst zu
    ändern, damit andere Screens (z.B. Anschreiben Finanzamt), die dieselben
    Basisklassen nutzen, unverändert bleiben. */

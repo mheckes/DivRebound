@@ -2,7 +2,9 @@
 // Käufe und Verkäufe gehören zum Profil, nicht zu einem einzelnen Fall: Ein
 // Folge-DivRebound liest denselben Bestand und ergänzt nur neue Transaktionen.
 // Erfassung per PDF-Upload (lib/parseBrokerStatement.js) oder manuell;
-// Bestand und Tranchen kommen aus lib/holdings.js (FIFO pro Depot und ISIN).
+// Bestand und Tranchen kommen aus lib/holdings.js (FIFO pro ISIN). Depots werden
+// bewusst nicht unterschieden (Vereinfachung, docs/konzept-schweiz.md §0) - alle
+// Käufe und Verkäufe einer Aktie bilden einen gemeinsamen Bestand.
 // Mockup: Mock Up Schweiz 10-2026/divrebound_ch_mockup.html, Schritt 2.
 //
 // Zwei Einstiege: eigenständig über die Sidebar ("Schweiz › Wertpapierbestand")
@@ -50,9 +52,9 @@ function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 }
 
-const knownDepots = () => [...new Set(transactions.map((t) => t.depotId))].sort();
 const issuerByIsin = () => Object.fromEntries(transactions.filter((t) => t.issuerName).map((t) => [t.isin, t.issuerName]));
-const depotLabel = (depotId) => (depotId ? `Depot ${depotId}` : "Depot ohne Nummer");
+// Depot-Nr. aus älteren Importen ignorieren: ein gemeinsamer Bestand je Aktie.
+const withoutDepot = (txs) => txs.map((t) => ({ ...t, depotId: "" }));
 
 function render(container) {
   const profile = getState().currentProfile;
@@ -102,7 +104,7 @@ function render(container) {
     <details class="help-disclosure">
       <summary>Wie DivRebound den Bestand berechnet (FIFO)</summary>
       <div class="help-disclosure-body">
-        <p>Bei Teilverkäufen gilt: <b>zuerst gekaufte Aktien werden zuerst verkauft</b>. Ist eine Tranche ganz verkauft, entfällt sie. Ist sie teilweise verkauft, bleibt ihr ursprüngliches Erwerbsdatum, nur die Stückzahl sinkt. Gerechnet wird getrennt pro Depot.</p>
+        <p>Bei Teilverkäufen gilt: <b>zuerst gekaufte Aktien werden zuerst verkauft</b>. Ist eine Tranche ganz verkauft, entfällt sie. Ist sie teilweise verkauft, bleibt ihr ursprüngliches Erwerbsdatum, nur die Stückzahl sinkt.</p>
         <p><b>Abgleich:</b> Legen Sie die Tabelle neben Ihren aktuellen Depotauszug. Weicht eine Stückzahl ab, fehlt eine Abrechnung. Zusätzlich prüft DivRebound später, ob die Stückzahlen auf den Tax Vouchern zum berechneten Bestand passen.</p>
         <p><b>Erwerbsdatum</b> ist immer der Handelstag (steht auf der Abrechnung unter „Details zur Ausführung“), nicht das Auftragsdatum und nicht die Valuta.</p>
       </div>
@@ -137,8 +139,6 @@ function renderCaptureCard() {
 
 function renderManualForm() {
   if (!manualFormOpen) return "";
-  const depots = knownDepots();
-  const depotOptions = (depots.length ? depots : [""]).map((d) => `<option value="${esc(d)}">${esc(depotLabel(d))}</option>`).join("");
   return `
     <div class="holdings-manual" id="manual-form">
       <div class="field-grid">
@@ -154,8 +154,6 @@ function renderManualForm() {
           <input class="field-input" type="date" data-mf="tradeDate"></div>
         <div class="field-row"><label class="field-label">Stück</label>
           <input class="field-input mono" type="number" min="0" step="any" data-mf="quantity"></div>
-        <div class="field-row"><label class="field-label">Depot</label>
-          <select class="field-input" data-mf="depotId">${depotOptions}</select></div>
       </div>
       <datalist id="holdings-isins">${Object.entries(issuerByIsin()).map(([i, n]) => `<option value="${esc(i)}">${esc(n)}</option>`).join("")}</datalist>
       <div class="field-hint">Handelstag = Tag der Ausführung (auf der Abrechnung unter „Details zur Ausführung“), nicht Auftragsdatum oder Valuta.</div>
@@ -202,16 +200,10 @@ function renderLastImport() {
 }
 
 function renderHoldings() {
-  const holdings = computeHoldings(transactions.filter((t) => t.tradeDate));
-  const multipleDepots = new Set(holdings.map((h) => h.depotId)).size > 1;
+  const holdings = computeHoldings(withoutDepot(transactions.filter((t) => t.tradeDate)));
   let rows = "";
-  let currentDepot = null;
   for (const h of holdings) {
-    if (multipleDepots && h.depotId !== currentDepot) {
-      currentDepot = h.depotId;
-      rows += `<tr class="holdings-depot-row"><td colspan="4">${esc(depotLabel(h.depotId))}</td></tr>`;
-    }
-    const key = `${h.depotId}|${h.isin}`;
+    const key = h.isin;
     const open = !collapsed.has(key);
     rows += `
       <tr class="holdings-isin-row" data-toggle="${esc(key)}">
@@ -264,7 +256,7 @@ function renderTransactions() {
                 : `<input class="field-input" type="date" data-set-date="${esc(t.transactionId)}" title="Handelstag aus der Abrechnung eintragen">`
             }</td>
             <td>${t.type === "buy" ? "Kauf" : "Verkauf"}</td>
-            <td>${esc(t.issuerName || t.isin)}<div class="mono holdings-lot-note">${esc(t.isin)}${knownDepots().length > 1 ? ` · ${esc(depotLabel(t.depotId))}` : ""}</div></td>
+            <td>${esc(t.issuerName || t.isin)}<div class="mono holdings-lot-note">${esc(t.isin)}</div></td>
             <td class="num">${t.type === "sell" ? "−" : ""}${t.quantity}</td>
             <td class="holdings-source">${t.source?.kind === "manual" ? "manuell erfasst" : esc(t.source?.fileName ?? "Abrechnung")}
               ${t.extractionConfidence === "extracted" ? `<div><span class="badge badge-warn">bitte prüfen</span> <button class="holdings-link" data-confirm="${esc(t.transactionId)}" type="button">stimmt</button></div>` : ""}</td>
@@ -460,7 +452,7 @@ async function saveManual(container) {
   const transaction = {
     transactionId: crypto.randomUUID(),
     profileId: profile.profileId,
-    depotId: value("depotId"),
+    depotId: "",
     isin,
     issuerName: value("issuerName") || issuerByIsin()[isin] || "",
     type: value("type") === "sell" ? "sell" : "buy",

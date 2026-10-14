@@ -122,7 +122,7 @@ export function openNewCaseWizard() {
       setState({ cases: [...getState().cases, reclaimCase], currentCase: reclaimCase });
 
       close({ profile, reclaimCase });
-      navigate(targetCountry === "CH" ? `#/ch/${reclaimCase.caseId}/1` : `#/dk/${reclaimCase.caseId}/step1`);
+      navigate(targetCountry === "CH" ? `#/ch/${reclaimCase.caseId}/1` : `#/dk/${reclaimCase.caseId}/checklist`);
     });
   });
 }
