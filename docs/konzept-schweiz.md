@@ -205,6 +205,8 @@ Nur PDFs mit echtem Textlayer (pdf.js). Alle Werte bleiben `extracted`, bis die 
 | Tax Voucher (Baader) | „Tax Voucher“ auf Seite 1 | ISIN, Stück (Bestand), Vorgangs-Nr., Referenz-Nr. | Baader 17.07.2026 (20 und 5 Stück) |
 | Dividendenabrechnung | vorhandener `parseDividendCertificate.js` mit `nativeCurrency: "CHF"` | Termin, Bruttobetrag, Stück | comdirect Calida (bereits kalibriert) |
 
+**Aktienerkennung bei manueller Erfassung:** Eingebaute Liste aller Schweizer Aktien der SIX Swiss Exchange (ISIN → Name, `app/src/config/swissShares.js`, erzeugt mit `npm run update-swiss-shares` aus der offiziellen SIX-Aktienliste). Die App selbst greift nicht aufs Internet zu. Eigene Namen aus dem Bestand haben Vorrang; ISINs werden per Prüfziffer validiert.
+
 Erkenntnisse aus den Referenzdokumenten:
 - **Voucher ≠ Tranche.** Baader stellt für einen Termin mehrere Voucher mit derselben Vorgangs-Nr. aus (20 + 5 Stück für 4 Tranchen). Zuordnung immer über ISIN + Termin, Prüfung über die Summe.
 - **Seite 2 des Vouchers** (das eigentliche Schreiben an die ESTV mit „Dividendentermin“) ist als Vektorgrafik ohne Text eingebettet. Der Termin wird deshalb aus der Dividendenabrechnung übernommen oder von den Nutzern beim Upload bestätigt.

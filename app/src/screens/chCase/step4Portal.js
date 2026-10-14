@@ -8,6 +8,7 @@ import { navigate } from "../../router/router.js";
 import { PROFILE_FIELDS } from "../../util/profileFields.js";
 import { chStepRoute } from "../../config/caseSteps.js";
 import { computeLots } from "../../lib/holdings.js";
+import { shareNames } from "../../util/shareNames.js";
 import {
   esc, corridor, saveCase, loadTransactions, entitlementsFor, completeDistributions, isTimeBarred,
   formatChf, formatDatePortal, stepHeader, stepNavHtml, bindStepNav, copyToClipboard,
@@ -143,7 +144,7 @@ function renderAssets(reclaimCase, results, years) {
       total += r.refund ?? 0;
       html += `
         <div class="share-block-head ch-dist-head">
-          <span><b>${esc(d.issuerName || d.isin)}</b> · ${esc(d.isin)}</span>
+          <span><b>${esc(shareNames(transactions).nameFor(d.isin) || d.issuerName || d.isin)}</b> · ${esc(d.isin)}</span>
           <span>Fälligkeit <b>${esc(formatDatePortal(d.paymentDate))}</b>${d.grossPerShare ? ` · Brutto ${formatChf(d.grossPerShare)}/Stk.` : ""} · ${r.entries.length} ${r.entries.length === 1 ? "Eintrag" : "Einträge"}</span>
         </div>
         <div class="ch-entry ch-entry-head"><span></span><span>#</span><span>ISIN</span><span>Erwerbsdatum</span><span>Anzahl</span><span>Erstattung</span></div>

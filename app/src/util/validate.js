@@ -33,6 +33,26 @@ export function isValidTaxNumber(value) {
   return digits >= 10 && digits <= 13;
 }
 
+/**
+ * ISIN mit gültiger Prüfziffer (ISO 6166): Buchstaben -> Zahlen (A=10 … Z=35),
+ * dann Luhn-Verfahren über alle Ziffern.
+ */
+export function isValidIsin(value) {
+  const isin = String(value ?? "").trim().toUpperCase();
+  if (!/^[A-Z]{2}[A-Z0-9]{9}\d$/.test(isin)) return false;
+  const digits = [...isin].map((c) => (/\d/.test(c) ? c : String(c.charCodeAt(0) - 55))).join("");
+  let sum = 0;
+  for (let i = 0; i < digits.length; i++) {
+    let d = Number(digits[digits.length - 1 - i]);
+    if (i % 2 === 1) {
+      d *= 2;
+      if (d > 9) d -= 9;
+    }
+    sum += d;
+  }
+  return sum % 10 === 0;
+}
+
 export function isinMatchesCorridor(isin, isinPrefix) {
   return typeof isin === "string" && isin.startsWith(isinPrefix);
 }

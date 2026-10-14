@@ -194,3 +194,11 @@
   background: var(--danger-tint);
   color: var(--danger);
 }
+
+/* Name steht fest (bekannte ISIN) - nicht editierbar, damit eine Aktie
+   überall gleich heißt (util/shareNames.js). */
+#divrebound-app .holdings-manual .field-input.is-locked {
+  background: var(--bg);
+  color: var(--charcoal);
+  cursor: default;
+}

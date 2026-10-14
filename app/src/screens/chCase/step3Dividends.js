@@ -14,6 +14,7 @@ import { parseBrokerStatement } from "../../lib/parseBrokerStatement.js";
 import { parseDividendCertificate } from "../../lib/parseDividendCertificate.js";
 import { computeHoldings, computeLots } from "../../lib/holdings.js";
 import { formatDateDe } from "../../util/format.js";
+import { shareNames } from "../../util/shareNames.js";
 import { openConfirmModal } from "../../components/modal.js";
 import { showToast } from "../../components/toast.js";
 import {
@@ -71,6 +72,9 @@ function setPaymentDate(dist, paymentDate) {
   }
 }
 
+/** Name nach SIX-Konvention bzw. wie im Bestand erfasst (util/shareNames.js), sonst der aus dem PDF */
+const canonicalName = (isin, parsedName) => shareNames(transactions).nameFor(isin) || parsedName;
+
 const daysBetween = (a, b) => (new Date(b) - new Date(a)) / 86400000;
 
 function attachVoucher(reclaimCase, parsed, fileName) {
@@ -90,11 +94,11 @@ function attachVoucher(reclaimCase, parsed, fileName) {
         daysBetween(d.paymentDate, parsed.letterDate) <= 150
     );
   if (!dist) {
-    dist = newDistribution({ isin: parsed.isin, issuerName: parsed.issuerName });
+    dist = newDistribution({ isin: parsed.isin, issuerName: canonicalName(parsed.isin, parsed.issuerName) });
     dists.push(dist);
   }
   dist.vorgangsNr = dist.vorgangsNr ?? parsed.vorgangsNr;
-  if (!dist.issuerName) dist.issuerName = parsed.issuerName;
+  if (!dist.issuerName) dist.issuerName = canonicalName(parsed.isin, parsed.issuerName);
   dist.vouchers.push({ fileName, quantity: parsed.quantity, documentRef: parsed.documentRef });
   return "voucher";
 }
@@ -109,7 +113,7 @@ function attachStatement(reclaimCase, distribution, rawText, fileName) {
     dist = newDistribution({ isin: distribution.isin });
     dists.push(dist);
   }
-  if (!dist.issuerName) dist.issuerName = distribution.issuerName;
+  if (!dist.issuerName) dist.issuerName = canonicalName(distribution.isin, distribution.issuerName);
   const exDate = exDateFromText(rawText);
   if (exDate) {
     dist.exDate = exDate;
@@ -181,15 +185,15 @@ function openYearHints(reclaimCase) {
       const hasDist = reclaimCase.ch.distributions.some((d) => d.isin === h.isin && d.paymentDate?.startsWith(String(y)));
       if ((heldAtYearEnd || tradedInYear) && !hasDist && !dismissed.has(`${h.isin}|${y}`)) years.push(y);
     }
-    if (years.length) hints.push({ isin: h.isin, issuerName: h.issuerName, years });
+    if (years.length) hints.push({ isin: h.isin, issuerName: shareNames(transactions).nameFor(h.isin) || h.issuerName, years });
   }
   return hints;
 }
 
 function holdingsIsins() {
-  const names = {};
-  for (const t of transactions) if (!names[t.isin] || t.issuerName) names[t.isin] = t.issuerName || t.isin;
-  return names;
+  // Einheitlicher Name je ISIN (util/shareNames.js)
+  const resolver = shareNames(transactions);
+  return Object.fromEntries([...new Set(transactions.map((t) => t.isin))].map((isin) => [isin, resolver.nameFor(isin) || isin]));
 }
 
 function render(container, reclaimCase) {
@@ -281,7 +285,7 @@ function distributionRow(d, result, isinNames) {
   }
   const id = d.distributionId;
   const isinCell = d.isin
-    ? `<b>${esc(d.issuerName || isinNames[d.isin] || "")}</b><div class="mono ch-sub">${esc(d.isin)}</div>`
+    ? `<b>${esc(shareNames(transactions).nameFor(d.isin) || d.issuerName || isinNames[d.isin] || "")}</b><div class="mono ch-sub">${esc(d.isin)}</div>`
     : `<select class="field-input ch-cell-input" data-dist="${id}" data-prop="isin" data-focus-key="${id}-isin">
         <option value="">Aktie wählen …</option>
         ${Object.entries(isinNames).map(([isin, name]) => `<option value="${esc(isin)}">${esc(name)} (${esc(isin)})</option>`).join("")}

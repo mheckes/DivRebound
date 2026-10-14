@@ -18,6 +18,8 @@ import { parseBrokerStatement } from "../../lib/parseBrokerStatement.js";
 import { computeHoldings } from "../../lib/holdings.js";
 import { corridors } from "../../config/corridors.js";
 import { formatDateDe } from "../../util/format.js";
+import { isValidIsin } from "../../util/validate.js";
+import { shareNames } from "../../util/shareNames.js";
 import { openConfirmModal } from "../../components/modal.js";
 import { showToast } from "../../components/toast.js";
 import { navigate } from "../../router/router.js";
@@ -52,7 +54,11 @@ function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 }
 
-const issuerByIsin = () => Object.fromEntries(transactions.filter((t) => t.issuerName).map((t) => [t.isin, t.issuerName]));
+/** Einheitlicher Name zur ISIN (SIX-Liste vor eigenem Bestand), siehe util/shareNames.js */
+const knownName = (isin) => shareNames(transactions).nameFor(isin);
+const knownShares = () => shareNames(transactions).all();
+/** Umkehrung für die Namenssuche: Name -> ISIN */
+const isinByName = () => Object.fromEntries(Object.entries(knownShares()).map(([isin, name]) => [name, isin]));
 // Depot-Nr. aus älteren Importen ignorieren: ein gemeinsamer Bestand je Aktie.
 const withoutDepot = (txs) => txs.map((t) => ({ ...t, depotId: "" }));
 
@@ -145,9 +151,10 @@ function renderManualForm() {
         <div class="field-row"><label class="field-label">Art</label>
           <select class="field-input" data-mf="type"><option value="buy">Kauf</option><option value="sell">Verkauf</option></select></div>
         <div class="field-row"><label class="field-label">ISIN</label>
-          <input class="field-input mono" data-mf="isin" placeholder="z.B. CH0017875789" list="holdings-isins"></div>
+          <input class="field-input mono" data-mf="isin" placeholder="z.B. CH0017875789" list="holdings-isins">
+          <span class="field-hint" data-isin-hint></span></div>
         <div class="field-row field-row-wide"><label class="field-label">Aktie</label>
-          <input class="field-input" data-mf="issuerName" placeholder="wird bei bekannter ISIN ergänzt"></div>
+          <input class="field-input" data-mf="issuerName" placeholder="Name eingeben, z.B. Nestlé" list="holdings-names"></div>
       </div>
       <div class="field-grid">
         <div class="field-row"><label class="field-label">Handelstag</label>
@@ -155,7 +162,8 @@ function renderManualForm() {
         <div class="field-row"><label class="field-label">Stück</label>
           <input class="field-input mono" type="number" min="0" step="any" data-mf="quantity"></div>
       </div>
-      <datalist id="holdings-isins">${Object.entries(issuerByIsin()).map(([i, n]) => `<option value="${esc(i)}">${esc(n)}</option>`).join("")}</datalist>
+      <datalist id="holdings-isins">${Object.keys(knownShares()).sort().map((isin) => `<option value="${esc(isin)}"></option>`).join("")}</datalist>
+      <datalist id="holdings-names">${Object.values(knownShares()).sort((a, b) => a.localeCompare(b, "de")).map((name) => `<option value="${esc(name)}"></option>`).join("")}</datalist>
       <div class="field-hint">Handelstag = Tag der Ausführung (auf der Abrechnung unter „Details zur Ausführung“), nicht Auftragsdatum oder Valuta.</div>
       <div class="field-error" data-mf-error hidden></div>
       <div class="holdings-actions">
@@ -207,7 +215,7 @@ function renderHoldings() {
     const open = !collapsed.has(key);
     rows += `
       <tr class="holdings-isin-row" data-toggle="${esc(key)}">
-        <td><span class="holdings-caret ${open ? "open" : ""}">›</span> <b>${esc(h.issuerName || h.isin)}</b></td>
+        <td><span class="holdings-caret ${open ? "open" : ""}">›</span> <b>${esc(knownName(h.isin) || h.isin)}</b></td>
         <td class="mono">${esc(h.isin)}</td>
         <td></td>
         <td class="num"><b>${h.total}</b>${h.oversold ? ` <span class="badge badge-danger" title="Es wurde mehr verkauft als gekauft">${h.oversold} Stk. zu viel verkauft – Käufe fehlen</span>` : ""}</td>
@@ -256,7 +264,7 @@ function renderTransactions() {
                 : `<input class="field-input" type="date" data-set-date="${esc(t.transactionId)}" title="Handelstag aus der Abrechnung eintragen">`
             }</td>
             <td>${t.type === "buy" ? "Kauf" : "Verkauf"}</td>
-            <td>${esc(t.issuerName || t.isin)}<div class="mono holdings-lot-note">${esc(t.isin)}</div></td>
+            <td>${esc(knownName(t.isin) || t.isin)}<div class="mono holdings-lot-note">${esc(t.isin)}</div></td>
             <td class="num">${t.type === "sell" ? "−" : ""}${t.quantity}</td>
             <td class="holdings-source">${t.source?.kind === "manual" ? "manuell erfasst" : esc(t.source?.fileName ?? "Abrechnung")}
               ${t.extractionConfidence === "extracted" ? `<div><span class="badge badge-warn">bitte prüfen</span> <button class="holdings-link" data-confirm="${esc(t.transactionId)}" type="button">stimmt</button></div>` : ""}</td>
@@ -312,11 +320,38 @@ function attachTableListeners(container) {
     })
   );
 
+  // ISIN-Suche im ISIN-Feld, Namenssuche im Namensfeld. Ist die ISIN bekannt
+  // (SIX-Liste oder eigener Bestand), steht der einheitliche Name fest und das
+  // Namensfeld ist gesperrt - so entstehen keine zwei Namen für dieselbe Aktie.
   const isinInput = container.querySelector('[data-mf="isin"]');
-  isinInput?.addEventListener("input", () => {
-    const name = issuerByIsin()[isinInput.value.trim().toUpperCase()];
-    const nameInput = container.querySelector('[data-mf="issuerName"]');
-    if (name && !nameInput.value) nameInput.value = name;
+  const nameInput = container.querySelector('[data-mf="issuerName"]');
+  const applyIsin = () => {
+    const isin = isinInput.value.trim().toUpperCase();
+    const name = knownName(isin);
+    const isinHint = container.querySelector("[data-isin-hint]");
+    if (name) {
+      nameInput.value = name;
+      nameInput.readOnly = true;
+    } else {
+      if (nameInput.readOnly) nameInput.value = "";
+      nameInput.readOnly = false;
+    }
+    nameInput.classList.toggle("is-locked", Boolean(name));
+    if (isin.length < 12) isinHint.textContent = "";
+    // Nur ein Hinweis, kein Hindernis: Übernehmen bleibt möglich.
+    else if (!isValidIsin(isin)) isinHint.textContent = "ISIN unbekannt";
+    else if (!name) isinHint.textContent = "Nicht in der Liste der SIX – bitte Namen der Aktie eintragen.";
+    else isinHint.textContent = "";
+  };
+  isinInput?.addEventListener("input", applyIsin);
+  // Wird ein Name aus der Liste gewählt, die passende ISIN eintragen.
+  nameInput?.addEventListener("input", () => {
+    if (nameInput.readOnly) return;
+    const isin = isinByName()[nameInput.value.trim()];
+    if (isin) {
+      isinInput.value = isin;
+      applyIsin();
+    }
   });
   container.querySelector('[data-action="save-manual"]')?.addEventListener("click", () => saveManual(container));
 
@@ -333,7 +368,7 @@ function attachTableListeners(container) {
       const t = transactions.find((x) => x.transactionId === btn.dataset.delete);
       const ok = await openConfirmModal(
         "Transaktion löschen?",
-        `${t.type === "buy" ? "Kauf" : "Verkauf"} ${t.quantity} Stk. ${esc(t.issuerName || t.isin)}${t.tradeDate ? ` vom ${formatDateDe(t.tradeDate)}` : ""} wird aus dem Bestand entfernt.`,
+        `${t.type === "buy" ? "Kauf" : "Verkauf"} ${t.quantity} Stk. ${esc(knownName(t.isin) || t.isin)}${t.tradeDate ? ` vom ${formatDateDe(t.tradeDate)}` : ""} wird aus dem Bestand entfernt.`,
         { confirmLabel: "Löschen", danger: true }
       );
       if (!ok) return;
@@ -388,7 +423,7 @@ async function handleFiles(container, fileList) {
       const summary = {
         ...base,
         type: parsed.type,
-        issuerName: parsed.issuerName,
+        issuerName: knownName(parsed.isin) || parsed.issuerName,
         quantity: parsed.executions.reduce((s, e) => s + (e.quantity ?? 0), 0),
         tradeDates: parsed.executions.map((e) => e.tradeDate).filter(Boolean),
         warnings: parsed.warnings,
@@ -409,7 +444,7 @@ async function handleFiles(container, fileList) {
           profileId: profile.profileId,
           depotId: parsed.depotId ?? "",
           isin: parsed.isin,
-          issuerName: parsed.issuerName,
+          issuerName: knownName(parsed.isin) || parsed.issuerName,
           type: parsed.type,
           tradeDate: execution.tradeDate,
           quantity: execution.quantity ?? 0,
@@ -441,6 +476,7 @@ async function saveManual(container) {
   let error = "";
   if (!ISIN_PATTERN.test(isin)) error = "ISIN hat 12 Zeichen, z.B. CH0017875789.";
   else if (!isin.startsWith(corridor.isinPrefix)) error = "Hier werden nur Schweizer Aktien erfasst (ISIN beginnt mit CH).";
+  else if (!knownName(isin) && !value("issuerName")) error = "Bitte den Namen der Aktie eintragen.";
   else if (!tradeDate) error = "Bitte den Handelstag angeben.";
   else if (!(quantity > 0)) error = "Bitte die Stückzahl angeben.";
   if (error) {
@@ -454,7 +490,7 @@ async function saveManual(container) {
     profileId: profile.profileId,
     depotId: "",
     isin,
-    issuerName: value("issuerName") || issuerByIsin()[isin] || "",
+    issuerName: knownName(isin) || value("issuerName"),
     type: value("type") === "sell" ? "sell" : "buy",
     tradeDate,
     quantity,
