@@ -24,6 +24,12 @@
       "runtimeExecutable": "C:\\Users\\hecke\\.dev-cache\\run-divrebound-site-appdev.cmd",
       "runtimeArgs": [],
       "port": 5174
+    },
+    {
+      "name": "mockups",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-e", "const h=require('http'),f=require('fs'),p=require('path');h.createServer((q,r)=>{const fp=p.join(process.cwd(),decodeURIComponent(q.url.split('?')[0]));f.readFile(fp,(e,d)=>{if(e){r.writeHead(404);return r.end('404')}r.writeHead(200,{'Content-Type':fp.endsWith('.html')?'text/html; charset=utf-8':'application/octet-stream'});r.end(d)})}).listen(4180)"],
+      "port": 4180
     }
   ]
 }

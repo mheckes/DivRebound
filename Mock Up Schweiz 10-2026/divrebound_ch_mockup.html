@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DivRebound Schweiz – Mockup</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  /* Tokens 1:1 aus app/src/style/tokens.css */
+  :root{
+    --navy:#0f2240; --navy-mid:#1a3a6b; --navy-light:#e8eef7;
+    --cyan:#00b4d8; --cyan-dark:#007a9e; --cyan-light:#e0f7fc;
+    --bg:#f2f4f7; --surface:#fff; --charcoal:#111827; --muted:#6b7c93; --stone:#aab4c4; --divider:#d8dfe8;
+    --success:#059669; --success-bg:#d1fae5; --danger:#a8433a; --danger-tint:#f7e9e7;
+    --warn:#9a6700; --warn-bg:#fff4d6;
+    --font-display:"DM Serif Display", Georgia, serif;
+    --font-body:"DM Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono:"JetBrains Mono", "Courier New", monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--charcoal);font-family:var(--font-body);font-size:13px;}
+  button,input,select{font-family:inherit;}
+
+  .mock-bar{background:#fff7e0;border-bottom:1px solid #f0d48a;padding:8px 16px;font-size:12px;color:#6b5200;display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+  .mock-bar b{color:#4a3800;}
+  .mock-toggle{display:inline-flex;border:1px solid #e0c060;border-radius:8px;overflow:hidden;margin-left:auto;}
+  .mock-toggle button{border:none;background:#fff;padding:5px 10px;font-size:11.5px;font-weight:600;color:#6b5200;cursor:pointer;}
+  .mock-toggle button.on{background:#6b5200;color:#fff;}
+
+  .app-shell{display:flex;min-height:calc(100vh - 36px);max-width:1360px;margin:0 auto;background:#fff;box-shadow:0 0 0 1px var(--divider);}
+
+  /* Sidebar (wie components/sidebar.css) */
+  .sidebar{width:260px;flex-shrink:0;background:var(--navy);color:#fff;padding:20px 16px;display:flex;flex-direction:column;gap:18px;}
+  .sidebar-brand{display:flex;align-items:center;gap:10px;}
+  .sidebar-wordmark{font-family:var(--font-display);font-size:17px;}
+  .sidebar-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:12.5px;font-weight:600;padding:9px 12px;border-radius:8px;text-align:left;width:100%;margin-bottom:8px;}
+  .sidebar-divider{height:1px;background:rgba(255,255,255,.15);}
+  .sidebar-section{display:flex;flex-direction:column;gap:3px;}
+  .sidebar-section-title{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.55);font-weight:700;margin-bottom:2px;}
+  .sidebar-link{font-size:13px;color:rgba(255,255,255,.9);padding:6px 8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .sidebar-link:hover{background:rgba(255,255,255,.08);}
+  .sidebar-link.current{background:rgba(0,180,216,.16);color:var(--cyan);font-weight:600;}
+  .new-tag{font-size:9.5px;background:var(--cyan);color:var(--navy);padding:1px 6px;border-radius:99px;font-weight:700;}
+  .sidebar-new{font-size:13px;font-weight:700;color:var(--cyan);padding:6px 8px;}
+  .nav-country{padding:7px 8px 4px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:7px;}
+  .nav-country.muted{color:rgba(255,255,255,.55);font-weight:500;}
+  .nav-case-group{margin-left:8px;padding-left:14px;border-left:1.5px solid rgba(255,255,255,.15);display:flex;flex-direction:column;gap:2px;}
+  .nav-holdings{font-size:12.5px;color:rgba(255,255,255,.85);padding:5px 8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .nav-holdings:hover{background:rgba(255,255,255,.08);}
+  .nav-holdings.current{background:rgba(0,180,216,.16);color:var(--cyan);font-weight:600;}
+  .nav-case{padding:5px 8px;border-radius:6px;font-size:12.5px;color:rgba(255,255,255,.85);}
+  .nav-case.active{color:var(--cyan);font-weight:600;}
+  .nav-steps{margin-left:12px;padding-left:10px;border-left:1.5px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:1px;margin-bottom:6px;}
+  .nav-step{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;font-size:12px;color:rgba(255,255,255,.6);cursor:pointer;}
+  .nav-step:hover{background:rgba(255,255,255,.06);}
+  .nav-step.current{color:#fff;font-weight:600;background:rgba(255,255,255,.08);}
+  .nav-step .dot{width:17px;height:17px;border-radius:50%;border:1.5px solid rgba(255,255,255,.4);font-size:9.5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .nav-step.done .dot{background:var(--success);border-color:var(--success);color:#fff;}
+  .nav-step.current .dot{border-color:var(--cyan);color:var(--cyan);}
+
+  /* Content */
+  .content{flex:1;min-width:0;padding:24px 28px 40px;}
+  .content-title{font-family:var(--font-display);font-size:22px;margin:0 0 4px;}
+  .content-breadcrumb{font-size:12px;color:var(--muted);margin-bottom:18px;}
+  .content-breadcrumb b{color:var(--navy);}
+  .screen{display:none;max-width:880px;}
+  .screen.active{display:block;}
+  .lead{font-size:13px;color:var(--muted);line-height:1.6;margin:0 0 16px;max-width:680px;}
+
+  .card{background:#fff;border:1px solid var(--divider);border-radius:14px;margin-bottom:16px;overflow:hidden;}
+  .card-head{padding:12px 18px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .card-head.navy{background:var(--navy);border-bottom:none;}
+  .card-head.navy .card-title{color:#fff;}
+  .card-title{font-size:13px;font-weight:700;color:var(--navy);}
+  .card-sub{font-size:11.5px;color:var(--muted);}
+  .card-head.navy .card-sub{color:rgba(255,255,255,.7);}
+  .card-body{padding:14px 18px;}
+  details.card>summary{list-style:none;cursor:pointer;}
+  details.card>summary::-webkit-details-marker{display:none;}
+  details.card>summary .card-title::before{content:"›  ";display:inline-block;transition:transform .15s;}
+  details.card[open]>summary .card-title::before{transform:rotate(90deg);}
+
+  .btn{background:var(--cyan);color:var(--navy);border:none;padding:10px 18px;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+  .btn:hover{background:#00a2c4;}
+  .btn.ghost{background:#fff;color:var(--navy);border:1.5px solid var(--navy);font-weight:600;}
+  .btn.ghost:hover{background:var(--navy-light);}
+  .btn.small{padding:6px 11px;font-size:11.5px;border-radius:7px;}
+  .btn.success{background:var(--success);color:#fff;}
+  .btn:disabled{background:var(--stone);color:#fff;cursor:default;border-color:var(--stone);}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
+  .link{color:var(--cyan-dark);font-weight:600;cursor:pointer;text-decoration:underline;}
+
+  .banner{border-radius:10px;padding:12px 16px;font-size:12.5px;line-height:1.55;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;}
+  .banner.info{background:var(--navy-light);border:1px solid var(--navy);color:var(--navy);}
+  .banner.warn{background:var(--warn-bg);border:1px solid #e6c15a;color:#5c4300;}
+  .banner.ok{background:var(--success-bg);border:1px solid var(--success);color:#064e3b;}
+  .banner .ico{font-size:15px;line-height:1.2;}
+
+  .help{border:1px solid var(--divider);border-radius:10px;margin:12px 0 16px;overflow:hidden;background:#fff;}
+  .help>summary{padding:10px 14px;cursor:pointer;list-style:none;font-size:12px;font-weight:700;color:var(--navy);background:var(--navy-light);}
+  .help>summary::-webkit-details-marker{display:none;}
+  .help>summary::before{content:"ⓘ  ";}
+  .help-body{border-top:1px solid var(--divider);padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.6;}
+  .help-body b{color:var(--charcoal);}
+
+  /* Checkliste */
+  .check-group-title{padding:10px 18px 4px;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;}
+  .check-item{display:grid;grid-template-columns:26px 160px 1fr auto;gap:12px;align-items:center;padding:9px 18px;border-top:1px solid var(--divider);}
+  .check-group-title+.check-item{border-top:none;}
+  .state{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+  .state.ok{background:var(--success-bg);color:var(--success);}
+  .state.missing{background:var(--danger-tint);color:var(--danger);}
+  .state.check{background:var(--warn-bg);color:var(--warn);}
+  .state.later{background:var(--bg);color:var(--muted);}
+  .check-label{font-weight:600;font-size:12.5px;}
+  .check-value{font-size:12px;color:var(--muted);line-height:1.45;}
+  .check-value.mono{font-family:var(--font-mono);color:var(--charcoal);}
+  .check-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+  .inline-input{display:flex;gap:6px;align-items:center;}
+  .inline-input input{border:1.5px solid var(--danger);border-radius:7px;padding:6px 9px;font-family:var(--font-mono);font-size:12px;width:160px;}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .split ul{margin:0;padding-left:18px;line-height:1.7;font-size:12.5px;}
+
+  /* Tabellen */
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;padding:9px 12px;border-bottom:1px solid var(--divider);background:#fafbfc;}
+  td{padding:9px 12px;border-bottom:1px solid var(--divider);vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .mono{font-family:var(--font-mono);font-size:12px;}
+  .pill{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;}
+  .pill.ok{background:var(--success-bg);color:var(--success);}
+  .pill.warn{background:var(--warn-bg);color:var(--warn);}
+  .pill.bad{background:var(--danger-tint);color:var(--danger);}
+  .pill.grey{background:var(--bg);color:var(--muted);}
+  .pill.cyan{background:var(--cyan-light);color:var(--cyan-dark);}
+  .chip{display:inline-block;font-family:var(--font-mono);font-size:11px;background:var(--navy-light);color:var(--navy);padding:2px 7px;border-radius:6px;margin-right:4px;}
+  tr.sub td{background:#fafbfc;font-size:12px;color:var(--muted);}
+  tr.sub td:first-child{padding-left:34px;}
+  tr.gone td{color:var(--stone);}
+  tr.gone td.mono, tr.gone td.num{text-decoration:line-through;}
+  tr.new td{background:#f3fbf7;}
+  .expander{cursor:pointer;user-select:none;}
+  .caret{display:inline-block;width:12px;color:var(--muted);transition:transform .15s;}
+  .open>td .caret,.expander.open .caret{transform:rotate(90deg);}
+  .icon-btn{border:none;background:none;cursor:pointer;color:var(--muted);font-size:13px;padding:2px 4px;}
+  .icon-btn:hover{color:var(--danger);}
+
+  .dropzone{border:2px dashed var(--stone);border-radius:12px;padding:20px;text-align:center;color:var(--muted);font-size:12.5px;background:#fafbfc;}
+  .dropzone b{color:var(--navy);}
+  .or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:11.5px;margin:10px 0;}
+  .or::before,.or::after{content:"";flex:1;height:1px;background:var(--divider);}
+
+  .manual-form{display:none;padding:14px 18px;border-top:1px solid var(--divider);background:#fafbfc;}
+  .manual-form.open{display:block;}
+  .form-grid{display:grid;grid-template-columns:110px 1.3fr 1.4fr 130px 90px;gap:10px;align-items:end;}
+  .field{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--muted);font-weight:600;}
+  .field input,.field select{border:1.5px solid var(--divider);border-radius:7px;padding:7px 9px;font-size:12.5px;color:var(--charcoal);background:#fff;}
+  .field input.mono{font-family:var(--font-mono);}
+  .form-hint{font-size:11.5px;color:var(--muted);margin-top:8px;}
+
+  .question-box{background:var(--navy);color:#fff;border-radius:14px;padding:18px 20px;margin-bottom:16px;}
+  .question-box h3{font-family:var(--font-display);font-weight:400;font-size:19px;margin:0 0 6px;}
+  .question-box p{margin:0 0 14px;font-size:12.5px;color:rgba(255,255,255,.8);line-height:1.6;}
+  .question-box .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.6);}
+
+  /* Spickzettel */
+  .page-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+  .page-tab{padding:8px 13px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:#fff;border:1.5px solid var(--divider);color:var(--muted);}
+  .page-tab .n{display:inline-block;width:17px;height:17px;border-radius:50%;background:var(--bg);font-size:10px;text-align:center;line-height:17px;margin-right:4px;}
+  .page-tab.active{background:var(--navy-light);border-color:var(--navy);color:var(--navy);}
+  .page-tab.done .n{background:var(--success);color:#fff;}
+  .row{display:grid;grid-template-columns:22px 1fr auto 30px;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--divider);}
+  .row:last-child{border-bottom:none;}
+  .row input[type=checkbox]{width:16px;height:16px;accent-color:var(--navy);}
+  .row-label{font-size:12px;color:var(--charcoal);line-height:1.35;}
+  .row-label .portal{display:block;font-size:10.5px;color:var(--muted);font-style:italic;}
+  .row-value{font-family:var(--font-mono);font-size:12.5px;font-weight:600;background:var(--bg);padding:4px 8px;border-radius:6px;white-space:nowrap;}
+  .row-value.assumption{background:var(--cyan-light);color:var(--cyan-dark);}
+  .copy-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--divider);background:#fff;cursor:pointer;font-size:13px;color:var(--navy);}
+  .copy-btn:hover{background:var(--navy-light);}
+  .copy-btn.copied{background:var(--success);color:#fff;border-color:var(--success);}
+  .year-picks{display:flex;gap:8px;flex-wrap:wrap;}
+  .year-pick{display:flex;align-items:center;gap:6px;border:1.5px solid var(--divider);border-radius:8px;padding:5px 10px;font-family:var(--font-mono);font-size:12.5px;font-weight:600;}
+  .year-pick.on{border-color:var(--cyan);background:var(--cyan-light);color:var(--cyan-dark);}
+  .year-pick.claimed{color:var(--stone);text-decoration:line-through;}
+  .year-head{padding:9px 18px;background:var(--navy-light);border-top:1px solid var(--divider);font-size:12px;font-weight:700;color:var(--navy);display:flex;justify-content:space-between;}
+  .asset-block-head{padding:10px 18px;background:var(--cyan-light);border-top:1px solid var(--divider);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;}
+  .asset-block-head b{color:var(--cyan-dark);}
+  .entry{display:grid;grid-template-columns:22px 1.3fr 1fr .6fr 80px;gap:10px;align-items:center;padding:8px 18px;border-top:1px solid var(--divider);}
+  .entry.head{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;background:#fafbfc;}
+  .entry .cv{display:flex;align-items:center;gap:6px;}
+  .entry .cv .row-value{font-size:12px;}
+  .entry .copy-btn{width:24px;height:24px;font-size:11px;}
+  .entry.done{background:#f3fbf7;}
+  .derivation{padding:10px 18px 12px 50px;font-size:11.5px;color:var(--muted);line-height:1.7;background:#fcfcfd;}
+  .derivation .fa{color:var(--danger);font-weight:600;} .derivation .fb{color:var(--warn);font-weight:600;}
+  .total-row{display:flex;justify-content:space-between;padding:12px 18px;border-top:2px solid var(--navy);font-weight:700;color:var(--navy);}
+  .plaus{margin:14px 18px;padding:12px;border:1px dashed var(--stone);border-radius:8px;background:var(--bg);font-size:12px;}
+  .plaus input{width:90px;padding:5px 7px;border:1.5px solid var(--divider);border-radius:6px;font-family:var(--font-mono);}
+
+  /* Status-Zeitleiste (gemeinsam DK + CH) */
+  .timeline{display:flex;padding:18px 18px 16px;}
+  .tl-step{flex:1;text-align:center;position:relative;font-size:11.5px;color:var(--muted);cursor:pointer;padding:0 4px;}
+  .tl-step::before{content:"";position:absolute;top:11px;left:-50%;width:100%;height:2px;background:var(--divider);z-index:0;}
+  .tl-step:first-child::before{display:none;}
+  .tl-dot{width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid var(--divider);margin:0 auto 6px;position:relative;z-index:1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+  .tl-step.done{color:var(--success);} .tl-step.done .tl-dot{background:var(--success);border-color:var(--success);color:#fff;}
+  .tl-step.done::before{background:var(--success);}
+  .tl-step.now{color:var(--navy);font-weight:700;} .tl-step.now .tl-dot{border-color:var(--cyan);color:var(--cyan);}
+  .tl-step.now::before{background:var(--success);}
+  .tl-step .where{display:block;font-size:10px;font-weight:500;color:var(--stone);margin-top:2px;}
+  .claim-id{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);}
+  .claim-id input{border:1.5px solid var(--divider);border-radius:7px;padding:6px 9px;font-family:var(--font-mono);font-size:12px;width:170px;}
+
+  .step-row{display:flex;gap:12px;align-items:flex-start;padding:8px 0;font-size:12.5px;line-height:1.5;}
+  .step-num{width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .step-row input[type=checkbox]{margin-top:4px;width:16px;height:16px;accent-color:var(--success);}
+  .download-btn{display:flex;align-items:center;gap:10px;background:var(--cyan);color:var(--navy);border:none;padding:13px 20px;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;}
+  .filename{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);margin-top:8px;}
+  .status-panel{background:var(--navy-light);border:1px solid var(--navy);border-radius:12px;padding:14px 18px;margin-bottom:16px;}
+  .status-panel-title{font-weight:700;color:var(--navy);margin-bottom:4px;}
+  .status-panel-text{font-size:12.5px;color:var(--navy);line-height:1.55;margin-bottom:10px;}
+  .summary-row{display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-bottom:1px solid var(--divider);font-size:12.5px;}
+  .summary-row:last-child{border-bottom:none;}
+  .summary-row span:first-child{color:var(--muted);}
+  .done-banner{padding:16px 18px;background:var(--success-bg);border:1px solid var(--success);border-radius:12px;display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+  .done-icon{width:36px;height:36px;border-radius:50%;background:var(--success);color:#fff;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .done-title{font-family:var(--font-display);font-size:18px;color:var(--success);}
+  .done-sub{font-size:12.5px;margin-top:2px;}
+
+  /* Modal (Platzhalter Anleitung) */
+  .modal-bg{position:fixed;inset:0;background:rgba(15,34,64,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:10;}
+  .modal-bg.open{display:flex;}
+  .modal{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:90vh;overflow:auto;}
+  .modal-head{background:var(--navy);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;}
+  .modal-head h3{font-family:var(--font-display);font-weight:400;font-size:19px;margin:0;}
+  .modal-close{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;}
+  .modal-body{padding:16px 20px 20px;}
+  .guide-step{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--divider);}
+  .guide-step:last-child{border-bottom:none;}
+  .guide-step .step-num{width:26px;height:26px;}
+  .guide-step b{display:block;font-size:13px;margin-bottom:2px;}
+  .guide-step .ph{margin-top:6px;height:70px;border:1.5px dashed var(--stone);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--stone);background:#fafbfc;}
+
+  /* Felder 1:1 wie style/base.css + screens/profile/profile.css */
+  .field-row{display:flex;flex-direction:column;gap:6px;}
+  .field-grid{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+  .field-grid:last-child{margin-bottom:0;}
+  .field-grid .field-row{flex:1;min-width:150px;}
+  .field-grid .field-row-wide{flex:2;}
+  .field-label,.confirmed-label{color:var(--muted);font-weight:400;font-size:11px;text-transform:uppercase;letter-spacing:.03em;line-height:15px;}
+  .field-optional{font-weight:400;color:var(--muted);font-size:10.5px;text-transform:none;}
+  .field-hint{font-size:11px;color:var(--muted);margin-top:4px;}
+  .field-input,.confirmed-input{border:1px solid var(--divider);border-radius:8px;padding:9px 12px;height:40px;font-size:13px;font-family:var(--font-body);color:var(--charcoal);background:#fff;min-width:0;}
+  .field-input:focus{outline:none;border-color:var(--navy);}
+  .confirmed-input{border-color:transparent;background:transparent;font-weight:600;}
+  .confirmed-input:hover,.confirmed-input:focus{border-color:var(--navy);background:#fff;outline:none;}
+  .field-input.mono,.confirmed-input.mono{font-family:var(--font-mono);font-size:12.5px;}
+  .profile-page .card-body{padding:20px 22px;}
+  .inline-fields{display:flex;gap:6px;flex-wrap:wrap;}
+  .inline-fields input{flex:1;min-width:110px;height:34px;padding:6px 10px;}
+  .inline-fields input.wide{flex:2;min-width:180px;}
+  .check-item.missing .field-input{border-color:var(--danger);}
+  .autosave-note{padding:9px 18px;border-top:1px solid var(--divider);background:#fafbfc;font-size:11.5px;color:var(--success);}
+  .autosave-note.boxed{border:1px solid var(--divider);border-radius:12px;margin-bottom:16px;}
+  .field-error{font-size:11px;color:var(--danger);}
+  .field-error:empty{display:none;}
+  input.is-invalid{border-color:var(--danger)!important;background:#fff!important;}
+  .sub-title{font-size:12px;font-weight:700;color:var(--navy);margin:4px 0 10px;}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:var(--navy);color:#fff;padding:10px 16px;border-radius:10px;font-size:12.5px;opacity:0;pointer-events:none;transition:all .2s;z-index:20;display:flex;gap:12px;align-items:center;}
+  .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto;}
+  .toast-undo{background:none;border:none;color:var(--cyan);font-weight:700;cursor:pointer;font-size:12.5px;padding:0;}
+  .placeholder-screen{border:2px dashed var(--divider);border-radius:14px;padding:40px 24px;text-align:center;color:var(--muted);line-height:1.6;}
+
+  @media (max-width:820px){
+    .app-shell{flex-direction:column;} .sidebar{width:100%;}
+    .check-item{grid-template-columns:26px 1fr;} .check-item>*:nth-child(n+3){grid-column:2;} .check-actions{justify-content:flex-start;}
+    .split{grid-template-columns:1fr;} .content{padding:16px;}
+    .form-grid{grid-template-columns:1fr 1fr;}
+    .timeline{flex-wrap:wrap;row-gap:14px;} .tl-step{flex:1 0 33%;} .tl-step::before{display:none;}
+  }
+  @media (max-width:600px){
+    .entry{grid-template-columns:22px 1fr 1fr;} .entry.head>*:nth-child(n+4){display:none;}
+    .entry>*:nth-child(4){grid-column:2;} .entry>*:nth-child(5){grid-column:3;}
+  }
+</style>
+</head>
+<body>
+
+<div class="mock-bar">
+  <span>🧪 <b>Mockup v2</b> · Personendaten fiktiv · Jungfraubahn = Referenzfall · <b>Muster Holding AG</b> = fiktives Beispiel für einen Teilverkauf · Dänemark: nur geänderte Screens</span>
+  <span class="mock-toggle" title="Zustand des Wertpapierbestands">
+    <button data-mode="first" class="on">Erster DivRebound</button>
+    <button data-mode="followup">Folge-DivRebound</button>
+  </span>
+</div>
+
+<div class="app-shell">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div style="width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,.13);display:flex;align-items:center;justify-content:center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12L9 17" stroke="white" stroke-width="2.6" stroke-linecap="round"/><path d="M9 17L20 5M20 5L14.9 7.1M20 5L18.4 10.3" stroke="#00B4D8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="sidebar-wordmark">DivRebound</div>
+    </div>
+    <div>
+      <button class="sidebar-btn">📂 Bearbeitung laden</button>
+      <button class="sidebar-btn">💾 Bearbeitung speichern</button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-link">Home</div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Nutzer</div>
+      <div class="sidebar-link" data-go="profil">Persönliche Daten</div>
+      <div class="sidebar-link" data-go="anschreiben">Anschreiben Finanzamt</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Quellensteuer</div>
+      <div class="sidebar-new">＋ Neuer DivRebound</div>
+
+      <div class="nav-country">⌄ Dänemark</div>
+      <div class="nav-case-group">
+        <div class="nav-case" data-case="dk">DivRebound 07/2026</div>
+        <div class="nav-steps" id="steps-dk"></div>
+      </div>
+
+      <div class="nav-country">⌄ Schweiz</div>
+      <div class="nav-case-group">
+        <div class="nav-holdings" data-go="ch-bestand">Wertpapierbestand</div>
+        <div class="nav-case" data-case="ch">DivRebound 10/2026</div>
+        <div class="nav-steps" id="steps-ch"></div>
+      </div>
+      <div class="nav-country muted">› Italien <span class="new-tag" style="background:rgba(255,255,255,.12);color:#fff;">bald</span></div>
+    </div>
+  </aside>
+
+  <!-- ============ CONTENT ============ -->
+  <main class="content">
+
+    <!-- ========================= PROFIL ========================= -->
+    <section class="screen profile-page" id="profil">
+      <h1 class="content-title">Persönliche Daten</h1>
+      <div class="content-breadcrumb">Nutzer · gilt für alle Länder und DivRebounds</div>
+      <div id="profile-form" data-pf-root></div>
+    </section>
+
+    <section class="screen profile-page" id="anschreiben">
+      <h1 class="content-title">Anschreiben Finanzamt</h1>
+      <div class="content-breadcrumb">Nutzer · allgemeines Anschreiben, unabhängig von einem DivRebound</div>
+      <div class="card"><div class="card-head navy"><span class="card-title">Zuständiges Finanzamt</span><span class="card-sub">bitte prüfen</span></div>
+        <div class="card-body" id="letter-recipient" data-pf-root></div></div>
+      <div class="card"><div class="card-head navy"><span class="card-title">Dokument erstellen</span></div><div class="card-body">
+        <button class="download-btn" id="letter-download">📄 Anschreiben herunterladen (PDF)</button>
+        <div class="field-hint" id="letter-hint">Bitte zuerst die vollständige Anschrift des Finanzamts eintragen.</div>
+        <div class="filename">Anschreiben_Finanzamt_Mustermann.pdf</div>
+      </div></div>
+    </section>
+
+    <!-- ========================= SCHWEIZ ========================= -->
+
+    <!-- CH 1 Unterlagen -->
+    <section class="screen" id="ch-checkliste">
+      <h1 class="content-title">Unterlagen prüfen</h1>
+      <div class="content-breadcrumb">Schweiz › DivRebound 10/2026 › <b>1 von 6</b></div>
+      <p class="lead">Die Rückerstattung der Schweizer Verrechnungssteuer läuft vollständig über das ePortal der Eidgenössischen Steuerverwaltung. DivRebound bereitet alle Angaben so vor, dass Sie sie dort nur noch übertragen müssen. Was schon in Ihrem Profil steht, ist bereits abgehakt.</p>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Checkliste</span><span class="card-sub" id="ch-check-summary"></span></div>
+        <div id="ch-checklist" data-pf-root></div>
+      </div>
+      <div class="split">
+        <div class="card"><div class="card-head"><span class="card-title">Das übernimmt DivRebound</span></div><div class="card-body"><ul>
+          <li>Bestand aus Ihren Abrechnungen pflegen (FIFO)</li>
+          <li>Liste der Vermögenswerte fürs ePortal</li>
+          <li>Abgleich mit den Tax Vouchern</li>
+          <li>Antworten auf die Fragen im Portal</li>
+          <li>Anschreiben ans Finanzamt</li>
+        </ul></div></div>
+        <div class="card"><div class="card-head"><span class="card-title">Das machen Sie selbst</span></div><div class="card-body"><ul>
+          <li>Im ePortal anmelden (eigener Zugang)</li>
+          <li>Angaben ins Portal übertragen</li>
+          <li>Antrag ausdrucken und unterschreiben</li>
+          <li>Beim Finanzamt bestätigen lassen</li>
+          <li>Bestätigten Antrag im ePortal hochladen</li>
+        </ul></div></div>
+      </div>
+      <div class="actions"><button class="btn" data-go="ch-bestand">Weiter: Bestand prüfen →</button></div>
+    </section>
+
+    <!-- CH 2 Bestand -->
+    <section class="screen" id="ch-bestand">
+      <h1 class="content-title">Wertpapierbestand Schweiz</h1>
+      <div class="content-breadcrumb">Schweiz › DivRebound 10/2026 › <b>2 von 6</b> · auch direkt erreichbar unter „Schweiz › Wertpapierbestand“</div>
+
+      <div id="bestand-first">
+        <p class="lead">Erfassen Sie <b>alle Käufe und Verkäufe</b> Ihrer Schweizer Aktien, lückenlos ab dem ersten Kauf. Am einfachsten per Upload der Abrechnungen: DivRebound liest Handelstag, Stückzahl und ISIN aus. Beim nächsten DivRebound ergänzen Sie nur noch, was neu dazugekommen ist.</p>
+      </div>
+      <div id="bestand-followup" style="display:none;">
+        <div class="question-box">
+          <h3>Hat sich seit dem 27.04.2026 etwas geändert?</h3>
+          <p>Ihr Bestand stammt aus Ihrem letzten DivRebound. Die zuletzt erfasste Transaktion ist ein Kauf vom <b>27.04.2026</b>. Gab es seitdem Käufe oder Verkäufe Schweizer Aktien?</p>
+          <div class="actions">
+            <button class="btn" data-go="ch-voucher">Nein, Bestand ist aktuell</button>
+            <button class="btn ghost" id="btn-changed">Ja, Änderungen erfassen</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="capture-card">
+        <div class="card-head"><span class="card-title">Käufe und Verkäufe erfassen</span><span class="card-sub">Dateien verlassen Ihren Rechner nicht</span></div>
+        <div class="card-body">
+          <div class="dropzone">📄 <b>Abrechnungen hierher ziehen</b> oder klicken · PDF, mehrere Dateien möglich · bereits erfasste Abrechnungen werden erkannt und übersprungen</div>
+          <div class="or">oder</div>
+          <div style="text-align:center;"><button class="btn ghost small" id="btn-manual">＋ Transaktion manuell erfassen</button>
+            <div class="form-hint">z. B. wenn alte Abrechnungen beim Broker nicht mehr abrufbar sind</div></div>
+        </div>
+        <div class="manual-form" id="manual-form">
+          <div class="form-grid">
+            <label class="field">Art<select id="mf-type"><option value="buy">Kauf</option><option value="sell">Verkauf</option></select></label>
+            <label class="field">ISIN<input id="mf-isin" class="mono" placeholder="CH…" list="isin-list"></label>
+            <label class="field">Aktie<input id="mf-name" placeholder="wird bei bekannter ISIN ergänzt"></label>
+            <label class="field">Handelstag<input id="mf-date" type="date"></label>
+            <label class="field">Stück<input id="mf-qty" type="number" min="1" class="mono"></label>
+          </div>
+          <datalist id="isin-list"></datalist>
+          <div class="form-hint">Handelstag = Tag der Ausführung (steht auf der Abrechnung unter „Details zur Ausführung“), nicht Auftragsdatum oder Valuta.</div>
+          <div class="actions" style="margin-top:10px;"><button class="btn small" id="mf-save">Übernehmen</button><button class="btn ghost small" id="mf-cancel">Abbrechen</button><span id="mf-msg" style="font-size:12px;align-self:center;"></span></div>
+        </div>
+      </div>
+
+      <div class="card" id="import-card">
+        <div class="card-head"><span class="card-title">Zuletzt erkannte Abrechnungen</span><span class="card-sub">Bitte prüfen und bestätigen</span></div>
+        <table>
+          <thead><tr><th>Datei</th><th>Art</th><th>Aktie</th><th class="num">Stück</th><th>Handelstag</th><th>Status</th></tr></thead>
+          <tbody id="import-rows"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Aktueller Bestand</span><span class="card-sub">Smartbroker+ · Depot …1001 · Stand heute</span></div>
+        <table>
+          <thead><tr><th>Aktie / Tranche</th><th>ISIN</th><th>Erwerbsdatum</th><th class="num">Stück</th><th>Abgleich Depotauszug</th></tr></thead>
+          <tbody id="holdings-rows"></tbody>
+        </table>
+      </div>
+
+      <details class="help">
+        <summary>Wie DivRebound den Bestand berechnet (FIFO)</summary>
+        <div class="help-body">
+          Bei Teilverkäufen gilt: <b>zuerst gekaufte Aktien werden zuerst verkauft</b>. Ist eine Tranche ganz verkauft, entfällt sie. Ist sie teilweise verkauft, bleibt ihr ursprüngliches Erwerbsdatum, nur die Stückzahl sinkt. Gerechnet wird getrennt pro Depot.<br><br>
+          <b>Abgleich:</b> Legen Sie die Tabelle neben Ihren aktuellen Depotauszug. Weicht eine Stückzahl ab, fehlt eine Transaktion. Zusätzlich prüft DivRebound im nächsten Schritt, ob die Stückzahlen auf den Tax Vouchern zum berechneten Bestand passen.
+        </div>
+      </details>
+
+      <div class="card">
+        <div class="card-head expander" id="tx-toggle"><span class="card-title"><span class="caret">›</span> Alle erfassten Transaktionen</span><span class="card-sub" id="tx-count"></span></div>
+        <table id="tx-table" style="display:none;">
+          <thead><tr><th>Handelstag</th><th>Art</th><th>Aktie</th><th class="num">Stück</th><th>Quelle</th><th></th></tr></thead>
+          <tbody id="tx-rows"></tbody>
+        </table>
+      </div>
+      <div class="actions"><button class="btn" data-go="ch-voucher">Weiter: Dividenden &amp; Tax Voucher →</button></div>
+    </section>
+
+    <!-- CH 3 Voucher -->
+    <section class="screen" id="ch-voucher">
+      <h1 class="content-title">Dividenden &amp; Tax Voucher</h1>
+      <div class="content-breadcrumb">Schweiz › DivRebound 10/2026 › <b>3 von 6</b></div>
+      <p class="lead">Für jede Dividende braucht das ePortal einen Tax Voucher Ihrer Bank. DivRebound ordnet die Voucher über ISIN und Dividendentermin zu und prüft, ob die Stückzahlen zu Ihrem Bestand am Stichtag passen.</p>
+      <div class="dropzone" style="margin-bottom:16px;">📄 <b>Tax Voucher und Dividendenabrechnungen hochladen</b> · PDF</div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Erstattungsfähige Dividenden</span><span class="card-sub">Verjährung: 3 Jahre ab Ende des Zahlungsjahres</span></div>
+        <table>
+          <thead><tr><th>Aktie</th><th>Fälligkeit</th><th class="num">Bestand am Stichtag</th><th>Tax Voucher</th><th>Abgleich</th><th class="num">Erstattung</th></tr></thead>
+          <tbody id="dist-rows"></tbody>
+        </table>
+      </div>
+      <div class="banner warn"><span class="ico">💡</span><div>
+        <b>Möglicherweise noch offen: Jungfraubahn Holding AG 2024 und 2025.</b><br>
+        Laut Ihrem Bestand hielten Sie die Aktie seit dem 11.03.2024. Für die Dividenden 2024 und 2025 liegen keine Unterlagen vor. Wenn Dividenden gezahlt wurden, sind sie noch nicht verjährt.
+        <div class="actions" style="margin-top:10px;"><button class="btn small">Unterlagen hochladen</button><button class="btn small ghost">Bereits erstattet / keine Dividende</button></div>
+      </div></div>
+      <details class="help">
+        <summary>Warum zwei Tax Voucher für eine Dividende?</summary>
+        <div class="help-body">Manche Banken stellen pro Lagerstelle einen eigenen Voucher aus (im Beispiel: 20 und 5 Stück). Entscheidend ist, dass die <b>Summe</b> dem Bestand am Stichtag entspricht. Weicht sie ab, fehlt entweder ein Voucher oder eine Kauf-/Verkaufsabrechnung.<br><br>
+        <b>Stichtag:</b> Anspruch hat, wer die Aktie am Ende des Handelstags vor dem Ex-Tag hält. Der Dividendentermin steht auf Seite 2 des Vouchers nur als Bild; DivRebound übernimmt ihn aus der Dividendenabrechnung oder bittet Sie um Bestätigung.</div>
+      </details>
+      <div class="actions"><button class="btn" data-go="ch-portal">Weiter: ePortal ausfüllen →</button></div>
+    </section>
+
+    <!-- CH 4 Portal -->
+    <section class="screen" id="ch-portal">
+      <h1 class="content-title">ePortal ausfüllen</h1>
+      <div class="content-breadcrumb">Schweiz › DivRebound 10/2026 › <b>4 von 6</b></div>
+      <div class="banner info"><span class="ico">🔗</span><div>Öffnen Sie das ePortal, melden Sie sich an und wählen Sie die Kachel <b>„Verrechnungssteuer“</b> → <b>Neuen Antrag anlegen</b>. Ein Antrag kann <b>mehrere Jahre</b> umfassen. Die Reiter unten folgen der Reihenfolge im Portal.
+        <div class="actions" style="margin-top:8px;"><a class="btn small" href="https://eportal.admin.ch" target="_blank" rel="noopener">ePortal öffnen ↗</a></div></div></div>
+      <div class="page-tabs" id="page-tabs"></div>
+      <div class="card" id="portal-card"></div>
+      <div class="actions"><button class="btn" data-go="ch-finanzamt">Weiter: Formular &amp; Finanzamt →</button></div>
+    </section>
+
+    <!-- CH 5 Formular & Finanzamt -->
+    <section class="screen" id="ch-finanzamt">
+      <h1 class="content-title">Formular &amp; Finanzamt</h1>
+      <div class="content-breadcrumb">Schweiz › DivRebound 10/2026 › <b>5 von 6</b></div>
+      <p class="lead">Ihr Antrag muss vom deutschen Finanzamt bestätigt werden. Speichern Sie ihn im ePortal als PDF, drucken Sie ihn aus, unterschreiben Sie ihn und senden Sie ihn mit dem Anschreiben an Ihr Finanzamt.</p>
+      <div id="ch-timeline"></div>
+      <div id="ch-stale"></div>
+      <div class="banner warn"><span class="ico">⚠️</span><div>Keine handschriftlichen Korrekturen auf dem ausgedruckten Antrag – die ESTV lehnt solche Anträge ab. Fehler im Portal korrigieren und neu ausdrucken.</div></div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Formular</span><span class="card-sub">wird im ePortal erzeugt</span></div>
+        <div class="card-body">
+          <div class="step-row"><input type="checkbox" checked><span>Im ePortal auf <b>„Erstellen“</b> klicken und den Antrag als PDF speichern bzw. ausdrucken (3 Seiten).</span></div>
+          <div class="step-row"><input type="checkbox" checked><span>Auf Seite 1 unter „Rechtsgültige Unterschrift“ Ort und Datum eintragen und unterschreiben.</span></div>
+          <div class="claim-id" style="margin-top:8px;">Antrags-ID (oben rechts auf dem Antrag) <input value="DE-1407-5964-00" placeholder="DE-…"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Anschreiben an das Finanzamt</span><span class="card-sub">Finanzamt München</span></div>
+        <div class="card-body">
+          <p style="margin:0 0 12px;font-size:12.5px;line-height:1.6;color:var(--muted);">Bitte um Bestätigung der Ansässigkeit auf dem beigefügten Antrag <span class="mono" style="color:var(--charcoal);">DE-1407-5964-00</span> (Jahre 2024–2026), mit Steuer-IdNr und Steuernummer.</p>
+          <button class="download-btn">📄 Anschreiben herunterladen (PDF)</button>
+          <div class="filename">Anschreiben_Finanzamt_Mustermann_Schweiz_2024-2026.pdf</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Nächste Schritte</span></div>
+        <div class="card-body">
+          <div class="step-row"><span class="step-num">1</span><span>Antrag und Anschreiben per Post an das Finanzamt senden.</span></div>
+          <div class="step-row"><span class="step-num">2</span><span>Das Finanzamt bestätigt auf Seite 1 (Stempel und Unterschrift) und schickt den Antrag zurück.</span></div>
+          <div class="step-row"><span class="step-num">3</span><span>Danach geht es weiter mit <span class="link" data-go="ch-upload">Schritt 6: Hochladen &amp; abschließen</span>.</span></div>
+        </div>
+      </div>
+      <div class="status-panel">
+        <div class="status-panel-title">Bearbeitung pausiert</div>
+        <div class="status-panel-text">Die weitere Bearbeitung benötigt die Bestätigung durch das Finanzamt (Wartezeit meist 2–3 Wochen). Bearbeitungsstand jetzt speichern, um später einfach fortfahren zu können.</div>
+        <div class="actions"><button class="btn ghost small">💾 Bearbeitungsstand speichern</button><button class="btn ghost small">📅 Erinnerung herunterladen (.ics)</button></div>
+      </div>
+      <details class="card"><summary class="card-head"><span class="card-title">Zusammenfassung des Antrags</span><span class="card-sub" id="ch-sum-sub"></span></summary><div class="card-body" id="ch-summary"></div></details>
+    </section>
+
+    <!-- CH 6 Hochladen & abschließen -->
+    <section class="screen" id="ch-upload">
+      <h1 class="content-title">Hochladen &amp; abschließen</h1>
+      <div class="content-breadcrumb">Schweiz › DivRebound 10/2026 › <b>6 von 6</b></div>
+      <p class="lead">Der vom Finanzamt bestätigte Antrag wird im ePortal hochgeladen. Erst danach prüft die ESTV Ihren Antrag und überweist die Erstattung.</p>
+      <div id="ch-timeline-2"></div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Bestätigten Antrag hochladen</span><span class="card-sub">Antrag DE-1407-5964-00</span></div>
+        <div class="card-body">
+          <div class="step-row"><input type="checkbox" class="up-check"><span><b>Prüfen:</b> Stempel, Unterschrift und Datum des Finanzamts sind auf Seite 1 vorhanden.</span></div>
+          <div class="step-row"><input type="checkbox" class="up-check"><span><b>Einscannen:</b> alle 3 Seiten als <b>ein</b> PDF, gut lesbar (Handy-Scan-App genügt).</span></div>
+          <div class="step-row"><input type="checkbox" class="up-check"><span><b>Hochladen:</b> im ePortal unter „Verrechnungssteuer“ → Antragsübersicht → Antrag <span class="mono">DE-1407-5964-00</span> öffnen und das PDF hochladen.</span></div>
+          <div class="actions" style="margin-top:8px;"><a class="btn small" href="https://eportal.admin.ch" target="_blank" rel="noopener">ePortal öffnen ↗</a><button class="btn ghost small" data-guide="upload">📘 Anleitung: Hochladen im ePortal</button></div>
+        </div>
+      </div>
+      <div class="card" id="finish-card">
+        <div class="card-head navy"><span class="card-title">DivRebound abschließen</span></div>
+        <div class="card-body" id="finish-body"></div>
+      </div>
+    </section>
+
+    <!-- ========================= DÄNEMARK ========================= -->
+
+    <section class="screen" id="dk-checkliste">
+      <h1 class="content-title">Unterlagen prüfen</h1>
+      <div class="content-breadcrumb">Dänemark › DivRebound 07/2026 › <b>1 von 5</b></div>
+      <p class="lead">Für die Erstattung der dänischen Quellensteuer erzeugt DivRebound eine Wohnsitzbescheinigung, die Ihr Finanzamt bestätigt. Anschließend tragen Sie Ihren Antrag im Online-Formular von SKAT ein. Was schon in Ihrem Profil steht, ist bereits abgehakt.</p>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Checkliste</span><span class="card-sub" id="dk-check-summary"></span></div>
+        <div id="dk-checklist" data-pf-root></div>
+      </div>
+      <div class="actions"><button class="btn" data-go="dk-2">Weiter: Dividendenabrechnungen →</button></div>
+    </section>
+
+    <section class="screen" id="dk-2">
+      <h1 class="content-title">Dividendenabrechnungen</h1>
+      <div class="content-breadcrumb">Dänemark › DivRebound 07/2026 › <b>2 von 5</b></div>
+      <div class="placeholder-screen"><b>Bestehender Screen „Positions-/Jahresübersicht“</b><br>unverändert – nur Titel und Breadcrumb an die neue Nummerierung angepasst</div>
+    </section>
+    <section class="screen" id="dk-3">
+      <h1 class="content-title">Fehlende Angaben</h1>
+      <div class="content-breadcrumb">Dänemark › DivRebound 07/2026 › <b>3 von 5</b></div>
+      <p class="lead">Hier steht nur noch, was nach dem Einlesen Ihrer Dividendenabrechnungen offen ist. Alles andere stammt aus Ihren persönlichen Daten.</p>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Aus den Abrechnungen abgeleitet – bitte bestätigen</span></div>
+        <div class="card-body">
+          <div style="font-weight:600;margin-bottom:6px;">Zeitraum der Ansässigkeit</div>
+          <div class="form-hint" style="margin:0 0 10px;">„Von“ ist der früheste Zahltag Ihrer Ausschüttungen – Ihre Abrechnungen lauten ab dann auf Ihre deutsche Adresse. Die Wohnsitzbescheinigung muss alle Zahltage abdecken.</div>
+          <div class="actions" style="align-items:flex-end;gap:16px;">
+            <label class="field">Von<input type="date" value="2025-03-27" class="mono"></label>
+            <label class="field">Bis<input type="date" disabled class="mono"></label>
+            <label style="font-size:12px;display:flex;align-items:center;gap:6px;padding-bottom:8px;"><input type="checkbox" checked> Wohnsitz besteht weiterhin</label>
+          </div>
+          <div style="margin-top:8px;"><span class="pill cyan">↺ aus Abrechnungen abgeleitet</span></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-head navy"><span class="card-title">Bitte noch ergänzen</span><span class="card-sub" id="dk-missing-sub"></span></div><div id="dk-missing" data-pf-root></div></div>
+      <div class="actions"><button class="btn" data-go="dk-finanzamt">Weiter: Formular &amp; Finanzamt →</button></div>
+    </section>
+
+    <section class="screen" id="dk-finanzamt">
+      <h1 class="content-title">Formular &amp; Finanzamt</h1>
+      <div class="content-breadcrumb">Dänemark › DivRebound 07/2026 › <b>4 von 5</b> · ersetzt „Zusammenfassung &amp; Download“</div>
+      <p class="lead">Die Wohnsitzbescheinigung (Formular 02.050) muss vom deutschen Finanzamt bestätigt werden. DivRebound füllt sie für Sie aus. Drucken Sie sie aus, unterschreiben Sie sie und senden Sie sie mit dem Anschreiben an Ihr Finanzamt.</p>
+      <div id="dk-timeline"></div>
+      <div id="dk-stale"></div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Formular</span><span class="card-sub">wird von DivRebound erzeugt</span></div>
+        <div class="card-body">
+          <button class="download-btn">📄 Wohnsitzbescheinigung herunterladen (PDF)</button>
+          <div class="filename">Wohnsitzbescheinigung_02050_Mustermann_2025-2026.pdf</div>
+          <div style="font-size:12px;color:var(--success);margin-top:8px;">✓ Zuletzt erzeugt am 14.07.2026, 18:02 Uhr</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Anschreiben an das Finanzamt</span><span class="card-sub">Finanzamt München</span></div>
+        <div class="card-body">
+          <p style="margin:0 0 12px;font-size:12.5px;line-height:1.6;color:var(--muted);">Bitte um Bestätigung der Ansässigkeit auf der beigefügten Wohnsitzbescheinigung, mit Steuer-IdNr.</p>
+          <button class="download-btn">📄 Anschreiben herunterladen (PDF)</button>
+          <div class="filename">Anschreiben_Finanzamt_Mustermann_Daenemark_2025-2026.pdf</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Nächste Schritte</span></div>
+        <div class="card-body">
+          <div class="step-row"><span class="step-num">1</span><span>Wohnsitzbescheinigung ausdrucken, unterschreiben und mit dem Anschreiben per Post an das Finanzamt senden.</span></div>
+          <div class="step-row"><span class="step-num">2</span><span>Das Finanzamt bestätigt (Stempel und Unterschrift) und schickt die Bescheinigung zurück.</span></div>
+          <div class="step-row"><span class="step-num">3</span><span>Danach geht es weiter mit <span class="link" data-go="dk-5">Schritt 5: SKAT-Portal</span>, dort laden Sie die bestätigte Bescheinigung hoch.</span></div>
+        </div>
+      </div>
+      <div class="status-panel">
+        <div class="status-panel-title">Bearbeitung pausiert</div>
+        <div class="status-panel-text">Die weitere Bearbeitung benötigt die Bestätigung durch das Finanzamt (Wartezeit meist 2–3 Wochen). Bearbeitungsstand jetzt speichern, um später einfach fortfahren zu können.</div>
+        <div class="actions"><button class="btn ghost small">💾 Bearbeitungsstand speichern</button><button class="btn ghost small">📅 Erinnerung herunterladen (.ics)</button></div>
+      </div>
+      <details class="card"><summary class="card-head"><span class="card-title">Zusammenfassung</span><span class="card-sub">Angaben für die Wohnsitzbescheinigung · 3 Ausschüttungen</span></summary>
+        <div class="card-body">
+          <div class="summary-row"><span>Name</span><span>Max Mustermann</span></div>
+          <div class="summary-row"><span>Adresse</span><span>Musterstraße 1, 80331 München</span></div>
+          <div class="summary-row"><span>Steuer-ID</span><span class="mono">12345678901</span></div>
+          <div class="summary-row"><span>Voraussichtliche Erstattung</span><span class="mono">DKK 412,80 ≈ 55,33 EUR</span></div>
+        </div></details>
+    </section>
+
+    <section class="screen" id="dk-5">
+      <h1 class="content-title">SKAT-Portal ausfüllen</h1>
+      <div class="content-breadcrumb">Dänemark › DivRebound 07/2026 › <b>5 von 5</b></div>
+      <div id="dk-timeline-2"></div>
+      <div class="placeholder-screen"><b>Bestehende Screens „SKAT-Formular öffnen“ + Cheat Sheet</b><br>unverändert. Neu: dieselbe Status-Zeitleiste oben, und „Als eingereicht markieren“ schließt den DivRebound ab – wie Schritt 6 bei der Schweiz.</div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Anleitung (Platzhalter) -->
+<div class="modal-bg" id="guide">
+  <div class="modal">
+    <div class="modal-head"><h3 id="guide-title">Anleitung</h3><button class="modal-close" data-close>✕</button></div>
+    <div class="modal-body" id="guide-body"></div>
+  </div>
+</div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Daten
+// ---------------------------------------------------------------------------
+const profile = {
+  firstName:"Max", lastName:"Mustermann", street:"Musterstraße 1", postalCode:"80331", city:"München",
+  birthDate:"1975-06-14", birthPlace:"Augsburg", tin:"12345678901", taxNumber:"", taxOfficeName:"Finanzamt München", taxOfficeStreet:"Deroystraße 18", taxOfficePostalCode:"80335", taxOfficeCity:"München",
+  email:"max.mustermann@example.de", phone:"0049 171 1234567", iban:"DE89 3704 0044 0532 0130 00", bic:"COBADEFFXXX", holder:"Max Mustermann",
+};
+const PORTAL_URL = "https://eportal.admin.ch";
+
+const JF = { isin:"CH0017875789", name:"Jungfraubahn Holding AG" };
+const MU = { isin:"CH0012345678", name:"Muster Holding AG" };
+const KNOWN = { [JF.isin]:JF.name, [MU.isin]:MU.name };
+
+let transactions = [
+  { ...MU, type:"buy",  date:"2023-03-15", qty:40, src:"Kaufabrechnung · Vorgang 4810021" },
+  { ...MU, type:"buy",  date:"2023-11-10", qty:30, src:"Kaufabrechnung · Vorgang 5022317" },
+  { ...JF, type:"buy",  date:"2024-03-11", qty:15, src:"Kaufabrechnung · Vorgang 5390442" },
+  { ...JF, type:"buy",  date:"2024-10-24", qty:5,  src:"Kaufabrechnung · Vorgang 5871203" },
+  { ...MU, type:"sell", date:"2025-02-12", qty:50, src:"Verkaufsabrechnung · Vorgang 6015530" },
+  { ...JF, type:"buy",  date:"2026-01-09", qty:2,  src:"Kaufabrechnung · Vorgang 612218879" },
+  { ...JF, type:"buy",  date:"2026-04-27", qty:3,  src:"Kaufabrechnung · Vorgang 654946744", note:"Auftrag 17.04.2026, Handelstag 27.04.2026" },
+];
+
+const distributions = [
+  { ...MU, exDate:"2024-04-23", payDate:"2024-04-25", gross:2.00, vouchers:[70] },
+  { ...MU, exDate:"2025-04-22", payDate:"2025-04-24", gross:2.10, vouchers:[20] },
+  { ...MU, exDate:"2026-04-21", payDate:"2026-04-23", gross:2.20, vouchers:[20] },
+  { ...JF, exDate:"2026-05-14", payDate:"2026-05-18", gross:8.50, vouchers:[20,5] },
+];
+const REFUND_RATE = 0.35 - 0.15; // Verrechnungssteuer 35 % minus DBA-Satz 15 %
+
+// ---------------------------------------------------------------------------
+// FIFO: Bestand je Tranche am Stichtag (Handelstag < Ex-Tag)
+// ---------------------------------------------------------------------------
+function fifo(isin, cutoffExclusive) {
+  const lots = [];
+  const txs = transactions.filter(t => t.isin === isin && (!cutoffExclusive || t.date < cutoffExclusive))
+                          .sort((a,b) => a.date.localeCompare(b.date) || (a.type === "buy" ? -1 : 1));
+  for (const t of txs) {
+    if (t.type === "buy") { lots.push({ date:t.date, original:t.qty, remaining:t.qty, notes:[], manual:t.manual }); continue; }
+    let toSell = t.qty;
+    for (const lot of lots) {
+      if (!toSell) break;
+      const take = Math.min(lot.remaining, toSell);
+      if (!take) continue;
+      lot.remaining -= take; toSell -= take;
+      lot.notes.push({ sellDate:t.date, take });
+    }
+    if (toSell > 0) lots.gap = (lots.gap || 0) + toSell;
+  }
+  return lots;
+}
+
+// ---------------------------------------------------------------------------
+// Formatierung
+// ---------------------------------------------------------------------------
+const fmtDate = iso => { const [y,m,d] = iso.split("-"); return `${d}.${m}.${y}`; };
+const fmtChf = n => n.toLocaleString("de-DE", { minimumFractionDigits:2, maximumFractionDigits:2 });
+const yearOf = iso => iso.slice(0,4);
+const copyBtn = v => `<button class="copy-btn" data-copy="${v}" title="Kopieren">⧉</button>`;
+const entriesFor = d => fifo(d.isin, d.exDate).filter(l => l.remaining > 0).map(l => ({ ...l, refund: l.remaining * d.gross * REFUND_RATE }));
+const heldAt = d => entriesFor(d).reduce((s,l) => s + l.remaining, 0);
+const refundOf = d => heldAt(d) * d.gross * REFUND_RATE;
+const years = () => [...new Set(distributions.map(d => yearOf(d.payDate)))].sort();
+const totalRefund = () => distributions.reduce((s,d) => s + refundOf(d), 0);
+
+// ---------------------------------------------------------------------------
+// Navigation
+// ---------------------------------------------------------------------------
+const STEPS = {
+  ch: [["ch-checkliste","Unterlagen prüfen"],["ch-bestand","Bestand prüfen"],["ch-voucher","Dividenden & Tax Voucher"],["ch-portal","ePortal ausfüllen"],["ch-finanzamt","Formular & Finanzamt"],["ch-upload","Hochladen & abschließen"]],
+  dk: [["dk-checkliste","Unterlagen prüfen"],["dk-2","Dividendenabrechnungen"],["dk-3","Fehlende Angaben"],["dk-finanzamt","Formular & Finanzamt"],["dk-5","SKAT-Portal ausfüllen"]],
+};
+let finished = false;
+function renderNav(current) {
+  for (const [c, steps] of Object.entries(STEPS)) {
+    const cur = steps.findIndex(s => s[0] === current);
+    document.getElementById(`steps-${c}`).innerHTML = steps.map(([id,label], i) => {
+      const done = (cur >= 0 && i < cur) || (c === "ch" && finished) || (c === "dk" && cur < 0 && i < 4);
+      const cls = i === cur ? "current" : done ? "done" : "";
+      return `<div class="nav-step ${cls}" data-go="${id}"><span class="dot">${done && i !== cur ? "✓" : i + 1}</span>${label}</div>`;
+    }).join("");
+    document.querySelector(`.nav-case[data-case="${c}"]`).classList.toggle("active", cur >= 0);
+  }
+  document.querySelector(".nav-holdings").classList.toggle("current", current === "ch-bestand");
+}
+function go(id) {
+  if (typeof guardLeave === "function" && !guardLeave()) return;
+  if (typeof invalid !== "undefined") invalid.clear();
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
+  renderNav(id);
+  window.scrollTo(0,0);
+}
+document.addEventListener("click", e => {
+  const g = e.target.closest("[data-go]"); if (g) { go(g.dataset.go); return; }
+  const c = e.target.closest("[data-copy]");
+  if (c) {
+    try { navigator.clipboard.writeText(c.dataset.copy); } catch (_) {}
+    c.classList.add("copied"); c.textContent = "✓";
+    setTimeout(() => { c.classList.remove("copied"); c.textContent = "⧉"; }, 1200);
+  }
+  const gd = e.target.closest("[data-guide]"); if (gd) openGuide(gd.dataset.guide);
+  if (e.target.closest("[data-close]") || e.target.id === "guide") document.getElementById("guide").classList.remove("open");
+});
+
+// ---------------------------------------------------------------------------
+// Anleitungen (Platzhalter)
+// ---------------------------------------------------------------------------
+const GUIDES = {
+  account: { title:"Anleitung: Zugang zum ePortal", steps:[
+    ["Konto anlegen", "Auf eportal.admin.ch „Anmelden“ wählen und ein neues Konto erstellen."],
+    ["Anmeldung absichern", "Zweiten Faktor einrichten (z. B. Authenticator-App)."],
+    ["Im ePortal anmelden", "Mit dem neuen Konto anmelden und die Startseite „Willkommen auf dem ePortal“ öffnen."],
+    ["Service „Verrechnungssteuer“ hinzufügen", "Kachel „Verrechnungssteuer – Rückerstattung für in Deutschland ansässige Personen“ auswählen."],
+  ]},
+  upload: { title:"Anleitung: Hochladen im ePortal", steps:[
+    ["Antragsübersicht öffnen", "Kachel „Verrechnungssteuer“ → Liste Ihrer Anträge."],
+    ["Antrag auswählen", "Antrag mit Ihrer Antrags-ID öffnen."],
+    ["Bestätigten Antrag hochladen", "Das eingescannte PDF hochladen und absenden."],
+  ]},
+};
+function openGuide(key) {
+  const g = GUIDES[key];
+  document.getElementById("guide-title").textContent = g.title;
+  document.getElementById("guide-body").innerHTML = `
+    <div class="banner warn" style="margin-bottom:10px;"><span class="ico">🚧</span><div><b>Platzhalter</b> – Texte und Screenshots folgen. Gerüst: Schritt-für-Schritt mit je einem Screenshot aus dem ePortal.</div></div>
+    ${g.steps.map(([t,d], i) => `<div class="guide-step"><span class="step-num">${i+1}</span><div><b>${t}</b><span style="font-size:12px;color:var(--muted);">${d}</span><div class="ph">Screenshot</div></div></div>`).join("")}
+    <div class="actions" style="margin-top:14px;"><a class="btn small" href="${PORTAL_URL}" target="_blank" rel="noopener">ePortal öffnen ↗</a></div>`;
+  document.getElementById("guide").classList.add("open");
+}
+
+// ---------------------------------------------------------------------------
+// Checklisten (gemeinsamer Baustein für CH und DK)
+// ---------------------------------------------------------------------------
+let mode = "first";
+const SYM = { ok:"✓", missing:"!", check:"?", later:"…" };
+
+// Profilfelder: EINE Quelle (profile), gelesen von „Persönliche Daten“,
+// „Anschreiben Finanzamt“, beiden Checklisten und allen Fällen.
+// Bearbeitung überall gleich: gefüllte Felder wirken wie Text (.confirmed-input),
+// leere wie Eingabefeld (.field-input). Gespeichert wird AUTOMATISCH beim
+// Verlassen des Felds – kein Speichern-Button.
+const PF = {
+  name:       { label:"Name", parts:[["firstName","Vorname"],["lastName","Nachname"]] },
+  address:    { label:"Adresse", parts:[["street","Straße und Hausnummer",,"wide"],["postalCode","PLZ"],["city","Ort"]] },
+  birthDate:  { label:"Geburtsdatum", parts:[["birthDate","Geburtsdatum","date"]] },
+  birthPlace: { label:"Geburtsort", parts:[["birthPlace","wie im Reisepass"]] },
+  tin:        { label:"Steuer-ID", parts:[["tin","11 Ziffern",,"mono"]] },
+  taxNumber:  { label:"Steuernummer", parts:[["taxNumber","z. B. 143/123/45678",,"mono"]], hint:"Wird im Schweizer Antrag zusätzlich zur Steuer-ID abgefragt. Steht auf Ihrem Steuerbescheid." },
+  taxOffice:  { label:"Finanzamt", parts:[["taxOfficeName","Name",,"wide"],["taxOfficeStreet","Straße",,"wide"],["taxOfficePostalCode","PLZ"],["taxOfficeCity","Ort"]] },
+  contact:    { label:"Kontakt", parts:[["email","E-Mail"],["phone","Telefon inkl. Ländervorwahl"]] },
+  bank:       { label:"Bankverbindung", parts:[["iban","IBAN",,"mono wide"],["holder","Kontoinhaber"]] },
+  bic:        { label:"BIC", parts:[["bic","BIC / SWIFT",,"mono"]] },
+};
+const FIELD_LABEL = {
+  firstName:"Vorname", lastName:"Nachname", street:"Straße", postalCode:"PLZ", city:"Ort", birthDate:"Geburtsdatum", birthPlace:"Geburtsort",
+  tin:"Steuer-ID", taxNumber:"Steuernummer", taxOfficeName:"Finanzamt", taxOfficeStreet:"Straße Finanzamt", taxOfficePostalCode:"PLZ Finanzamt",
+  taxOfficeCity:"Ort Finanzamt", email:"E-Mail", phone:"Telefon", iban:"IBAN", holder:"Kontoinhaber", bic:"BIC",
+};
+// Validierung: ungültige Werte werden NICHT gespeichert
+const VALIDATE = {
+  tin: v => /^\d{11}$/.test(v.replace(/\s/g, "")) || "Steuer-ID hat 11 Ziffern",
+  iban: v => /^[A-Z]{2}\d{2}[A-Z0-9 ]{10,32}$/i.test(v) || "IBAN beginnt mit Länderkürzel und Prüfziffer, z. B. DE89 …",
+  postalCode: v => /^\d{5}$/.test(v) || "PLZ hat 5 Ziffern",
+  taxOfficePostalCode: v => /^\d{5}$/.test(v) || "PLZ hat 5 Ziffern",
+  email: v => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) || "Bitte gültige E-Mail-Adresse",
+};
+const NEEDS = {
+  ch: ["name","address","birthDate","tin","taxNumber","taxOffice","contact","bank"],
+  dk: ["name","address","birthDate","birthPlace","tin","taxOffice","bank","bic"],
+};
+// Felder, die in bereits erzeugten Formularen stecken
+const USED_IN_FORM = { ch: NEEDS.ch, dk: ["name","address","birthDate","birthPlace","tin"] };
+const isFilled = key => PF[key].parts.every(([f]) => String(profile[f] ?? "").trim() !== "");
+const changedAfterForm = new Set();
+const invalid = new Set(); // Felder mit ungültiger, nicht gespeicherter Eingabe
+
+function fieldInput([field, ph, type, extra = ""]) {
+  const v = profile[field] ?? "";
+  const cls = String(v).trim() ? "confirmed-input" : "field-input";
+  return `<input class="${cls} ${extra}" data-pf="${field}" type="${type || "text"}" placeholder="${ph}" value="${v}">`;
+}
+function fieldRow(key) {
+  const f = PF[key], filled = isFilled(key);
+  return {
+    st: filled ? "ok" : "missing", label: f.label, key,
+    valueHtml: `<span class="inline-fields">${f.parts.map(fieldInput).join("")}</span><div class="field-error" data-err-for="${key}"></div>${!filled && f.hint ? `<div class="form-hint" style="margin-top:4px;">${f.hint}</div>` : ""}`,
+  };
+}
+const autosaveNote = `<div class="autosave-note">✓ Änderungen werden automatisch gespeichert – in Ihren persönlichen Daten, für alle offenen DivRebounds.</div>`;
+function renderChecklist(targetId, summaryId, groups) {
+  document.getElementById(targetId).innerHTML = groups.map(([title, items]) => {
+    const isProfile = typeof items[0] === "string";
+    return `<div class="check-group-title">${title}</div>
+    ${items.map(it => {
+      const r = typeof it === "string" ? fieldRow(it) : { st:it[0], label:it[1], valueHtml:`<span class="check-value">${it[2]}</span>`, action:it[3] || "" };
+      return `<div class="check-item ${r.st}" ${r.key ? `data-key="${r.key}"` : ""}><span class="state ${r.st}">${SYM[r.st]}</span><span class="check-label">${r.label}</span>
+        <span>${r.valueHtml}</span><span class="check-actions">${r.action || ""}</span></div>`; }).join("")}
+    ${isProfile ? autosaveNote : ""}`;
+  }).join("");
+  updateSummary(targetId, summaryId);
+}
+function updateSummary(targetId, summaryId) {
+  const items = document.querySelectorAll(`#${targetId} .check-item`);
+  const ok = [...items].filter(i => i.classList.contains("ok")).length;
+  document.getElementById(summaryId).textContent = `${ok} von ${items.length} vorhanden`;
+}
+
+// ---------------------------------------------------------------------------
+// Automatisches Speichern
+// ---------------------------------------------------------------------------
+let toastTimer = null, lastUndo = null;
+function showToast(html, undo) {
+  lastUndo = undo;
+  const t = document.getElementById("toast");
+  t.innerHTML = html + (undo ? ` <button class="toast-undo" id="toast-undo">Rückgängig</button>` : "");
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 4000);
+}
+document.addEventListener("click", e => {
+  if (e.target.id !== "toast-undo" || !lastUndo) return;
+  lastUndo(); lastUndo = null;
+  document.getElementById("toast").classList.remove("show");
+});
+
+// Speichern beim Verlassen des Felds ("change" feuert nur bei geändertem Wert)
+document.addEventListener("change", e => {
+  const inp = e.target.closest("[data-pf]");
+  if (!inp) return;
+  const field = inp.dataset.pf, v = inp.value.trim(), prev = profile[field] ?? "";
+  const err = v && VALIDATE[field] ? VALIDATE[field](v) : true;
+  const root = inp.closest("[data-pf-root]");
+  const errEl = inp.closest(".check-item, .field-row")?.querySelector(".field-error");
+  if (err !== true) {
+    invalid.add(field);
+    inp.classList.add("is-invalid");
+    if (errEl) errEl.textContent = `${err} – nicht gespeichert.`;
+    return;
+  }
+  invalid.delete(field);
+  inp.classList.remove("is-invalid");
+  if (errEl) errEl.textContent = "";
+  applyChange(field, v, prev, root?.id);
+  showToast(`✓ ${FIELD_LABEL[field]} gespeichert`, () => { applyChange(field, prev, v, null); });
+});
+
+function applyChange(field, value, prev, editingRootId) {
+  const keys = Object.keys(PF).filter(k => PF[k].parts.some(([f]) => f === field));
+  const wasFilled = Object.fromEntries(keys.map(k => [k, isFilled(k)]));
+  profile[field] = value;
+  for (const k of keys) {
+    if (wasFilled[k] && prev && value !== prev) changedAfterForm.add(k);
+  }
+  refreshProfileViews(editingRootId);
+  if (editingRootId) patchInPlace(editingRootId, field);
+}
+// Im gerade bearbeiteten Bereich nicht neu rendern (sonst springt der Fokus
+// weg), sondern nur Zustand und Optik des Felds aktualisieren.
+function patchInPlace(rootId, field) {
+  const root = document.getElementById(rootId);
+  root.querySelectorAll(`[data-pf="${field}"]`).forEach(i => {
+    const filled = String(profile[field] ?? "").trim() !== "";
+    i.classList.toggle("confirmed-input", filled); i.classList.toggle("field-input", !filled);
+    const lbl = i.closest(".field-row")?.querySelector("label");
+    if (lbl) { lbl.classList.toggle("confirmed-label", filled); lbl.classList.toggle("field-label", !filled); }
+  });
+  root.querySelectorAll(".check-item[data-key]").forEach(item => {
+    const st = isFilled(item.dataset.key) ? "ok" : "missing";
+    item.classList.remove("ok", "missing"); item.classList.add(st);
+    const s = item.querySelector(".state"); s.className = `state ${st}`; s.textContent = SYM[st];
+  });
+  if (rootId === "ch-checklist") updateSummary("ch-checklist", "ch-check-summary");
+  if (rootId === "dk-checklist") updateSummary("dk-checklist", "dk-check-summary");
+}
+function refreshProfileViews(skip) {
+  if (skip !== "profile-form") renderProfile();
+  if (skip !== "ch-checklist") renderChChecklist();
+  if (skip !== "dk-checklist") renderDkChecklist();
+  if (skip !== "dk-missing") renderDkMissing();
+  if (skip !== "letter-recipient") renderLetter();
+  renderStale(); renderPortal(); renderChSummary();
+}
+
+// Warnung beim Verlassen nur noch, wenn eine ungültige Eingabe nicht gespeichert werden konnte
+function guardLeave() {
+  if (!invalid.size) return true;
+  return confirm(`${[...invalid].map(f => FIELD_LABEL[f]).join(", ")}: ungültige Eingabe wurde nicht gespeichert. Seite trotzdem verlassen?`);
+}
+
+// ---------------------------------------------------------------------------
+// Persönliche Daten (wie screens/profile/profile.js, erweitert)
+// ---------------------------------------------------------------------------
+function pField(field, label, opts = {}) {
+  const def = Object.values(PF).flatMap(f => f.parts).find(p => p[0] === field) || [field, ""];
+  const v = profile[field] ?? "";
+  const lbl = String(v).trim() ? "confirmed-label" : "field-label";
+  return `<div class="field-row ${opts.wide ? "field-row-wide" : ""}"><label class="${lbl}">${label}${opts.hint ? ` <span class="field-optional">· ${opts.hint}</span>` : ""}${opts.isNew ? ` <span class="new-tag">neu</span>` : ""}</label>${fieldInput(def)}<div class="field-error"></div></div>`;
+}
+const taxOfficeFields = () => `
+  <div class="field-grid">${pField("taxOfficeName","Name des Finanzamts",{wide:true})}</div>
+  <div class="field-grid">${pField("taxOfficeStreet","Straße und Hausnummer",{wide:true})}</div>
+  <div class="field-grid">${pField("taxOfficePostalCode","Postleitzahl")}${pField("taxOfficeCity","Ort")}</div>`;
+function renderProfile() {
+  document.getElementById("profile-form").innerHTML = `
+    <div class="card"><div class="card-head navy"><span class="card-title">Persönliche Angaben</span></div><div class="card-body">
+      <div class="field-grid">${pField("firstName","Vorname")}${pField("lastName","Nachname")}</div>
+      <div class="field-grid">${pField("birthDate","Geburtsdatum")}${pField("birthPlace","Geburtsort",{hint:"wie im Reisepass"})}</div>
+      <div class="field-grid">${pField("street","Straße und Hausnummer",{wide:true})}</div>
+      <div class="field-grid">${pField("postalCode","Postleitzahl")}${pField("city","Ort")}</div>
+      <div class="field-grid">${pField("email","Email",{hint:"benötigt für die Schweiz"})}${pField("phone","Telefon",{hint:"benötigt für die Schweiz"})}</div>
+    </div></div>
+    <div class="card"><div class="card-head navy"><span class="card-title">Steuerliche Angaben</span></div><div class="card-body">
+      <div class="field-grid">${pField("tin","Steuer-ID (TIN)",{hint:"11 Ziffern · Dänemark und Schweiz"})}${pField("taxNumber","Steuernummer",{hint:"benötigt für die Schweiz",isNew:true})}</div>
+      <div class="field-hint" style="margin:-4px 0 18px;">Die Steuernummer steht auf Ihrem Einkommensteuerbescheid. Sie ist nicht dasselbe wie die 11-stellige Steuer-ID.</div>
+      <div class="sub-title">Zuständiges Finanzamt</div>
+      ${taxOfficeFields()}
+      <div class="field-hint" style="margin-top:10px;">An dieses Finanzamt gehen Wohnsitzbescheinigung (Dänemark) und Antrag (Schweiz) zur Bestätigung.</div>
+    </div></div>
+    <div class="card"><div class="card-head navy"><span class="card-title">Bankverbindung</span></div><div class="card-body">
+      <div class="field-grid">${pField("holder","Kontoinhaber")}${pField("bic","BIC / SWIFT",{hint:"benötigt für Dänemark"})}</div>
+      <div class="field-grid">${pField("iban","IBAN",{wide:true})}</div>
+    </div></div>
+    <div class="autosave-note boxed">✓ Änderungen werden beim Verlassen eines Felds automatisch gespeichert und gelten für alle offenen DivRebounds. Bereits erzeugte Formulare bleiben unverändert – der Fall weist Sie dann darauf hin.</div>`;
+}
+
+// ---------------------------------------------------------------------------
+// Anschreiben Finanzamt – Adresse zur Bestätigung, gleiche Quelle wie Profil
+// ---------------------------------------------------------------------------
+function renderLetter() {
+  const complete = isFilled("taxOffice");
+  document.getElementById("letter-recipient").innerHTML = `${taxOfficeFields()}
+    <div class="autosave-note" style="margin:14px -22px -20px;">Aus Ihren persönlichen Daten · Änderungen hier werden automatisch dort gespeichert.</div>`;
+  document.getElementById("letter-download").disabled = !complete;
+  document.getElementById("letter-hint").style.display = complete ? "none" : "";
+}
+
+function renderChChecklist() {
+  const lastTx = transactions.map(t => t.date).sort().at(-1);
+  renderChecklist("ch-checklist", "ch-check-summary", [
+    ["Zugang", [
+      ["check", "ePortal-Zugang", "Eigenes Konto bei eportal.admin.ch. Noch keins? Mit der Anleitung in wenigen Minuten angelegt.",
+        `<a class="btn small" href="${PORTAL_URL}" target="_blank" rel="noopener">ePortal öffnen ↗</a><button class="btn ghost small" data-guide="account">📘 Anleitung</button><label style="font-size:12px;display:flex;align-items:center;gap:4px;"><input type="checkbox"> vorhanden</label>`],
+    ]],
+    ["Persönliche Daten", NEEDS.ch],
+    ["Depot", mode === "first"
+      ? [["missing", "Käufe und Verkäufe", "Noch keine erfasst. Alle Transaktionen Ihrer Schweizer Aktien ab dem ersten Kauf – per Abrechnung oder manuell.", `<button class="btn small" data-go="ch-bestand">Erfassen</button>`]]
+      : [["check", "Käufe und Verkäufe", `${transactions.length} Transaktionen erfasst · letzte am ${fmtDate(lastTx)} · seitdem etwas gekauft oder verkauft?`, `<button class="btn small ghost" data-go="ch-bestand">Bestand prüfen</button>`]]],
+    ["Dividenden", [
+      ["later", "Tax Voucher", "Pro Dividende einer. Kommen teils erst Wochen nach der Zahlung (Beispiel: Dividende 18.05., Voucher 17.07.).", `<span class="pill grey">Schritt 3</span>`],
+      ["later", "Dividendenabrechnungen", "Optional. Liefern Dividendentermin und Bruttobetrag für den Abgleich.", `<span class="pill grey">Schritt 3</span>`],
+    ]],
+  ]);
+}
+function renderDkChecklist() {
+  renderChecklist("dk-checklist", "dk-check-summary", [
+    ["Zugang", [["ok", "SKAT-Online-Formular", "Kein Login nötig – DivRebound verlinkt direkt auf das Formular für ausländische Aktionäre."]]],
+    ["Persönliche Daten", NEEDS.dk],
+    ["Aus Ihren Dividendenabrechnungen", [
+      ["later", "Dividendenabrechnungen", "Je eine pro Ausschüttung einer dänischen Aktie (ISIN beginnt mit DK), höchstens 3 Jahre zurück.", `<span class="pill grey">Schritt 2</span>`],
+      ["later", "Zeitraum der Ansässigkeit", "Wird aus den Zahltagen Ihrer Abrechnungen abgeleitet – Sie bestätigen ihn nur noch.", `<span class="pill grey">Schritt 3</span>`],
+    ]],
+  ]);
+}
+function renderDkMissing() {
+  const missing = NEEDS.dk.filter(k => !isFilled(k));
+  document.getElementById("dk-missing-sub").textContent = missing.length ? `${missing.length} offen` : "nichts offen";
+  document.getElementById("dk-missing").innerHTML = missing.length
+    ? missing.map(k => { const r = fieldRow(k); return `<div class="check-item missing" data-key="${k}"><span class="state missing">!</span><span class="check-label">${r.label}</span><span>${r.valueHtml}</span><span></span></div>`; }).join("") + autosaveNote
+    : `<div class="card-body"><div class="banner ok" style="margin:0;"><span class="ico">✓</span><div>Alle übrigen Angaben sind vollständig. Sie stammen aus Ihren persönlichen Daten (${NEEDS.dk.length} Felder) – <span class="link" data-go="dk-checkliste">ansehen oder ändern</span>.</div></div></div>`;
+}
+function renderStale() {
+  for (const c of ["ch","dk"]) {
+    const hit = [...changedAfterForm].filter(k => USED_IN_FORM[c].includes(k)).map(k => PF[k].label);
+    document.getElementById(`${c}-stale`).innerHTML = hit.length ? `<div class="banner warn"><span class="ico">↻</span><div>
+      <b>${hit.join(", ")} nach dem Erstellen des Formulars geändert.</b><br>
+      ${c === "dk" ? "Die Wohnsitzbescheinigung enthält noch die alten Angaben. Bitte neu herunterladen, falls Sie sie noch nicht verschickt haben."
+                   : "Der Antrag im ePortal enthält noch die alten Angaben. Bitte dort korrigieren und neu erstellen, falls Sie ihn noch nicht verschickt haben."}
+      <div class="actions" style="margin-top:8px;"><button class="btn small">${c === "dk" ? "Neu herunterladen" : "Geänderte Werte anzeigen"}</button><button class="btn small ghost">Bereits verschickt – ignorieren</button></div></div></div>` : "";
+  }
+}
+
+// ---------------------------------------------------------------------------
+// CH 2 Bestand
+// ---------------------------------------------------------------------------
+const imports = [
+  ["wertpapierabrechnung_20260109_kauf_ch0017875789_612218879.pdf", "Kauf", JF.name, 2, "2026-01-09", "ok"],
+  ["wertpapierabrechnung_20260427_kauf_ch0017875789_654946744.pdf", "Kauf", JF.name, 3, "2026-04-27", "check"],
+  ["wertpapierabrechnung_20260109_kauf_ch0017875789_612218879 (1).pdf", "Kauf", JF.name, 2, "2026-01-09", "dup"],
+];
+function renderBestand() {
+  const first = mode === "first";
+  document.getElementById("bestand-first").style.display = first ? "" : "none";
+  document.getElementById("bestand-followup").style.display = first ? "none" : "";
+  document.getElementById("capture-card").style.display = first || changed ? "" : "none";
+  document.getElementById("import-card").style.display = first ? "" : "none";
+
+  const status = {
+    ok: `<span class="pill ok">bestätigt</span>`,
+    check: `<span class="pill warn">bitte prüfen</span> <button class="btn small ghost">Bestätigen</button>`,
+    dup: `<span class="pill grey">doppelt – übersprungen</span>`,
+  };
+  document.getElementById("import-rows").innerHTML = imports.map(([f,a,n,q,d,s]) => `
+    <tr ${s === "dup" ? 'style="color:var(--stone)"' : ""}><td class="mono" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${f}">${f}</td>
+    <td>${a === "Verkauf" ? `<span class="pill bad">Verkauf</span>` : `<span class="pill cyan">Kauf</span>`}</td><td>${n}</td><td class="num">${q}</td>
+    <td class="mono">${fmtDate(d)}${s === "check" ? `<div style="font-size:10.5px;color:var(--warn);font-family:var(--font-body);">Auftrag war am 17.04.</div>` : ""}</td><td>${status[s]}</td></tr>`).join("");
+
+  const isins = [...new Set(transactions.map(t => t.isin))].sort((a,b) => (KNOWN[a] || a).localeCompare(KNOWN[b] || b));
+  let rows = "";
+  for (const isin of isins) {
+    const lots = fifo(isin);
+    const total = lots.reduce((s,l) => s + l.remaining, 0);
+    rows += `<tr class="expander open" data-exp="${isin}"><td><span class="caret">›</span> <b>${KNOWN[isin] || isin}</b></td><td class="mono">${isin}</td><td></td>
+      <td class="num"><b>${total}</b></td><td>${lots.gap ? `<span class="pill bad" title="Es wurde mehr verkauft als gekauft">${lots.gap} Stk zu viel verkauft – Käufe fehlen</span>` : `<label style="font-size:12px;"><input type="checkbox"> stimmt</label>`}</td></tr>`;
+    for (const l of lots) {
+      const gone = l.remaining === 0;
+      const note = l.notes.map(n => `${n.take} verkauft am ${fmtDate(n.sellDate)}`).join(", ");
+      rows += `<tr class="sub ${gone ? "gone" : ""}" data-of="${isin}"><td>Tranche${gone ? " · vollständig verkauft" : l.remaining < l.original ? ` · ursprünglich ${l.original}` : ""}${l.manual ? ` <span class="pill grey">manuell</span>` : ""}${note ? `<span style="display:block;font-size:11px;">${note}</span>` : ""}</td>
+        <td></td><td class="mono">${fmtDate(l.date)}</td><td class="num">${l.remaining}</td><td></td></tr>`;
+    }
+  }
+  document.getElementById("holdings-rows").innerHTML = rows;
+  document.querySelectorAll("[data-exp]").forEach(r => r.onclick = e => {
+    if (["INPUT","LABEL"].includes(e.target.tagName)) return;
+    r.classList.toggle("open");
+    document.querySelectorAll(`[data-of="${r.dataset.exp}"]`).forEach(s => s.style.display = r.classList.contains("open") ? "" : "none");
+  });
+
+  document.getElementById("tx-count").textContent = `${transactions.length} Transaktionen`;
+  document.getElementById("tx-rows").innerHTML = transactions.map((t, i) => ({ t, i })).sort((a,b) => a.t.date.localeCompare(b.t.date)).map(({ t, i }) => `
+    <tr class="${t.manual ? "new" : ""}"><td class="mono">${fmtDate(t.date)}</td><td>${t.type === "buy" ? "Kauf" : "Verkauf"}</td><td>${t.name}</td><td class="num">${t.type === "sell" ? "−" : ""}${t.qty}</td>
+    <td style="font-size:11.5px;color:var(--muted);">${t.src}${t.note ? `<br>${t.note}` : ""}</td>
+    <td>${t.manual ? `<button class="icon-btn" title="Bearbeiten">✎</button><button class="icon-btn" data-del="${i}" title="Löschen">🗑</button>` : ""}</td></tr>`).join("");
+  document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { transactions.splice(+b.dataset.del, 1); refreshAll(); });
+  document.getElementById("isin-list").innerHTML = Object.entries(KNOWN).map(([i,n]) => `<option value="${i}">${n}</option>`).join("");
+}
+let changed = false;
+document.getElementById("tx-toggle").onclick = function () {
+  this.classList.toggle("open");
+  document.getElementById("tx-table").style.display = this.classList.contains("open") ? "" : "none";
+};
+document.getElementById("btn-changed").onclick = () => { changed = true; renderBestand(); };
+document.getElementById("btn-manual").onclick = () => document.getElementById("manual-form").classList.add("open");
+document.getElementById("mf-cancel").onclick = () => document.getElementById("manual-form").classList.remove("open");
+document.getElementById("mf-isin").oninput = e => { const n = KNOWN[e.target.value.trim().toUpperCase()]; if (n) document.getElementById("mf-name").value = n; };
+document.getElementById("mf-save").onclick = () => {
+  const isin = document.getElementById("mf-isin").value.trim().toUpperCase();
+  const name = document.getElementById("mf-name").value.trim();
+  const date = document.getElementById("mf-date").value;
+  const qty = parseInt(document.getElementById("mf-qty").value, 10);
+  const type = document.getElementById("mf-type").value;
+  const msg = document.getElementById("mf-msg");
+  if (!/^CH[A-Z0-9]{9}\d$/.test(isin)) { msg.innerHTML = `<span style="color:var(--danger);">ISIN muss mit CH beginnen und 12 Zeichen haben.</span>`; return; }
+  if (!date || !(qty > 0)) { msg.innerHTML = `<span style="color:var(--danger);">Bitte Handelstag und Stückzahl angeben.</span>`; return; }
+  KNOWN[isin] = KNOWN[isin] || name || isin;
+  transactions.push({ isin, name: KNOWN[isin], type, date, qty, src:"manuell erfasst", manual:true });
+  msg.innerHTML = `<span style="color:var(--success);">✓ übernommen</span>`;
+  ["mf-isin","mf-name","mf-date","mf-qty"].forEach(id => document.getElementById(id).value = "");
+  const tt = document.getElementById("tx-toggle"); tt.classList.add("open"); document.getElementById("tx-table").style.display = "";
+  refreshAll();
+};
+
+// ---------------------------------------------------------------------------
+// CH 3 Dividenden & Voucher
+// ---------------------------------------------------------------------------
+function renderVoucher() {
+  document.getElementById("dist-rows").innerHTML = distributions.map(d => {
+    const held = heldAt(d), sum = d.vouchers.reduce((a,b) => a + b, 0), ok = held === sum;
+    return `<tr><td><b>${d.name}</b><div class="mono" style="color:var(--muted);font-size:11px;">${d.isin}</div></td>
+      <td class="mono">${fmtDate(d.payDate)}<div style="font-size:10.5px;color:var(--muted);font-family:var(--font-body);">Ex-Tag ${fmtDate(d.exDate)}</div></td>
+      <td class="num">${held}</td><td>${d.vouchers.map(v => `<span class="chip">${v} Stk</span>`).join("")}</td>
+      <td>${ok ? `<span class="pill ok">${d.vouchers.length > 1 ? d.vouchers.join(" + ") + " = " : ""}${sum} ✓</span>` : `<span class="pill bad">Voucher ${sum} ≠ Bestand ${held}</span>`}</td>
+      <td class="num">CHF ${fmtChf(refundOf(d))}</td></tr>`;
+  }).join("");
+}
+
+// ---------------------------------------------------------------------------
+// CH 4 ePortal-Spickzettel – EIN Antrag, mehrere Jahre
+// ---------------------------------------------------------------------------
+let curPage = "general";
+const pages = [["general","Allgemeine Angaben"],["assets","Vermögenswerte"],["questions","Fragen"],["additional","Zusätzliche Angaben"],["review","Angaben prüfen"]];
+const questions = [
+  ["Waren Sie zum Zeitpunkt der erfassten Fälligkeiten im Sinne des Doppelbesteuerungsabkommens in München ansässig?", "Ja"],
+  ["Waren Sie zum Zeitpunkt der Fälligkeiten an den erfassten Vermögenserträgen nutzungsberechtigt?", "Ja"],
+  ["Haben Sie die erfassten Vermögenserträge für eigene Rechnung einkassiert?", "Ja"],
+  ["Handelt es sich bei den erfassten Vermögenswerten um Eigenbestände und nicht um Bestände von Drittbegünstigten?", "Ja"],
+  ["Waren die erfassten Vermögenswerte zum Zeitpunkt der Ertragsfälligkeit Gegenstand von „Securities Lending and Borrowing“-Geschäften?", "Nein"],
+  ["Sind Sie für die erfassten Vermögenserträge in Deutschland unbeschränkt steuerpflichtig?", "Ja"],
+  ["Stammen die erfassten Vermögenserträge aus einer Erbschaft?", "Nein"],
+];
+const yearRefund = y => distributions.filter(d => yearOf(d.payDate) === y).reduce((s,d) => s + refundOf(d), 0);
+function row(label, portal, value, assumption = false) {
+  return `<div class="row"><input type="checkbox"><div class="row-label">${label}${portal ? `<span class="portal">${portal}</span>` : ""}</div>
+    <span class="row-value ${assumption ? "assumption" : ""}">${value}</span>${copyBtn(value)}</div>`;
+}
+function renderPortal() {
+  const idx = pages.findIndex(p => p[0] === curPage);
+  document.getElementById("page-tabs").innerHTML = pages.map(([id, label], i) => `
+    <div class="page-tab ${id === curPage ? "active" : ""} ${i < idx ? "done" : ""}" data-page="${id}"><span class="n">${i < idx ? "✓" : i + 1}</span>${label}</div>`).join("");
+  const card = document.getElementById("portal-card");
+  const ys = years();
+
+  if (curPage === "general") {
+    const allYears = ["2023", ...ys];
+    card.innerHTML = `<div class="card-head navy"><span class="card-title">Allgemeine Angaben</span><span class="card-sub">aus Ihrem Profil</span></div>
+      <div class="row" style="grid-template-columns:22px 1fr;"><input type="checkbox"><div class="row-label"><b>Für welche Jahre gilt der Antrag?</b>
+        <span class="portal">Im Portal alle markierten Jahre anhaken – Mehrfachauswahl ist möglich. DivRebound hat die Jahre gewählt, für die erstattungsfähige Dividenden vorliegen.</span>
+        <div class="year-picks" style="margin-top:8px;">${allYears.map(y => ys.includes(y)
+          ? `<span class="year-pick on">☑ ${y} <span style="font-family:var(--font-body);font-weight:500;font-size:11px;">CHF ${fmtChf(yearRefund(y))}</span></span>`
+          : `<span class="year-pick">☐ ${y} <span style="font-family:var(--font-body);font-weight:500;font-size:11px;">keine Dividenden</span></span>`).join("")}</div></div></div>
+      ${row("Vorname", "", profile.firstName)}${row("Nachname", "", profile.lastName)}
+      ${row("Strasse", "", profile.street)}${row("PLZ", "", profile.postalCode)}${row("Ort", "", profile.city)}
+      ${row("Geburtsdatum", "Format TT.MM.JJJJ", fmtDate(profile.birthDate))}
+      ${row("Steuerliche Identifikationsnummer", "IdNr", profile.tin)}
+      ${profile.taxNumber ? row("Steuernummer", "", profile.taxNumber)
+        : `<div class="row"><input type="checkbox" disabled><div class="row-label">Steuernummer<span class="portal">fehlt noch – <span class="link" data-go="ch-checkliste">jetzt ergänzen</span></span></div><span class="pill bad">fehlt</span><span></span></div>`}`;
+  }
+
+  if (curPage === "assets") {
+    let html = `<div class="card-head navy"><span class="card-title">Vermögenswerte</span><span class="card-sub">Pro Zeile im Portal „Vermögenswert hinzufügen“ → Wertschriften</span></div>`;
+    let total = 0;
+    for (const y of ys) {
+      html += `<div class="year-head"><span>Jahr ${y}</span><span>CHF ${fmtChf(yearRefund(y))}</span></div>`;
+      for (const d of distributions.filter(d => yearOf(d.payDate) === y)) {
+        const entries = entriesFor(d), lotsAll = fifo(d.isin, d.exDate);
+        html += `<div class="asset-block-head"><span><b>${d.name}</b> · ${d.isin}</span><span>Fälligkeit <b>${fmtDate(d.payDate)}</b> · Brutto CHF ${fmtChf(d.gross)}/Stk · ${entries.length} ${entries.length === 1 ? "Eintrag" : "Einträge"}</span></div>
+          <div class="entry head"><span></span><span>ISIN</span><span>Erwerbsdatum</span><span>Anzahl</span><span style="text-align:right;">Erstattung</span></div>`;
+        for (const e of entries) {
+          total += e.refund;
+          html += `<div class="entry"><input type="checkbox" class="entry-check">
+            <span class="cv"><span class="row-value">${d.isin}</span>${copyBtn(d.isin)}</span>
+            <span class="cv"><span class="row-value">${fmtDate(e.date)}</span>${copyBtn(fmtDate(e.date))}</span>
+            <span class="cv"><span class="row-value">${e.remaining}</span>${copyBtn(e.remaining)}</span>
+            <span class="mono" style="text-align:right;">${fmtChf(e.refund)}</span></div>`;
+        }
+        const hasSales = lotsAll.some(l => l.notes.length);
+        html += `<details><summary style="padding:8px 18px 8px 50px;font-size:11.5px;color:var(--navy);cursor:pointer;border-top:1px dashed var(--divider);">Herleitung anzeigen${hasSales ? " (mit Teilverkauf)" : ""}</summary><div class="derivation">
+          Bestand am Ende des Handelstags vor dem Ex-Tag (${fmtDate(d.exDate)}):<br>
+          ${lotsAll.map(l => {
+            if (l.remaining === 0) return `• Kauf ${fmtDate(l.date)} · ${l.original} Stk → <span class="fa">vollständig verkauft</span> (${l.notes.map(n => fmtDate(n.sellDate)).join(", ")}) – entfällt`;
+            if (l.remaining < l.original) return `• Kauf ${fmtDate(l.date)} · ${l.original} Stk → <span class="fb">${l.original - l.remaining} verkauft</span> am ${l.notes.map(n => fmtDate(n.sellDate)).join(", ")} – <b>${l.remaining} Stk</b> mit Original-Erwerbsdatum`;
+            return `• Kauf ${fmtDate(l.date)} · ${l.original} Stk → unverändert`;
+          }).join("<br>")}</div></details>`;
+      }
+    }
+    html += `<div class="total-row"><span>Erwartete Rückerstattung gesamt (20 % der Bruttodividende)</span><span>CHF ${fmtChf(total)}</span></div>`;
+    card.innerHTML = html;
+    card.querySelectorAll(".entry-check").forEach(c => c.onchange = () => c.closest(".entry").classList.toggle("done", c.checked));
+  }
+
+  if (curPage === "questions") {
+    card.innerHTML = `<div class="card-head navy"><span class="card-title">Fragen</span><span class="card-sub">Standardantworten für Privatanleger mit eigenem Depot</span></div>
+      ${questions.map(([q, a]) => row(q, "", a, true)).join("")}
+      <div class="plaus" style="background:var(--warn-bg);border-color:#e6c15a;color:#5c4300;">Trifft eine Antwort bei Ihnen nicht zu (z. B. Aktien geerbt oder verliehen), ist das ein Sonderfall, den DivRebound nicht abdeckt. Bitte lassen Sie sich dann beraten.</div>`;
+  }
+
+  if (curPage === "additional") {
+    card.innerHTML = `<div class="card-head navy"><span class="card-title">Zusätzliche Angaben</span><span class="card-sub">aus Ihrem Profil</span></div>
+      ${row("E-Mail", "Kontaktperson", profile.email)}
+      ${row("Telefonnummer", "mit 0049 statt +49", profile.phone.replace(/\s/g, ""))}
+      ${row("IBAN", "", profile.iban)}
+      ${row("Name des Kontoinhabers", "", profile.holder)}`;
+  }
+
+  if (curPage === "review") {
+    const exp = totalRefund();
+    card.innerHTML = `<div class="card-head navy"><span class="card-title">Angaben prüfen</span></div>
+      <table><thead><tr><th>Jahr</th><th class="num">Einträge</th><th class="num">Erwartete Erstattung</th></tr></thead><tbody>
+      ${ys.map(y => `<tr><td>${y}</td><td class="num">${distributions.filter(d => yearOf(d.payDate) === y).reduce((s,d) => s + entriesFor(d).length, 0)}</td><td class="num mono">CHF ${fmtChf(yearRefund(y))}</td></tr>`).join("")}
+      <tr><td><b>Gesamt</b></td><td></td><td class="num mono"><b>CHF ${fmtChf(exp)}</b></td></tr></tbody></table>
+      <div class="plaus">Vergleichen Sie mit „Total beantragte Rückerstattung“ im Portal:
+        <div style="margin-top:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">CHF <input id="plaus-in" placeholder="${fmtChf(exp)}"> <span id="plaus-out"></span></div></div>
+      <div class="card-body" style="font-size:12.5px;">Stimmt alles? Dann im Portal auf <b>„Erstellen“</b> klicken – weiter mit <span class="link" data-go="ch-finanzamt">Schritt 5: Formular &amp; Finanzamt</span>.</div>`;
+    document.getElementById("plaus-in").oninput = e => {
+      const v = parseFloat(e.target.value.replace(",", "."));
+      const out = document.getElementById("plaus-out");
+      if (isNaN(v)) { out.textContent = ""; return; }
+      out.innerHTML = Math.abs(v - exp) < 0.01 ? `<span class="pill ok">stimmt überein ✓</span>` : `<span class="pill bad">Abweichung CHF ${fmtChf(v - exp)} – Einträge prüfen</span>`;
+    };
+  }
+}
+document.getElementById("page-tabs").onclick = e => { const t = e.target.closest("[data-page]"); if (t) { curPage = t.dataset.page; renderPortal(); } };
+
+// ---------------------------------------------------------------------------
+// Status-Zeitleiste – gemeinsamer Baustein für DK und CH
+// ---------------------------------------------------------------------------
+const TIMELINE = {
+  ch: { steps:[["Formular erstellt","ePortal"],["Unterschrieben & versendet","Post"],["Vom Finanzamt bestätigt","Finanzamt"],["Im ePortal hochgeladen","ePortal"],["Ausgezahlt","Konto"]], at:2, title:"Antrag DE-1407-5964-00" },
+  dk: { steps:[["Formular erstellt","DivRebound"],["Unterschrieben & versendet","Post"],["Vom Finanzamt bestätigt","Finanzamt"],["Bei SKAT eingereicht","SKAT-Portal"],["Ausgezahlt","Konto"]], at:2, title:"Wohnsitzbescheinigung 02.050" },
+};
+function timelineHtml(c) {
+  const t = TIMELINE[c];
+  const amount = c === "ch" ? `CHF ${fmtChf(totalRefund())}` : "DKK 412,80";
+  return `<div class="card"><div class="card-head"><span class="card-title">${t.title} · ${amount}</span><span class="card-sub">Status zum Anklicken aktualisieren</span></div>
+    <div class="timeline">${t.steps.map(([s, where], i) => `<div class="tl-step ${i < t.at ? "done" : i === t.at ? "now" : ""}" data-tl="${c}" data-i="${i}">
+      <div class="tl-dot">${i < t.at ? "✓" : i + 1}</div>${s}<span class="where">${where}</span></div>`).join("")}</div></div>`;
+}
+function renderTimelines() {
+  document.getElementById("ch-timeline").innerHTML = timelineHtml("ch");
+  document.getElementById("ch-timeline-2").innerHTML = timelineHtml("ch");
+  document.getElementById("dk-timeline").innerHTML = timelineHtml("dk");
+  document.getElementById("dk-timeline-2").innerHTML = timelineHtml("dk");
+  document.querySelectorAll("[data-tl]").forEach(s => s.onclick = () => { TIMELINE[s.dataset.tl].at = +s.dataset.i + 1; renderTimelines(); renderFinish(); });
+}
+
+// ---------------------------------------------------------------------------
+// CH 5 Zusammenfassung, CH 6 Abschluss
+// ---------------------------------------------------------------------------
+function renderChSummary() {
+  document.getElementById("ch-sum-sub").textContent = `Jahre ${years().join(", ")} · CHF ${fmtChf(totalRefund())}`;
+  document.getElementById("ch-summary").innerHTML = `
+    <div class="summary-row"><span>Antragsteller</span><span>${profile.firstName} ${profile.lastName}, ${profile.street}, ${profile.postalCode} ${profile.city}</span></div>
+    <div class="summary-row"><span>Jahre</span><span>${years().join(", ")}</span></div>
+    ${years().map(y => `<div class="summary-row"><span>Erstattung ${y}</span><span class="mono">CHF ${fmtChf(yearRefund(y))}</span></div>`).join("")}
+    <div class="summary-row"><span>Überweisung auf</span><span class="mono">${profile.iban}</span></div>`;
+}
+function renderFinish() {
+  const body = document.getElementById("finish-body");
+  if (finished) {
+    body.innerHTML = `<div class="done-banner"><div class="done-icon">✓</div><div><div class="done-title">DivRebound abgeschlossen</div>
+      <div class="done-sub">Hochgeladen am 14.10.2026. Die ESTV prüft jetzt Ihren Antrag – die Auszahlung dauert erfahrungsgemäß einige Monate.</div></div></div>
+      <div style="font-size:12.5px;margin-bottom:8px;"><b>Optional:</b> Wenn das Geld da ist, hier eintragen – so sehen Sie in Ihrer Übersicht, was DivRebound Ihnen insgesamt gebracht hat.</div>
+      <div class="actions" style="align-items:flex-end;"><label class="field">Erhalten am<input type="date"></label><label class="field">Betrag (EUR)<input class="mono" placeholder="z. B. 85,40"></label><button class="btn small ghost">Speichern</button></div>`;
+    return;
+  }
+  const allChecked = [...document.querySelectorAll(".up-check")].every(c => c.checked);
+  body.innerHTML = `<p style="margin:0 0 12px;font-size:12.5px;line-height:1.6;color:var(--muted);">Sobald der bestätigte Antrag hochgeladen ist, schließen Sie den DivRebound ab. Erst dann zählt er als erledigt.</p>
+    <button class="btn success" id="btn-finish" ${allChecked ? "" : "disabled"}>✓ Hochgeladen – DivRebound abschließen</button>
+    ${allChecked ? "" : `<div class="form-hint">Bitte zuerst die drei Punkte oben abhaken.</div>`}`;
+  const b = document.getElementById("btn-finish");
+  if (b) b.onclick = () => { finished = true; TIMELINE.ch.at = 4; renderTimelines(); renderFinish(); renderNav("ch-upload"); };
+}
+document.querySelectorAll(".up-check").forEach(c => c.onchange = renderFinish);
+
+// ---------------------------------------------------------------------------
+// Mockup-Zustand
+// ---------------------------------------------------------------------------
+document.querySelectorAll(".mock-toggle button").forEach(b => b.onclick = () => {
+  mode = b.dataset.mode; changed = false;
+  document.querySelectorAll(".mock-toggle button").forEach(x => x.classList.toggle("on", x === b));
+  renderChChecklist(); renderBestand();
+});
+
+function refreshAll() { renderChChecklist(); renderBestand(); renderVoucher(); renderPortal(); renderChSummary(); renderTimelines(); }
+refreshAll(); renderProfile(); renderLetter(); renderDkChecklist(); renderDkMissing(); renderStale(); renderFinish();
+go("ch-checkliste");
+</script>
+</body>
+</html>
