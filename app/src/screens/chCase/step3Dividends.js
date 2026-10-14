@@ -6,8 +6,10 @@
 //
 // Der Dividendentermin steht auf dem Voucher nur als Grafik (Seite 2) - er
 // kommt aus der Dividendenabrechnung oder wird vom Nutzer eingetragen. Fehlt
-// der Ex-Tag, wird er als "2 Bankarbeitstage vor Zahltag" vorgeschlagen
-// (Schweizer Standard: Ex-Tag, Record Date, Zahltag) und als berechnet markiert.
+// der Ex-Tag, wird er als "2 Bankarbeitstage vor Zahltag" geschätzt (Schweizer
+// Standard: Ex-Tag, Record Date, Zahltag; Feiertage unberücksichtigt). Im ePortal
+// wird er nicht abgefragt; angezeigt wird er nur, wenn er das Ergebnis ändern
+// kann (Kauf/Verkauf kurz vor der Fälligkeit, siehe exDateMatters).
 
 import { getState } from "../../store/store.js";
 import { parseBrokerStatement } from "../../lib/parseBrokerStatement.js";
@@ -74,6 +76,18 @@ function setPaymentDate(dist, paymentDate) {
 
 /** Name nach SIX-Konvention bzw. wie im Bestand erfasst (util/shareNames.js), sonst der aus dem PDF */
 const canonicalName = (isin, parsedName) => shareNames(transactions).nameFor(isin) || parsedName;
+
+/**
+ * Der Ex-Tag wird im ePortal nicht abgefragt, bestimmt aber den Bestand am
+ * Stichtag. Er ändert das Ergebnis nur, wenn die Aktie kurz vor der Fälligkeit
+ * gekauft oder verkauft wurde - nur dann wird er zur Prüfung angezeigt.
+ */
+function exDateMatters(dist) {
+  if (!dist.paymentDate || !dist.isin) return false;
+  return transactions.some(
+    (t) => t.isin === dist.isin && t.tradeDate && t.tradeDate <= dist.paymentDate && daysBetween(t.tradeDate, dist.paymentDate) <= 10
+  );
+}
 
 const daysBetween = (a, b) => (new Date(b) - new Date(a)) / 86400000;
 
@@ -230,9 +244,9 @@ function render(container, reclaimCase) {
       ${
         dists.length
           ? `<div class="ch-table-wrap"><table class="ch-dist-table">
-              <thead><tr><th>Aktie</th><th>Fälligkeit</th><th>Ex-Tag</th><th class="num">Brutto/Aktie</th><th class="num">Bestand am Stichtag</th><th>Tax Voucher</th><th>Abgleich</th><th class="num">Erstattung</th><th></th></tr></thead>
+              <thead><tr><th>Aktie</th><th>Fälligkeit</th><th class="num">Brutto/Aktie</th><th class="num">Bestand am Stichtag</th><th>Tax Voucher</th><th>Abgleich</th><th class="num">Erstattung</th><th></th></tr></thead>
               <tbody>${dists.map((d) => distributionRow(d, byId[d.distributionId], isinNames)).join("")}</tbody>
-              <tfoot><tr><td colspan="7"><b>Voraussichtliche Erstattung (20 % der Bruttodividende)</b></td><td class="num"><b>${formatChf(total)}</b></td><td></td></tr></tfoot>
+              <tfoot><tr><td colspan="6"><b>Voraussichtliche Erstattung (20 % der Bruttodividende)</b></td><td class="num"><b>${formatChf(total)}</b></td><td></td></tr></tfoot>
             </table></div>`
           : `<div class="card-body"><p class="ch-empty">Noch keine Dividenden erfasst. Laden Sie oben Ihre Tax Voucher hoch.</p></div>`
       }
@@ -260,7 +274,7 @@ function render(container, reclaimCase) {
       <summary>Warum mehrere Tax Voucher für eine Dividende? Was ist der Stichtag?</summary>
       <div class="help-disclosure-body">
         <p>Manche Banken stellen für eine Dividende mehrere Voucher aus (z.B. 20 und 5 Stück). Entscheidend ist, dass die <b>Summe</b> dem Bestand am Stichtag entspricht. Weicht sie ab, fehlt entweder ein Voucher oder eine Kauf-/Verkaufsabrechnung in Schritt 2.</p>
-        <p><b>Stichtag:</b> Anspruch hat, wer die Aktie am Ende des Handelstags vor dem Ex-Tag hält. Der Dividendentermin steht auf dem Voucher nur als Bild – DivRebound übernimmt ihn aus der Dividendenabrechnung, oder Sie tragen ihn ein. Ein vorgeschlagener Ex-Tag (2 Bankarbeitstage vor dem Zahltag) ist als „berechnet“ markiert; bitte mit der Dividendenabrechnung abgleichen.</p>
+        <p><b>Stichtag:</b> Anspruch hat, wer die Aktie am Ende des Handelstags vor dem Ex-Tag hält. Der Dividendentermin steht auf dem Voucher nur als Bild – DivRebound übernimmt ihn aus der Dividendenabrechnung, oder Sie tragen ihn ein. Den Ex-Tag müssen Sie im ePortal nicht angeben; DivRebound braucht ihn nur, um den Bestand am Stichtag zu berechnen. Er wird aus der Dividendenabrechnung übernommen oder geschätzt und nur dann zur Prüfung angezeigt, wenn Sie kurz vor der Fälligkeit gekauft oder verkauft haben.</p>
       </div>
     </details>
 
@@ -293,9 +307,16 @@ function distributionRow(d, result, isinNames) {
   return `
     <tr class="${barred ? "ch-row-barred" : ""}">
       <td>${isinCell}</td>
-      <td><input class="field-input ch-cell-input" type="date" data-dist="${id}" data-prop="paymentDate" data-focus-key="${id}-pay" value="${esc(d.paymentDate ?? "")}"></td>
-      <td><input class="field-input ch-cell-input" type="date" data-dist="${id}" data-prop="exDate" data-focus-key="${id}-ex" value="${esc(d.exDate ?? "")}">
-        ${d.exDateDerived ? '<div class="ch-sub" title="2 Bankarbeitstage vor dem Zahltag – bitte prüfen">berechnet</div>' : ""}</td>
+      <td><input class="field-input ch-cell-input" type="date" data-dist="${id}" data-prop="paymentDate" data-focus-key="${id}-pay" value="${esc(d.paymentDate ?? "")}">
+        ${
+          exDateMatters(d)
+            ? `<div class="ch-exdate">
+                <label class="ch-sub" for="ex-${id}">Ex-Tag${d.exDateDerived ? " (geschätzt)" : ""}</label>
+                <input id="ex-${id}" class="field-input ch-cell-input" type="date" data-dist="${id}" data-prop="exDate" data-focus-key="${id}-ex" value="${esc(d.exDate ?? "")}">
+                <div class="ch-exdate-hint">Kauf/Verkauf kurz vor der Fälligkeit – Ex-Tag bitte prüfen</div>
+              </div>`
+            : ""
+        }</td>
       <td class="num"><input class="field-input ch-cell-input ch-cell-num" inputmode="decimal" data-dist="${id}" data-prop="grossPerShare" data-focus-key="${id}-gross" placeholder="CHF" value="${d.grossPerShare === null ? "" : esc(d.grossPerShare.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 4 }))}"></td>
       <td class="num">${result && !incomplete ? result.heldQuantity : "–"}</td>
       <td>${d.vouchers.map((v) => `<span class="ch-chip" title="${esc(v.fileName)}">${v.quantity ?? "?"} Stk.</span>`).join("") || '<span class="ch-sub">–</span>'}</td>

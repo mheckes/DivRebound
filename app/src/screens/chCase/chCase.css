@@ -548,3 +548,17 @@
     padding: 3px 6px;
   }
 }
+
+/* Ex-Tag nur bei Kauf/Verkauf kurz vor der Fälligkeit (step3Dividends.js) */
+#divrebound-app .ch-exdate {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+#divrebound-app .ch-exdate-hint {
+  font-size: 10.5px;
+  color: #8a5a00;
+  max-width: 180px;
+  line-height: 1.35;
+}
