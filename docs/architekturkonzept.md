@@ -176,14 +176,14 @@ Neue Seite später (z. B. „Korridore" oder „FAQ") = neue Markdown-Datei + ei
 | Website → App | Header rechts, außerdem Hero und Abschluss-Band | Button „Zur DivRebound App" |
 | App → Website | Inhaltsbereich der App, oben rechts in der Kopfzeile (gleiche Position wie der CTA auf der Website, gespiegelt) | Button „← Zur Website" |
 | App → Rechtliches | Fuß der Seitenleiste, immer sichtbar | Links Über mich · Impressum · Datenschutz |
-| Website → App (zurückkehrend) | Header rechts | Button wechselt zu „Zurück zur App", sobald die App schon einmal geöffnet wurde |
+| Website → App (zurückkehrend) | Header rechts | Gleicher Button „Zur DivRebound App" (kein Wechsel) |
 
 **Regeln**
 1. **Logo-Verhalten:** Auf der Website führt das Logo zur Startseite. In der App führt es zur App-Startseite (Home). Das entspricht der üblichen Erwartung in Anwendungen.
 2. **Gleiche Optik an der Übergangsstelle:** Header der Website und Seitenleiste der App sind beide Navy, das Logo steht beide Male oben links. Der Wechsel wirkt dadurch wie ein Umschalten innerhalb eines Produkts.
 3. **Impressum immer erreichbar:** Die Pflichtangaben müssen von jeder Seite leicht erreichbar sein, auch aus der App. Deshalb stehen die Links im Fuß der Seitenleiste (kein Rechtsrat, bitte prüfen lassen).
 4. **Kein Datenverlust beim Wechsel:** Website und App liegen auf derselben Origin (GitHub Pages, gleiches Repo). IndexedDB bleibt beim Wechsel erhalten. Offene Fälle gehen nicht verloren.
-5. **Zurück zur App:** Die App setzt beim Öffnen einen Marker in `localStorage` (z. B. `divrebound.lastVisit`, optional mit letztem Fall und Schritt). Die Website liest ihn und schaltet den CTA auf „Zurück zur App". Optional kann der Link direkt in den letzten Schritt springen.
+5. **CTA-Beschriftung:** Der Button heißt immer „Zur DivRebound App" – kein Wechsel für wiederkehrende Besucher (Entscheidung 14.10.2026), daher auch kein Marker im `localStorage`.
 6. **Routing in der App:** Hash-Routing (`/app/#/dk/2026-09/schritt-1`) statt History-API. GitHub Pages kennt keine serverseitigen Rewrites, Deep Links wären sonst 404. Der Zurück-Button des Browsers springt so zwischen den App-Schritten und verlässt die App nicht unerwartet.
 7. **Eine Quelle für Links:** Die Website-Links in der App (Über mich, Impressum, Datenschutz, Startseite) kommen aus einer gemeinsamen Datei (`/assets/js/site-links.js` oder `_data/nav.yml`, in die App gespiegelt), damit neue Seiten an einer Stelle gepflegt werden.
 
@@ -218,7 +218,7 @@ Der Prototyp zeigt A in der App-Ansicht. „Neues markieren" im schwarzen Protot
 
 ### Startseite im Detail (Referenz: Prototyp)
 
-1. **Header** (Navy): Logo links, mittig Startseite · Über mich · CTA „Zur DivRebound App". Nach einem App-Besuch steht im CTA „Zurück zur App".
+1. **Header** (Navy): Logo links, mittig Startseite · Über mich · CTA „Zur DivRebound App".
 2. **Hero** (Navy-Karte): Eyebrow „Quellensteuer-Erstattung · automatisiert", Headline „Fair play for your *dividends*.", Subline zur Dividendenabrechnung, CTAs „Abrechnung hochladen" (primär) und „Wie es funktioniert →" (sekundär), drei Kennzahlen:
    - „bis zu 30 %" Quellensteuer rückforderbar, abhängig vom Land
    - „3 Schritte" Rückerstattung in wenigen Klicks, intuitive Anleitung, kein Vorwissen nötig
@@ -308,7 +308,7 @@ Du hast in den Vorgaben nur „Impressum" genannt. Da die Seite (a) an Privatper
 
 1. Jekyll-Grundgerüst aufsetzen (`_config.yml` mit `baseurl`, `_layouts/default.html`, `_includes/header.html` + `footer.html`, `_data/nav.yml`)
 2. `assets/css/tokens.css` mit der Farbpalette aus Abschnitt 3 anlegen und in Website und App einbinden
-3. Header (Navy, Menüpunkte und CTA mittig, CTA-Zustand „Zurück zur App" über `localStorage`) und Footer nach Prototyp bauen
+3. Header (Navy, Menüpunkte und CTA mittig, CTA immer „Zur DivRebound App") und Footer nach Prototyp bauen
 4. Startseite (`index.md`) nach Blueprint aus Abschnitt 5 bauen, Texte und Layout aus dem Prototyp übernehmen
 5. `_data/countries.yml` aus Abschnitt 5a anlegen, daraus Länder-Tabelle, Europakarte und Länderkarten rendern (Liquid). Karte als `assets/img/europa-karte.svg`
 6. `ueber-mich.md` nach Abschnitt 5b (Text und Foto aus dem Prototyp), `impressum.md` und `datenschutz.md` als einfache Content-Seiten anlegen (Platzhaltertexte, wo Inhalt noch fehlt)

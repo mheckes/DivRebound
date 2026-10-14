@@ -24,7 +24,7 @@ Website und App werden über GitHub Pages ausgeliefert (GitHub Inc.). Beim Aufru
 
 ## Cookies, Schriften und Analyse-Tools
 
-Es werden keine Cookies und keine Analyse- oder Tracking-Tools eingesetzt. Schriftarten werden von dieser Website selbst ausgeliefert, nicht von Google. Im lokalen Speicher deines Browsers wird nur vermerkt, ob du die App schon einmal geöffnet hast, damit die Website „Zurück zur App" anzeigen kann.
+Es werden keine Cookies und keine Analyse- oder Tracking-Tools eingesetzt. Schriftarten werden von dieser Website selbst ausgeliefert, nicht von Google.
 
 ## Rechte der betroffenen Person
 

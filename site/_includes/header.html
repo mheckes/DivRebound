@@ -9,6 +9,6 @@
       <a href="{{ item.url }}"{% if page.url == item.url %} class="active" aria-current="page"{% endif %}>{{ item.title }}</a>
       {%- endfor %}
     </div>
-    <a class="btn-cta" href="{{ nav.cta.url }}" data-app-cta data-returning="{{ nav.cta.titleReturning }}">{{ nav.cta.title }}</a>
+    <a class="btn-cta" href="{{ nav.cta.url }}" data-app-cta>{{ nav.cta.title }}</a>
   </nav>
 </header>

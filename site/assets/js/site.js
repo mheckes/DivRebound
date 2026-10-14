@@ -10,16 +10,6 @@
     return;
   }
 
-  // Die App setzt beim Start divrebound.lastVisit (siehe app/src/main.js).
-  // Wer schon einmal in der App war, sieht im Header "Zurück zur App".
-  try {
-    if (cta && localStorage.getItem("divrebound.lastVisit")) {
-      cta.textContent = cta.getAttribute("data-returning");
-    }
-  } catch (e) {
-    // localStorage gesperrt (z.B. privater Modus mit strengen Einstellungen): Standardtext bleibt.
-  }
-
   // Europakarte: Hover verknüpft Land in der Karte, Beschriftung und Länderkarte.
   document.querySelectorAll("[data-c]").forEach(function (el) {
     var c = el.getAttribute("data-c");

@@ -117,14 +117,6 @@ route("#/dk/:caseId/step2/cheatsheet", async (p) => {
 });
 
 async function bootstrap() {
-  // Marker für die Website: Wer die App schon einmal geöffnet hat, sieht dort
-  // im Header "Zurück zur App" statt "Zur DivRebound App" (site/assets/js/site.js).
-  try {
-    localStorage.setItem("divrebound.lastVisit", new Date().toISOString());
-  } catch {
-    // localStorage gesperrt: Website zeigt dann einfach den Standardtext.
-  }
-
   mountSidebar(sidebarRoot);
 
   // Gespeichert wird automatisch beim Verlassen eines Felds (util/autosave.js) -

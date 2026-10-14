@@ -3,7 +3,7 @@
     { "title": "Startseite", "url": "/" },
     { "title": "Über mich", "url": "/ueber-mich/" }
   ],
-  "cta": { "title": "Zur DivRebound App", "titleReturning": "Zurück zur App", "url": "/app/" },
+  "cta": { "title": "Zur DivRebound App", "url": "/app/" },
   "footer": [
     { "title": "Impressum", "url": "/impressum/" },
     { "title": "Datenschutz", "url": "/datenschutz/" },
