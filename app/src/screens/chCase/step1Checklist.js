@@ -4,7 +4,8 @@
 // automatisch gespeichert (components/checklist.js). Käufe/Verkäufe aus dem
 // Wertpapierbestand, alles andere aus dem Fall.
 
-import { getState } from "../../store/store.js";
+import { getState, setState } from "../../store/store.js";
+import * as profileRepo from "../../db/profileRepo.js";
 import { navigate } from "../../router/router.js";
 import { formatDateDe } from "../../util/format.js";
 import { openGuideModal } from "../../components/guideModal.js";
@@ -12,7 +13,7 @@ import {
   PROFILE_ITEM, profileRow, textRow, setRowState, updateChecklistSummary, bindChecklistAutosave, AUTOSAVE_ROW,
 } from "../../components/checklist.js";
 import { chStepRoute } from "../../config/caseSteps.js";
-import { corridor, saveCase, loadTransactions, stepHeader, stepNavHtml, bindStepNav } from "./chShared.js";
+import { corridor, loadTransactions, stepHeader, stepNavHtml, bindStepNav } from "./chShared.js";
 
 const PROFILE_ITEMS = ["name", "address", "birthDate", "tin", "taxNumber", "taxOffice", "contact", "bank"].map((k) => PROFILE_ITEM[k]);
 
@@ -23,7 +24,15 @@ export async function mount(container, reclaimCase) {
   return bindChecklistAutosave(container);
 }
 
+/**
+ * "ePortal-Zugang vorhanden" gehört zum Nutzer, nicht zum einzelnen Fall:
+ * einmal abgehakt, gilt es für alle weiteren DivRebounds (profile.chPortalAccess).
+ * Ältere Fälle hatten den Haken im Fall gespeichert - der zählt weiterhin.
+ */
+const hasPortalAccess = (profile, reclaimCase) => Boolean(profile.chPortalAccess ?? reclaimCase.ch.portalAccess);
+
 function render(container, reclaimCase, profile, transactions) {
+  const portalAccess = hasPortalAccess(profile, reclaimCase);
   const lastTx = [...transactions].filter((t) => t.tradeDate).sort((a, b) => b.tradeDate.localeCompare(a.tradeDate))[0];
 
   container.innerHTML = `
@@ -36,12 +45,12 @@ function render(container, reclaimCase, profile, transactions) {
 
       <div class="ch-check-group">Zugang</div>
       ${textRow(
-        reclaimCase.ch.portalAccess ? "ok" : "check",
+        portalAccess ? "ok" : "check",
         "ePortal-Zugang",
-        "Eigenes Konto bei eportal.admin.ch. Noch keins? Mit der Anleitung in wenigen Minuten angelegt.",
+        "Eigenes Konto bei eportal.admin.ch.",
         `<a class="btn-secondary btn-small" href="${corridor.onlinePortalUrl}" target="_blank" rel="noopener">ePortal öffnen ↗</a>
          <button class="btn-secondary btn-small" data-guide="account" type="button">Anleitung</button>
-         <label class="ch-check-toggle"><input type="checkbox" data-portal-access ${reclaimCase.ch.portalAccess ? "checked" : ""}> vorhanden</label>`,
+         <label class="ch-check-toggle"><input type="checkbox" data-portal-access ${portalAccess ? "checked" : ""}> vorhanden</label>`,
         "data-access-item"
       )}
 
@@ -86,8 +95,9 @@ function render(container, reclaimCase, profile, transactions) {
   container.querySelector('[data-guide="account"]').addEventListener("click", () => openGuideModal("account"));
   container.querySelectorAll("[data-go-step]").forEach((btn) => btn.addEventListener("click", () => navigate(chStepRoute(reclaimCase.caseId, Number(btn.dataset.goStep)))));
   container.querySelector("[data-portal-access]").addEventListener("change", async (e) => {
-    reclaimCase.ch.portalAccess = e.target.checked;
-    await saveCase(reclaimCase);
+    const updated = { ...getState().currentProfile, chPortalAccess: e.target.checked };
+    await profileRepo.put(updated);
+    setState({ currentProfile: updated });
     setRowState(container.querySelector("[data-access-item]"), e.target.checked ? "ok" : "check");
     updateChecklistSummary(container);
   });

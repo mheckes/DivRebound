@@ -144,7 +144,7 @@
   border-left: 1.5px solid rgba(255, 255, 255, 0.15);
 }
 #divrebound-app details.nav-case {
-  margin-bottom: 1px;
+  margin-bottom: 3px;
 }
 /* Länderweiter Eintrag über den Fällen, z.B. "Wertpapierbestand" bei der
    Schweiz (gilt für alle Fälle dieses Landes, nicht nur einen). */
@@ -221,7 +221,11 @@
   border-left: 1.5px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  /* Abstand zur hervorgehobenen Fallzeile und zwischen den Schritten, damit
+     sich hinterlegte Zeilen (aktiver Fall, aktueller Schritt) nicht berühren. */
+  gap: 3px;
+  margin-top: 3px;
+  margin-bottom: 6px;
 }
 #divrebound-app .nav-step {
   display: flex;

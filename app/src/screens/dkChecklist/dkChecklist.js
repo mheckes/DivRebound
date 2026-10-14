@@ -56,6 +56,21 @@ export function mount(container) {
       ${textRow("later", "Zeitraum der Ansässigkeit", "Wird aus den Zahltagen Ihrer Abrechnungen abgeleitet – Sie bestätigen ihn nur noch.", `<span class="badge badge-extracted">Schritt 3</span>`)}
     </div>
 
+    <div class="ch-two-col">
+      <div class="card"><div class="card-head"><span class="card-title">Das übernimmt DivRebound</span></div><div class="card-body"><ul class="ch-list">
+        <li>Dividendenabrechnungen auslesen und Erstattung berechnen</li>
+        <li>Wohnsitzbescheinigung (Formular 02.050) ausfüllen</li>
+        <li>Anschreiben ans Finanzamt</li>
+        <li>Spickzettel für das SKAT-Online-Formular</li>
+      </ul></div></div>
+      <div class="card"><div class="card-head"><span class="card-title">Das machen Sie selbst</span></div><div class="card-body"><ul class="ch-list">
+        <li>Wohnsitzbescheinigung ausdrucken und unterschreiben</li>
+        <li>Beim Finanzamt bestätigen lassen</li>
+        <li>Angaben ins SKAT-Formular übertragen</li>
+        <li>Bestätigte Bescheinigung dort hochladen und absenden</li>
+      </ul></div></div>
+    </div>
+
     <div class="ch-step-nav">
       <span></span>
       <button class="btn-primary" data-step-next type="button">Weiter: ${DK_STEPS[1].title} →</button>
