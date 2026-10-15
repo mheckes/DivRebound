@@ -49,7 +49,7 @@ function render(container, reclaimCase, profile, transactions) {
         "ePortal-Zugang",
         "Eigenes Konto bei eportal.admin.ch.",
         `<a class="btn-secondary btn-small" href="${corridor.onlinePortalUrl}" target="_blank" rel="noopener">ePortal öffnen ↗</a>
-         <button class="btn-secondary btn-small" data-guide="account" type="button">Anleitung</button>
+         <button class="btn-secondary btn-small" data-guide="account" type="button" ${portalAccess ? "disabled" : ""} title="${portalAccess ? "Zugang vorhanden – Anleitung nicht nötig" : ""}">Anleitung</button>
          <label class="ch-check-toggle"><input type="checkbox" data-portal-access ${portalAccess ? "checked" : ""}> vorhanden</label>`,
         "data-access-item"
       )}
@@ -99,6 +99,10 @@ function render(container, reclaimCase, profile, transactions) {
     await profileRepo.put(updated);
     setState({ currentProfile: updated });
     setRowState(container.querySelector("[data-access-item]"), e.target.checked ? "ok" : "check");
+    // Mit vorhandenem Zugang wird die Anleitung nicht mehr gebraucht.
+    const guideBtn = container.querySelector('[data-guide="account"]');
+    guideBtn.disabled = e.target.checked;
+    guideBtn.title = e.target.checked ? "Zugang vorhanden – Anleitung nicht nötig" : "";
     updateChecklistSummary(container);
   });
 }

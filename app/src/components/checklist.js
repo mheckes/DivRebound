@@ -8,7 +8,9 @@ import { PROFILE_FIELDS } from "../util/profileFields.js";
 import { confirmedFieldClasses } from "../util/fieldDisplay.js";
 import { bindProfileAutosave } from "../util/autosave.js";
 
-const SYMBOL = { ok: "✓", missing: "!", check: "?", later: "…" };
+// "later" = noch offen, kommt aber erst in einem späteren Schritt: gleiches
+// Zeichen wie "missing", aber grau statt rot (siehe .ch-state.later).
+const SYMBOL = { ok: "✓", missing: "!", check: "?", later: "!" };
 
 function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);

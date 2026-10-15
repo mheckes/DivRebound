@@ -122,6 +122,11 @@
   cursor: pointer;
   font-family: var(--font-body);
 }
+#divrebound-app .btn-secondary:disabled {
+  color: var(--stone);
+  background: var(--bg);
+  cursor: not-allowed;
+}
 #divrebound-app .btn-accent {
   background: var(--cyan);
   color: var(--charcoal);
