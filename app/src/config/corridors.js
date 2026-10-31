@@ -40,4 +40,22 @@ export const corridors = {
     isinPrefix: "CH",
     nativeCurrency: "CHF",
   },
+  IT: {
+    targetCountry: "IT",
+    // Vorerst nur deutsche Ansässige (DBA DE-IT, Art. 10). docs/konzept-italien.md
+    residencyCountries: ["DE"],
+    // Nur Papier: Form A ausfüllen, Finanzamt bestätigt, per Post nach Pescara.
+    flow: "form+mail",
+    formId: "FORM_A",
+    // Zeilen der Tabelle auf Seite 4; mehr Ausschüttungen -> weiteres Form A
+    maxDistributionsPerForm: 4,
+    // 48 Monate ab Steuerabzug
+    limitationPeriodYears: 4,
+    standardWithholdingRate: 0.26,
+    treatyRateByResidence: { DE: 0.15 },
+    treatyArticle: 10,
+    isinPrefix: "IT",
+    nativeCurrency: "EUR",
+    mailingAddress: ["Agenzia delle Entrate", "Centro Operativo di Pescara", "Via Rio Sparto 21", "65129 Pescara", "Italy"],
+  },
 };

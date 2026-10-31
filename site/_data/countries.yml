@@ -22,7 +22,7 @@
 - {name: Österreich, rate: 27.5, creditable: 15,   potential: 12.5, status: no}
 - {name: Frankreich, rate: 25,   creditable: 12.8, potential: 12.2, status: no}
 - {name: Dänemark,   rate: 27,   creditable: 15,   potential: 12,   status: live,    code: DK, companies: [Novo Nordisk, Maersk, Carlsberg]}
-- {name: Italien,    rate: 26,   creditable: 15,   potential: 11,   status: planned, code: IT, companies: [Enel, Generali, Eni, UniCredit]}
+- {name: Italien,    rate: 26,   creditable: 15,   potential: 11,   status: live,    code: IT, companies: [Enel, Generali, Eni, UniCredit]}
 - {name: Kanada,     rate: 25,   creditable: 15,   potential: 10,   status: planned}
 - {name: Norwegen,   rate: 25,   creditable: 15,   potential: 10,   status: planned}
 - {name: Südkorea,   rate: 20,   creditable: 15,   potential: 5,    status: planned}

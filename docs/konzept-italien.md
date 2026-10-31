@@ -1,6 +1,6 @@
 # DivRebound — Konzept Corridor Italien (Ritenuta sui dividendi)
 
-**Status:** In Abstimmung (Stand 30.10.2026, nach Antworten zum ersten Entwurf)
+**Status:** Umgesetzt (Stand 31.10.2026). Unternehmensliste `config/italianShares.js` startet mit 5 belegten Einträgen.
 **Vorbild für Ablauf und Screens:** Dänemark (Formular → Finanzamt → Einreichung). Von der Schweiz werden nur zwei Bausteine übernommen: die Gliederung dieses Dokuments und die Idee einer gepflegten Aktienliste (`swissShares.js`).
 **Ziel dieses Dokuments:** Grundlage für die Implementierung des dritten Ziellands. Beschreibt den Papier-Ablauf mit Form A, was DivRebound pro Schritt beiträgt, das Feld-Mapping für das Formular, die Erweiterungen am Datenmodell und eine Aufgabenliste.
 **Referenzfall:** Antrag Italmobiliare S.p.A. (IT0005253205), Zahltage 08.05.2024 (100 Stück, 3,00 €) und 07.05.2025 (240 Stück, 0,90 €), Erstattung gesamt **56,76 €**. Die Befüllung muss diesen Fall reproduzieren (Vorlage: `2025_IT0005253205_Antrag_Italmobiliare.pdf`, Werte dort als FreeText-Anmerkungen).
@@ -41,7 +41,7 @@
 
 Statuswerte (`ReclaimCase.status`): `draft` → `residency_form_generated` → `awaiting_tax_office` → `ready_for_mailing` → `submitted` (= abgeschlossen, zählt für die Statistik) – analog DK (`ready_for_skat_submission` heißt hier `ready_for_mailing`).
 
-Hinweis zur Dauer: Erstattungen aus Pescara dauern erfahrungsgemäß lange (oft mehrere Jahre). Das sollte in Schritt 5 ehrlich stehen, damit der Fall nicht als „hängend“ empfunden wird.
+Hinweis zur Dauer: Die Bearbeitung in Pescara dauert erfahrungsgemäß viele Monate (beim Referenzfall 9 Monate). Das sollte in Schritt 5 ehrlich stehen, damit der Fall nicht als „hängend“ empfunden wird.
 
 ---
 

@@ -14,7 +14,7 @@ import {
 import { openPassphraseModal, openExportOptionsModal, openInfoModal, openConfirmModal } from "./modal.js";
 import { openNewCaseWizard } from "./newCaseWizard.js";
 import { legalLinks } from "../config/siteLinks.js";
-import { CH_STEPS, chStepRoute, DK_STEPS, dkStepRoute, dkStepFromHash } from "../config/caseSteps.js";
+import { CH_STEPS, chStepRoute, DK_STEPS, dkStepRoute, dkStepFromHash, IT_STEPS, itStepRoute } from "../config/caseSteps.js";
 
 const STATUS_ORDER = [
   "draft",
@@ -85,11 +85,36 @@ function renderSwissCase(reclaimCase, activeCaseId) {
     </details>`;
 }
 
+// Italien: wie Schweiz - erledigt, wenn mit "Weiter" verlassen
+// (reclaimCase.it.stepsDone) bzw. nach Italien versendet.
+function renderItalianCase(reclaimCase, activeCaseId) {
+  const isActive = reclaimCase.caseId === activeCaseId;
+  const currentStep = isActive ? Number(window.location.hash.match(/^#\/it\/[^/]+\/(\d)$/)?.[1] ?? 0) : 0;
+  const done = new Set(reclaimCase.it?.stepsDone ?? []);
+  const completed = Boolean(reclaimCase.it?.mailedAt);
+  return `
+    <details class="nav-case ${isActive ? "active" : ""}" ${isActive ? "open" : ""} data-case-id="${reclaimCase.caseId}">
+      <summary>
+        ${chevron()}
+        <span style="flex:1;">${caseLabel(reclaimCase)}</span>
+        <button class="nav-case-delete" data-action="delete-case" data-case-id="${reclaimCase.caseId}" title="Fall löschen">✕</button>
+      </summary>
+      <div class="nav-steps">
+        ${IT_STEPS.map((s) => {
+          const isDone = completed || done.has(s.n);
+          const cls = s.n === currentStep ? "current" : isDone ? "done" : "";
+          return `<div class="nav-step nav-step-numbered ${cls}" data-nav="${itStepRoute(reclaimCase.caseId, s.n)}"><span class="nav-step-num">${isDone && s.n !== currentStep ? "✓" : s.n}</span>${s.title}</div>`;
+        }).join("")}
+      </div>
+    </details>`;
+}
+
 export function renderSidebar(container) {
   const state = getState();
   const activeCaseId = state.currentCase?.caseId ?? null;
   const dkCases = state.cases.filter((c) => c.targetCountry === "DK");
   const chCases = state.cases.filter((c) => c.targetCountry === "CH");
+  const itCases = state.cases.filter((c) => c.targetCountry === "IT");
 
   container.innerHTML = `
     <div class="sidebar-brand">
@@ -136,8 +161,11 @@ export function renderSidebar(container) {
           ${chCases.map((c) => renderSwissCase(c, activeCaseId)).join("")}
         </div>
       </details>
-      <details class="nav-country disabled">
-        <summary>${chevron()} Italien <span class="tree-stub-tag">bald</span></summary>
+      <details class="nav-country" open>
+        <summary>${chevron()} Italien</summary>
+        <div class="nav-case-group">
+          ${itCases.map((c) => renderItalianCase(c, activeCaseId)).join("")}
+        </div>
       </details>
     </div>
 

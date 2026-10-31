@@ -5,6 +5,9 @@ import * as profileRepo from "../../db/profileRepo.js";
 import { parseDividendCertificate } from "../../lib/parseDividendCertificate.js";
 import { corridors } from "../../config/corridors.js";
 import { isinMatchesCorridor, isDuplicateDistribution } from "../../util/validate.js";
+// Name/Adresse aus der Abrechnung ins Profil - ohne das bliebe applicantSnapshot
+// (bei Case-Anlage aus dem damals noch leeren Profil kopiert) dauerhaft leer.
+import { applyProfileHints } from "../../util/profileHints.js";
 import { formatNumberDe, parseNumberDe, formatDateDe } from "../../util/format.js";
 
 const APPROX_EUR_DKK_RATE = 7.46; // grobe Näherung, wie im Mockup - keine externe FX-Anbindung im MVP
@@ -30,30 +33,6 @@ async function persistCase(reclaimCase) {
     currentCase: reclaimCase,
     cases: state.cases.map((c) => (c.caseId === reclaimCase.caseId ? reclaimCase : c)),
   });
-}
-
-// Trägt Name/Adresse aus dem Adressblock der Abrechnung (profileHints) ins
-// Profil ein - nur für Felder, die dort noch leer sind (nie ein vom Nutzer
-// bereits gesetztes Feld überschreiben). Ohne das bliebe applicantSnapshot
-// (bei Case-Anlage aus dem damals noch leeren Profil kopiert) dauerhaft leer,
-// da es sonst nirgends im Wizard eine Gelegenheit gibt, Name/Adresse einzutragen.
-function applyProfileHints(profile, hints) {
-  if (!hints) return false;
-  const map = {
-    firstName: hints.firstName,
-    lastName: hints.lastName,
-    address: hints.address,
-    postalCode: hints.postalCode,
-    city: hints.city,
-  };
-  let changed = false;
-  for (const [field, value] of Object.entries(map)) {
-    if (value && !profile.residence[field]) {
-      profile.residence[field] = value;
-      changed = true;
-    }
-  }
-  return changed;
 }
 
 async function handleFiles(container, fileList) {

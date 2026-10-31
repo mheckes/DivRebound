@@ -11,7 +11,7 @@ import { navigate } from "../../router/router.js";
 import { corridors } from "../../config/corridors.js";
 import { formatNumberDe } from "../../util/format.js";
 import { openNewCaseWizard } from "../../components/newCaseWizard.js";
-import { CH_STEPS, chStepRoute } from "../../config/caseSteps.js";
+import { CH_STEPS, chStepRoute, IT_STEPS, itStepRoute } from "../../config/caseSteps.js";
 
 const STATUS_LABELS = {
   draft: "In Bearbeitung — Ausschüttungen erfassen",
@@ -29,17 +29,28 @@ function nextSwissStep(reclaimCase) {
   return CH_STEPS.find((s) => !done.has(s.n)) ?? CH_STEPS[CH_STEPS.length - 1];
 }
 
+// Italien: wie Schweiz, abgeschlossen = nach Italien versendet.
+function nextItalianStep(reclaimCase) {
+  if (reclaimCase.it?.mailedAt) return IT_STEPS[IT_STEPS.length - 1];
+  const done = new Set(reclaimCase.it?.stepsDone ?? []);
+  return IT_STEPS.find((s) => !done.has(s.n)) ?? IT_STEPS[IT_STEPS.length - 1];
+}
+
 function statusLabel(reclaimCase) {
   if (reclaimCase.targetCountry === "CH") {
     return reclaimCase.ch?.completedAt ? "Abgeschlossen" : `Schritt ${nextSwissStep(reclaimCase).n}: ${nextSwissStep(reclaimCase).title}`;
   }
+  if (reclaimCase.targetCountry === "IT") {
+    return reclaimCase.it?.mailedAt ? "Abgeschlossen" : `Schritt ${nextItalianStep(reclaimCase).n}: ${nextItalianStep(reclaimCase).title}`;
+  }
   return STATUS_LABELS[reclaimCase.status] ?? reclaimCase.status;
 }
 
-const COUNTRY_LABELS = { DK: "Dänemark", CH: "Schweiz" };
+const COUNTRY_LABELS = { DK: "Dänemark", CH: "Schweiz", IT: "Italien" };
 
 function continueRoute(reclaimCase) {
   if (reclaimCase.targetCountry === "CH") return chStepRoute(reclaimCase.caseId, nextSwissStep(reclaimCase).n);
+  if (reclaimCase.targetCountry === "IT") return itStepRoute(reclaimCase.caseId, nextItalianStep(reclaimCase).n);
   switch (reclaimCase.status) {
     case "residency_form_generated":
     case "awaiting_tax_office":
@@ -77,9 +88,13 @@ function render(container) {
   const allCases = state.cases;
   const cases = allCases.filter((c) => c.targetCountry === "DK");
   const swissCases = allCases.filter((c) => c.targetCountry === "CH");
-  const completedCount = cases.filter((c) => c.status === "submitted").length + swissCases.filter((c) => c.ch?.completedAt).length;
+  const italianCases = allCases.filter((c) => c.targetCountry === "IT");
+  const completedCount =
+    cases.filter((c) => c.status === "submitted").length + swissCases.filter((c) => c.ch?.completedAt).length + italianCases.filter((c) => c.it?.mailedAt).length;
   // Tatsächlich erhaltene Erstattungen (optional im letzten Schritt eingetragen)
-  const receivedEur = swissCases.reduce((sum, c) => sum + (Number(String(c.ch?.receivedRefund?.amountEur ?? "").replace(",", ".")) || 0), 0);
+  const amount = (refund) => Number(String(refund?.amountEur ?? "").replace(/\./g, "").replace(",", ".")) || 0;
+  const receivedEur =
+    swissCases.reduce((sum, c) => sum + amount(c.ch?.receivedRefund), 0) + italianCases.reduce((sum, c) => sum + amount(c.it?.receivedRefund), 0);
   const corridor = corridors.DK;
 
   const totalRefund = profile
@@ -132,7 +147,7 @@ function render(container) {
         <div class="home-tile-desc">
           ${allCases.length} DivRebound${allCases.length === 1 ? "" : "s"} angelegt, davon ${completedCount} abgeschlossen<br>
           ${cases.length ? `${formatNumberDe(totalRefund)} DKK bestätigte Erstattung Dänemark<br>` : ""}
-          ${receivedEur ? `${formatNumberDe(receivedEur)} EUR erhalten (Schweiz)` : ""}
+          ${receivedEur ? `${formatNumberDe(receivedEur)} EUR erhalten (Schweiz, Italien)` : ""}
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ import "./screens/cheatSheet/cheatSheet.css";
 import "./screens/profile/profile.css";
 import "./screens/holdings/holdings.css";
 import "./screens/chCase/chCase.css";
+import "./screens/itCase/itCase.css";
 import "./components/statusTimeline.css";
 
 import * as pdfjsLib from "pdfjs-dist";
@@ -42,6 +43,7 @@ import * as coverLetter from "./screens/coverLetter/coverLetter.js";
 import * as holdingsScreen from "./screens/holdings/holdings.js";
 import * as chCase from "./screens/chCase/chCase.js";
 import * as dkChecklist from "./screens/dkChecklist/dkChecklist.js";
+import * as itCase from "./screens/itCase/itCase.js";
 
 import { websiteHome } from "./config/siteLinks.js";
 
@@ -90,6 +92,10 @@ route("#/ch/bestand", () => mountScreen(holdingsScreen, {}));
 route("#/ch/:caseId/:step", async (p) => {
   await ensureCaseSelected(p.caseId);
   mountScreen(chCase, p);
+});
+route("#/it/:caseId/:step", async (p) => {
+  await ensureCaseSelected(p.caseId);
+  mountScreen(itCase, p);
 });
 route("#/dk/:caseId/checklist", async (p) => {
   await ensureCaseSelected(p.caseId);

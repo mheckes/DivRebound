@@ -34,7 +34,7 @@ const MARGIN_TOP = 62;
 const BODY_SIZE = 10.5;
 const LINE_GAP = 14.5;
 
-function wrapLines(text, font, size, maxWidth) {
+export function wrapLines(text, font, size, maxWidth) {
   const words = text.split(" ");
   const lines = [];
   let line = "";

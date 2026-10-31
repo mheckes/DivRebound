@@ -32,6 +32,9 @@ export const PROFILE_ITEM = {
   contact: { label: "Kontakt", fields: [["email", "E-Mail"], ["phone", "Telefon inkl. Ländervorwahl"]] },
   bank: { label: "Bankverbindung", fields: [["iban", "IBAN", "mono wide"], ["accountHolderName", "Kontoinhaber"]] },
   bic: { label: "BIC", fields: [["bic", "BIC / SWIFT", "mono"]] },
+  bankName: { label: "Name der Bank", fields: [["bankName", "z.B. Commerzbank AG", "wide"]] },
+  bankAddress: { label: "Adresse der Bank", fields: [["bankAddress", "z.B. Kaiserplatz, 60311 Frankfurt am Main", "wide"]] },
+  email: { label: "E-Mail", fields: [["email", "E-Mail", "wide"]] },
 };
 
 export const isItemFilled = (profile, item) => item.fields.every(([key]) => PROFILE_FIELDS[key].read(profile).trim() !== "");
@@ -50,8 +53,8 @@ export function textRow(state, label, text, actionsHtml = "", attrs = "") {
   return checklistRow(state, label, `<span class="ch-check-text">${text}</span>`, actionsHtml, attrs);
 }
 
-/** Zeile mit direkt bearbeitbaren Profilfeldern */
-export function profileRow(profile, item) {
+/** Direkt bearbeitbare Profilfelder einer Zeile (gespeichert über data-field) */
+export function profileInputsHtml(profile, item) {
   const inputs = item.fields
     .map(([key, placeholder, extra = ""]) => {
       const value = PROFILE_FIELDS[key].read(profile);
@@ -60,13 +63,23 @@ export function profileRow(profile, item) {
     })
     .join("");
   const errors = item.fields.map(([key]) => `<span class="field-error" data-error-for="${key}" hidden></span>`).join("");
+  return `<div class="ch-inline-fields">${inputs}</div>${errors}`;
+}
+
+/** Zeile mit direkt bearbeitbaren Profilfeldern */
+export function profileRow(profile, item) {
   return checklistRow(
     isItemFilled(profile, item) ? "ok" : "missing",
     item.label,
-    `<div class="ch-inline-fields">${inputs}</div>${errors}`,
+    profileInputsHtml(profile, item),
     "",
     `data-profile-item="${Object.keys(PROFILE_ITEM).find((k) => PROFILE_ITEM[k] === item) ?? ""}"`
   );
+}
+
+/** Wie profileRow, aber optional: leer = grau ("later") statt rot */
+export function optionalProfileRow(profile, item) {
+  return checklistRow(isItemFilled(profile, item) ? "ok" : "later", item.label, profileInputsHtml(profile, item), "", `data-optional-item="${Object.keys(PROFILE_ITEM).find((k) => PROFILE_ITEM[k] === item) ?? ""}"`);
 }
 
 export const AUTOSAVE_ROW = `<div class="ch-autosave-row autosave-note">✓ Zum Ändern ins Feld klicken – Änderungen werden automatisch in Ihren persönlichen Daten gespeichert.</div>`;
@@ -99,6 +112,10 @@ export function bindChecklistAutosave(container, onSaved) {
       container.querySelectorAll("[data-profile-item]").forEach((row) => {
         const item = PROFILE_ITEM[row.dataset.profileItem];
         if (item) setRowState(row, isItemFilled(profile, item) ? "ok" : "missing");
+      });
+      container.querySelectorAll("[data-optional-item]").forEach((row) => {
+        const item = PROFILE_ITEM[row.dataset.optionalItem];
+        if (item) setRowState(row, isItemFilled(profile, item) ? "ok" : "later");
       });
       updateChecklistSummary(container);
       onSaved?.(profile, key);

@@ -70,6 +70,7 @@ export const PROFILE_FIELDS = {
   taxOfficePostalCode: taxOfficeField("postalCode", "PLZ des Finanzamts", { validate: POSTAL_CODE }),
   taxOfficeCity: taxOfficeField("city", "Ort des Finanzamts"),
   bankName: bankField("bankName", "Name der Bank"),
+  bankAddress: bankField("address", "Adresse der Bank"),
   accountHolderName: bankField("accountHolderName", "Kontoinhaber"),
   bic: bankField("bic", "BIC"),
   iban: bankField("iban", "IBAN", {

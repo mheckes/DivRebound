@@ -18,7 +18,7 @@ const RESIDENCE_OPTIONS = [{ code: "DE", label: "Deutschland", available: true }
 const TARGET_OPTIONS = [
   { code: "DK", label: "Dänemark", available: true },
   { code: "CH", label: "Schweiz", available: true },
-  { code: "IT", label: "Italien", available: false },
+  { code: "IT", label: "Italien", available: true },
 ];
 
 function mountOverlay(innerHtml) {
@@ -122,7 +122,8 @@ export function openNewCaseWizard() {
       setState({ cases: [...getState().cases, reclaimCase], currentCase: reclaimCase });
 
       close({ profile, reclaimCase });
-      navigate(targetCountry === "CH" ? `#/ch/${reclaimCase.caseId}/1` : `#/dk/${reclaimCase.caseId}/checklist`);
+      const firstStep = { CH: `#/ch/${reclaimCase.caseId}/1`, IT: `#/it/${reclaimCase.caseId}/1` };
+      navigate(firstStep[targetCountry] ?? `#/dk/${reclaimCase.caseId}/checklist`);
     });
   });
 }

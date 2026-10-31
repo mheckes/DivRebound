@@ -64,7 +64,8 @@ function buildBlankProfile() {
       city: "",
       taxOffice: { name: "", street: "", postalCode: "", city: "" },
     },
-    bank: { bankName: "", accountHolderName: "", iban: "", bic: "" },
+    bank: { bankName: "", accountHolderName: "", iban: "", bic: "", address: "" },
+    issuers: {},
     createdAt: now,
     updatedAt: now,
   };
@@ -183,6 +184,9 @@ function render(container, profile) {
         <div class="field-grid">
           ${field(profile, "bic", "BIC / SWIFT", { mono: true })}
           ${field(profile, "iban", "IBAN", { mono: true })}
+        </div>
+        <div class="field-grid">
+          ${field(profile, "bankAddress", "Adresse der Bank", { hint: "optional, für Italien", wide: true, placeholder: "z.B. Kaiserplatz, 60311 Frankfurt am Main" })}
         </div>
         <div class="field-hint">Geben Sie hier ein Konto an, das SEPA-Überweisungen empfangen kann und auf dem Sie Ihre Quellensteuer-Erstattung erhalten wollen.</div>
       </div>

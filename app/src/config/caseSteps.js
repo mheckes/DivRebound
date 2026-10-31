@@ -12,6 +12,18 @@ export const CH_STEPS = [
 
 export const chStepRoute = (caseId, n) => `#/ch/${caseId}/${n}`;
 
+// Italien: Ablauf wie Dänemark, statt SKAT-Portal Versand per Post
+// (docs/konzept-italien.md §1).
+export const IT_STEPS = [
+  { n: 1, title: "Unterlagen prüfen" },
+  { n: 2, title: "Dividendenabrechnungen" },
+  { n: 3, title: "Fehlende Angaben" },
+  { n: 4, title: "Formular & Finanzamt" },
+  { n: 5, title: "Versand nach Italien" },
+];
+
+export const itStepRoute = (caseId, n) => `#/it/${caseId}/${n}`;
+
 // Dänemark: bestehende Routen, neu nummeriert. Schritt 5 umfasst
 // "SKAT-Formular öffnen" (step2/verify) und das Cheat Sheet (step2/cheatsheet).
 export const DK_STEPS = [

@@ -61,7 +61,12 @@ export async function createProfile(residenceCountry) {
       accountHolderName: "",
       iban: "",
       bic: "",
+      // Anschrift der Bank (Form A Italien, Seite 3; optional)
+      address: "",
     },
+    // Angaben zu italienischen Gesellschaften, die nicht in config/italianShares.js
+    // stehen: { [isin]: { taxCode, address } } (optional, Form A Seite 4)
+    issuers: {},
     createdAt: now,
     updatedAt: now,
   };
