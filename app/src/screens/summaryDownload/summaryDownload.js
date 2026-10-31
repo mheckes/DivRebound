@@ -1,19 +1,11 @@
 // Dänemark, Schritt 4 "Formular & Finanzamt" (vormals "Zusammenfassung &
 // Download"): Wohnsitzbescheinigung (Formular 02.050) und Anschreiben erzeugen.
 // Gleicher Aufbau wie bei der Schweiz (docs/konzept-schweiz.md §1a):
-// Status-Zeitleiste, Formular, Anschreiben, nächste Schritte, "Bearbeitung
-// pausiert", Zusammenfassung. Danach wartet der Fall auf die Bestätigung durch
-// das Finanzamt (Medienbruch).
-//
-// Anzeige der Personendaten bewusst NICHT aus reclaimCase.applicantSnapshot,
-// sondern durchgängig aus dem live InvestorProfile: fillResidencyCertificate.js
-// - die tatsächliche PDF-Fill-Logik - liest Name/Adresse/Steuer-ID/Geburtsdatum/
-// -ort/Wohnsitzland selbst ausschließlich aus profile.residence (siehe dortiger
-// Quellcode), nie aus dem Snapshot. Würde diese Zusammenfassung stattdessen den
-// (zum Case-Anlagezeitpunkt oft noch leeren, siehe divrebound_data_schema.md §2)
-// Snapshot anzeigen, widerspräche die Anzeige dem tatsächlich erzeugten PDF.
-// Der Ansässigkeitszeitraum kommt vollständig aus reclaimCase.residencePeriod
-// (case-spezifisch, nicht Teil des Profils).
+// Status-Zeitleiste, Formular (kompakte Zeile mit Vorschau und PDF, wie bei
+// Italien), Anschreiben, nächste Schritte, "Bearbeitung pausiert". Die frühere
+// Zusammenfassung und die Liste der bestätigten Ausschüttungen sind entfallen
+// (wiederholten nur Schritt 2 und 3). Danach wartet der Fall auf die
+// Bestätigung durch das Finanzamt (Medienbruch).
 
 import { getState, setState } from "../../store/store.js";
 import { navigate } from "../../router/router.js";
@@ -21,10 +13,10 @@ import * as caseRepo from "../../db/caseRepo.js";
 import { fillResidencyCertificate, buildFileName } from "../../lib/fillResidencyCertificate.js";
 import { exportEncrypted, exportPlain, triggerJsonDownload } from "../../crypto/exportImport.js";
 import { openExportOptionsModal } from "../../components/modal.js";
-import { corridors } from "../../config/corridors.js";
-import { formatDateDe, formatCurrency, formatNumberDe } from "../../util/format.js";
+import { formatDateDe } from "../../util/format.js";
 import { buildTaxOfficeLetter } from "../../lib/buildTaxOfficeLetter.js";
 import { normalizeTaxOffice } from "../../util/taxOffice.js";
+import { openPdfPreview } from "../../util/pdfPreview.js";
 import { dkTimelineHtml, bindDkTimeline } from "./dkTimeline.js";
 
 // Gleiche Reihenfolge wie in components/sidebar.js - dort nicht exportiert,
@@ -38,24 +30,10 @@ const STATUS_ORDER = [
   "submitted",
 ];
 
-// Nur zur Anzeige einer groben EUR-Näherung neben dem DKK-Erstattungsbetrag,
-// wie schon im Schritt-1-Mockup (Positions-/Jahresübersicht) verwendet.
-const APPROX_EUR_DKK_RATE = 7.46;
-
-const COUNTRY_NAMES_DE = { DE: "Deutschland", AT: "Österreich", CH: "Schweiz" };
-
 function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, (c) => (
     { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
   ));
-}
-
-function countryNameGerman(code) {
-  return COUNTRY_NAMES_DE[code] ?? code ?? "";
-}
-
-function chevronSvg() {
-  return `<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 }
 
 function caseLabel(reclaimCase) {
@@ -68,13 +46,6 @@ function yearLabel(reclaimCase) {
   const years = [...new Set(reclaimCase.distributions.map((d) => d.taxYear))].sort();
   if (years.length === 0) return String(new Date().getFullYear());
   return years.length > 1 ? `${years[0]}-${years[years.length - 1]}` : `${years[0]}`;
-}
-
-function formatResidencePeriod(period) {
-  const from = formatDateDe(period?.from);
-  if (!from) return "–";
-  const until = period?.until ? formatDateDe(period.until) : "andauernd";
-  return `${from} – ${until}`;
 }
 
 function formatDateTimeDe(isoString) {
@@ -100,96 +71,30 @@ function downloadBlob(bytes, fileName, mimeType) {
   URL.revokeObjectURL(url);
 }
 
-function refundForDistribution(distribution, treatyRate) {
-  return distribution.withheldTax - distribution.grossDividend * treatyRate;
+/** Unterzeile der Formular-Zeile; Jahre wie im Dateinamen (buildFileName). */
+function documentSubline(reclaimCase) {
+  const years = [...new Set(reclaimCase.distributions.map((d) => d.taxYear))].sort();
+  const parts = [];
+  if (years.length) parts.push(`${years.length === 1 ? "Steuerjahr" : "Steuerjahre"} ${years.join(", ")}`);
+  const from = formatDateDe(reclaimCase.residencePeriod?.from);
+  if (from) parts.push(`ansässig seit ${from}`);
+  return parts.join(" · ");
 }
 
-function renderDistributionsCard(reclaimCase, profile) {
-  const confirmed = reclaimCase.distributions.filter((d) => d.extractionConfidence !== "extracted");
-  const corridor = corridors[reclaimCase.targetCountry] ?? corridors.DK;
-  const treatyRate = corridor.treatyRateByResidence?.[profile.residence.country] ?? 0.15;
-  const nativeCurrency = corridor.nativeCurrency ?? "DKK";
+function buildLetter(profile) {
+  return buildTaxOfficeLetter(profile, { reference: "Wohnsitzbescheinigung (Formular 02.050) zur Erstattung dänischer Quellensteuer" });
+}
 
-  if (confirmed.length === 0) {
-    return `
-      <details class="card">
-        <summary class="card-head head-navy">
-          <span style="display:flex;align-items:center;">
-            ${chevronSvg()}
-            <span class="card-title">Bestätigte Ausschüttungen</span>
-          </span>
-          <span class="count-pill">0 von ${reclaimCase.distributions.length}</span>
-        </summary>
-        <div class="card-body">
-          <p class="empty-hint">Noch keine bestätigten Ausschüttungen. Bitte in Schritt 2 zuerst mindestens eine Ausschüttung bestätigen.</p>
-        </div>
-      </details>`;
-  }
+function letterFileName(profile, reclaimCase) {
+  return `Anschreiben_Finanzamt_${profile.residence.lastName || "DivRebound"}_Daenemark_${yearLabel(reclaimCase)}.pdf`;
+}
 
-  let totalGross = 0;
-  let totalWithheld = 0;
-  let totalRefund = 0;
-  const rows = confirmed
-    .map((d) => {
-      const refund = refundForDistribution(d, treatyRate);
-      totalGross += d.grossDividend;
-      totalWithheld += d.withheldTax;
-      totalRefund += refund;
-      return `
-        <tr>
-          <td>
-            <div style="font-weight:600;">${esc(d.issuerName)}</div>
-            <div class="mono" style="font-size:10.5px;color:var(--muted);">${esc(d.isin)}</div>
-          </td>
-          <td class="mono">${esc(formatDateDe(d.paymentDate))}</td>
-          <td class="mono">${esc(formatCurrency(d.grossDividend, d.currency))}</td>
-          <td class="mono">${esc(formatCurrency(d.withheldTax, d.currency))}</td>
-          <td class="mono">${esc(formatCurrency(refund, d.currency))}</td>
-        </tr>`;
-    })
-    .join("");
-
-  return `
-    <details class="card">
-      <summary class="card-head head-navy">
-        <span style="display:flex;align-items:center;">
-          ${chevronSvg()}
-          <span class="card-title">Bestätigte Ausschüttungen</span>
-        </span>
-        <span class="count-pill">${confirmed.length} von ${reclaimCase.distributions.length}</span>
-      </summary>
-      <div class="card-body">
-        <div style="overflow-x:auto;">
-          <table class="dist-table">
-            <thead>
-              <tr>
-                <th>ISIN / Emittent</th>
-                <th>Zahltag</th>
-                <th>Brutto</th>
-                <th>Quellensteuer</th>
-                <th>Erstattbar</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows}
-              <tr class="dist-total-row">
-                <td colspan="2">Gesamt</td>
-                <td class="mono">${esc(formatCurrency(totalGross, nativeCurrency))}</td>
-                <td class="mono">${esc(formatCurrency(totalWithheld, nativeCurrency))}</td>
-                <td class="mono">${esc(formatCurrency(totalRefund, nativeCurrency))}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="refund-summary">
-          <span class="refund-summary-label">Voraussichtliche Erstattung (Schätzung)</span>
-          <span class="refund-summary-value">
-            ${esc(formatCurrency(totalRefund, nativeCurrency))}
-            <span class="refund-summary-eur">≈ ${esc(formatNumberDe(totalRefund / APPROX_EUR_DKK_RATE))} EUR</span>
-          </span>
-        </div>
-      </div>
-    </details>`;
+async function buildCertificate(profile, reclaimCase) {
+  const templateBytes = await fetch(import.meta.env.BASE_URL + "forms/dk-02.050-template.pdf").then((r) => {
+    if (!r.ok) throw new Error(`Formularvorlage konnte nicht geladen werden (HTTP ${r.status})`);
+    return r.arrayBuffer();
+  });
+  return fillResidencyCertificate(templateBytes, profile, reclaimCase);
 }
 
 function renderDownloadStatusHtml(kind, data) {
@@ -225,8 +130,6 @@ function render(container) {
   }
 
   const residence = profile.residence;
-  const fullName = `${residence.firstName} ${residence.lastName}`.trim();
-  const fullAddress = `${residence.address}, ${residence.postalCode} ${residence.city}`;
 
   let fileNamePreview = "";
   try {
@@ -255,19 +158,18 @@ function render(container) {
         <span class="card-title">Formular</span>
         <span class="ch-head-sub">wird von DivRebound erzeugt</span>
       </div>
-      <div class="card-body">
-        <button class="download-btn" data-action="download">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <path d="M14 2v6h6"/>
-            <path d="M12 11v6"/>
-            <path d="m9 14 3 3 3-3"/>
-          </svg>
-          Wohnsitzbescheinigung herunterladen (PDF)
-        </button>
-        <div class="filename-preview">${esc(fileNamePreview)}</div>
-        <div id="download-status">${initialStatusHtml}</div>
+      <div class="doc-item">
+        <div>
+          <div class="doc-title">Wohnsitzbescheinigung (Formular 02.050)</div>
+          <div class="doc-sub">${esc(documentSubline(reclaimCase))}</div>
+          <div class="doc-file">${esc(fileNamePreview)}</div>
+        </div>
+        <div class="doc-actions">
+          <button class="btn-secondary btn-small" data-action="preview" type="button">👁 Vorschau</button>
+          <button class="btn-accent btn-small" data-action="download" type="button">⬇ PDF</button>
+        </div>
       </div>
+      <div class="doc-status" id="download-status">${initialStatusHtml}</div>
     </div>
 
     <div class="card">
@@ -275,19 +177,18 @@ function render(container) {
         <span class="card-title">Anschreiben an das Finanzamt</span>
         <span class="ch-head-sub">${esc(normalizeTaxOffice(residence.taxOffice).name || "Finanzamt fehlt")}</span>
       </div>
-      <div class="card-body">
-        <p class="ch-text">Bitte um Bestätigung der Ansässigkeit auf der beigefügten Wohnsitzbescheinigung, mit Steuer-ID.</p>
-        <button class="download-btn" data-action="letter" ${taxOfficeComplete ? "" : "disabled"}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <path d="M14 2v6h6"/>
-            <path d="M12 11v6"/>
-            <path d="m9 14 3 3 3-3"/>
-          </svg>
-          Anschreiben herunterladen (PDF)
-        </button>
-        ${taxOfficeComplete ? "" : `<div class="field-hint" style="margin-top:8px;">Bitte zuerst die Anschrift des Finanzamts in <a href="#/dk/${reclaimCase.caseId}/checklist">Schritt 1</a> ergänzen.</div>`}
+      <div class="doc-item">
+        <div>
+          <div class="doc-title">Anschreiben an das Finanzamt</div>
+          <div class="doc-sub">Bitte um Bestätigung der Ansässigkeit auf der beigefügten Wohnsitzbescheinigung, mit Steuer-ID.</div>
+          <div class="doc-file">${esc(letterFileName(profile, reclaimCase))}</div>
+        </div>
+        <div class="doc-actions">
+          <button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Vorschau</button>
+          <button class="btn-accent btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ PDF</button>
+        </div>
       </div>
+      ${taxOfficeComplete ? "" : `<div class="doc-status field-hint">Bitte zuerst die Anschrift des Finanzamts in <a href="#/dk/${reclaimCase.caseId}/checklist">Schritt 1</a> ergänzen.</div>`}
     </div>
 
     <div class="card">
@@ -312,26 +213,6 @@ function render(container) {
       </div>
     </div>
 
-    <details class="card">
-      <summary class="card-head">
-        <span style="display:flex;align-items:center;">
-          ${chevronSvg()}
-          <span class="card-title">Zusammenfassung: Angaben für die Wohnsitzbescheinigung</span>
-        </span>
-      </summary>
-      <div class="card-body">
-        <div class="summary-row"><span class="summary-label">Name</span><span class="summary-value">${esc(fullName)}</span></div>
-        <div class="summary-row"><span class="summary-label">Adresse</span><span class="summary-value">${esc(fullAddress)}</span></div>
-        <div class="summary-row"><span class="summary-label">Geburtsdatum</span><span class="summary-value">${esc(formatDateDe(profile.residence.birthDate))}</span></div>
-        <div class="summary-row"><span class="summary-label">Geburtsort</span><span class="summary-value">${esc(profile.residence.birthPlace)}</span></div>
-        <div class="summary-row"><span class="summary-label">Steuer-ID</span><span class="summary-value">${esc(residence.tin)}</span></div>
-        <div class="summary-row"><span class="summary-label">Wohnsitzland (DBA)</span><span class="summary-value">${esc(countryNameGerman(profile.residence.country))}</span></div>
-        <div class="summary-row"><span class="summary-label">Ansässig seit</span><span class="summary-value">${esc(formatResidencePeriod(reclaimCase.residencePeriod))}</span></div>
-      </div>
-    </details>
-
-    ${renderDistributionsCard(reclaimCase, profile)}
-
     <div class="ch-step-nav">
       <button class="btn-secondary" data-action="back" type="button">← Zurück</button>
       <button class="btn-primary" data-action="next" type="button">Weiter: SKAT-Portal ausfüllen →</button>
@@ -353,12 +234,21 @@ function attachListeners(container, reclaimCase) {
 
   container.querySelector('[data-action="letter"]').addEventListener("click", async () => {
     const profile = getState().currentProfile;
-    const bytes = await buildTaxOfficeLetter(profile, { reference: "Wohnsitzbescheinigung (Formular 02.050) zur Erstattung dänischer Quellensteuer" });
-    downloadBlob(bytes, `Anschreiben_Finanzamt_${profile.residence.lastName || "DivRebound"}_Daenemark_${yearLabel(reclaimCase)}.pdf`, "application/pdf");
+    downloadBlob(await buildLetter(profile), letterFileName(profile, reclaimCase), "application/pdf");
   });
 
   container.querySelector('[data-action="download"]').addEventListener("click", (e) => {
     handleDownload(container, e.currentTarget);
+  });
+
+  // Vorschau = befülltes PDF in neuem Tab, ohne es als "erzeugt" zu vermerken.
+  container.querySelector('[data-action="preview"]').addEventListener("click", () => {
+    const { currentProfile: profile } = getState();
+    openPdfPreview(() => buildCertificate(profile, reclaimCase));
+  });
+
+  container.querySelector('[data-action="letter-preview"]').addEventListener("click", () => {
+    openPdfPreview(() => buildLetter(getState().currentProfile));
   });
 
   container.querySelector('[data-action="save-state"]').addEventListener("click", () => {
@@ -380,12 +270,7 @@ async function handleDownload(container, btn) {
   statusEl.innerHTML = renderDownloadStatusHtml("loading");
 
   try {
-    const templateBytes = await fetch(import.meta.env.BASE_URL + "forms/dk-02.050-template.pdf").then((r) => {
-      if (!r.ok) throw new Error(`Formularvorlage konnte nicht geladen werden (HTTP ${r.status})`);
-      return r.arrayBuffer();
-    });
-
-    const filledBytes = await fillResidencyCertificate(templateBytes, profile, reclaimCase);
+    const filledBytes = await buildCertificate(profile, reclaimCase);
     const fileName = buildFileName(profile, reclaimCase);
     downloadBlob(filledBytes, fileName, "application/pdf");
 

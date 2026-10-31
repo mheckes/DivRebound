@@ -157,6 +157,8 @@ function render(container) {
       <div class="content-breadcrumb">Dänemark <b>›</b> DivRebound ${new Date(reclaimCase.createdAt).toLocaleDateString("de-DE", { month: "2-digit", year: "numeric" })} <b>›</b> 2 von 5</div>
     </div>
 
+    <p class="ch-lead">Laden Sie Ihre Dividendenabrechnungen dänischer Aktien hoch. DivRebound liest die relevanten Informationen aus und bereitet die Erstellung von Formularen vor.</p>
+
     <div class="dropzone" id="dropzone">
       <input type="file" id="file-input" multiple accept="application/pdf" hidden />
       <div class="dz-icon">

@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DivRebound Italien – Mockup</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  /* Tokens 1:1 aus app/src/style/tokens.css */
+  :root{
+    --navy:#0f2240; --navy-mid:#1a3a6b; --navy-light:#e8eef7;
+    --cyan:#00b4d8; --cyan-dark:#007a9e; --cyan-light:#e0f7fc;
+    --bg:#f2f4f7; --surface:#fff; --charcoal:#111827; --muted:#6b7c93; --stone:#aab4c4; --divider:#d8dfe8;
+    --success:#059669; --success-bg:#d1fae5; --danger:#a8433a; --danger-tint:#f7e9e7;
+    --warn:#9a6700; --warn-bg:#fff4d6;
+    --font-display:"DM Serif Display", Georgia, serif;
+    --font-body:"DM Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono:"JetBrains Mono", "Courier New", monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--charcoal);font-family:var(--font-body);font-size:13px;}
+  button,input,select{font-family:inherit;}
+
+  .mock-bar{background:#fff7e0;border-bottom:1px solid #f0d48a;padding:8px 16px;font-size:12px;color:#6b5200;display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+  .mock-bar b{color:#4a3800;}
+  .mock-toggle{display:inline-flex;border:1px solid #e0c060;border-radius:8px;overflow:hidden;margin-left:auto;}
+  .mock-toggle button{border:none;background:#fff;padding:5px 10px;font-size:11.5px;font-weight:600;color:#6b5200;cursor:pointer;}
+  .mock-toggle button.on{background:#6b5200;color:#fff;}
+
+  .app-shell{display:flex;min-height:calc(100vh - 36px);max-width:1360px;margin:0 auto;background:#fff;box-shadow:0 0 0 1px var(--divider);}
+
+  /* Sidebar (wie components/sidebar.css) */
+  .sidebar{width:260px;flex-shrink:0;background:var(--navy);color:#fff;padding:20px 16px;display:flex;flex-direction:column;gap:18px;}
+  .sidebar-brand{display:flex;align-items:center;gap:10px;}
+  .sidebar-wordmark{font-family:var(--font-display);font-size:17px;}
+  .sidebar-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:12.5px;font-weight:600;padding:9px 12px;border-radius:8px;text-align:left;width:100%;margin-bottom:8px;}
+  .sidebar-divider{height:1px;background:rgba(255,255,255,.15);}
+  .sidebar-section{display:flex;flex-direction:column;gap:3px;}
+  .sidebar-section-title{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.55);font-weight:700;margin-bottom:2px;}
+  .sidebar-link{font-size:13px;color:rgba(255,255,255,.9);padding:6px 8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .sidebar-link:hover{background:rgba(255,255,255,.08);}
+  .sidebar-link.current{background:rgba(0,180,216,.16);color:var(--cyan);font-weight:600;}
+  .new-tag{font-size:9.5px;background:var(--cyan);color:var(--navy);padding:1px 6px;border-radius:99px;font-weight:700;}
+  .sidebar-new{font-size:13px;font-weight:700;color:var(--cyan);padding:6px 8px;}
+  .nav-country{padding:7px 8px 4px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:7px;}
+  .nav-country.muted{color:rgba(255,255,255,.55);font-weight:500;}
+  .nav-case-group{margin-left:8px;padding-left:14px;border-left:1.5px solid rgba(255,255,255,.15);display:flex;flex-direction:column;gap:2px;}
+  .nav-holdings{font-size:12.5px;color:rgba(255,255,255,.85);padding:5px 8px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .nav-holdings:hover{background:rgba(255,255,255,.08);}
+  .nav-holdings.current{background:rgba(0,180,216,.16);color:var(--cyan);font-weight:600;}
+  .nav-case{padding:5px 8px;border-radius:6px;font-size:12.5px;color:rgba(255,255,255,.85);}
+  .nav-case.active{color:var(--cyan);font-weight:600;}
+  .nav-steps{margin-left:12px;padding-left:10px;border-left:1.5px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:1px;margin-bottom:6px;}
+  .nav-step{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;font-size:12px;color:rgba(255,255,255,.6);cursor:pointer;}
+  .nav-step:hover{background:rgba(255,255,255,.06);}
+  .nav-step.current{color:#fff;font-weight:600;background:rgba(255,255,255,.08);}
+  .nav-step .dot{width:17px;height:17px;border-radius:50%;border:1.5px solid rgba(255,255,255,.4);font-size:9.5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .nav-step.done .dot{background:var(--success);border-color:var(--success);color:#fff;}
+  .nav-step.current .dot{border-color:var(--cyan);color:var(--cyan);}
+
+  /* Content */
+  .content{flex:1;min-width:0;padding:24px 28px 40px;}
+  .content-title{font-family:var(--font-display);font-size:22px;margin:0 0 4px;}
+  .content-breadcrumb{font-size:12px;color:var(--muted);margin-bottom:18px;}
+  .content-breadcrumb b{color:var(--navy);}
+  .screen{display:none;max-width:880px;}
+  .screen.active{display:block;}
+  .lead{font-size:13px;color:var(--muted);line-height:1.6;margin:0 0 16px;max-width:680px;}
+
+  .card{background:#fff;border:1px solid var(--divider);border-radius:14px;margin-bottom:16px;overflow:hidden;}
+  .card-head{padding:12px 18px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .card-head.navy{background:var(--navy);border-bottom:none;}
+  .card-head.navy .card-title{color:#fff;}
+  .card-title{font-size:13px;font-weight:700;color:var(--navy);}
+  .card-sub{font-size:11.5px;color:var(--muted);}
+  .card-head.navy .card-sub{color:rgba(255,255,255,.7);}
+  .card-body{padding:14px 18px;}
+  details.card>summary{list-style:none;cursor:pointer;}
+  details.card>summary::-webkit-details-marker{display:none;}
+  details.card>summary .card-title::before{content:"›  ";display:inline-block;transition:transform .15s;}
+  details.card[open]>summary .card-title::before{transform:rotate(90deg);}
+
+  .btn{background:var(--cyan);color:var(--navy);border:none;padding:10px 18px;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+  .btn:hover{background:#00a2c4;}
+  .btn.ghost{background:#fff;color:var(--navy);border:1.5px solid var(--navy);font-weight:600;}
+  .btn.ghost:hover{background:var(--navy-light);}
+  .btn.small{padding:6px 11px;font-size:11.5px;border-radius:7px;}
+  .btn.success{background:var(--success);color:#fff;}
+  .btn:disabled{background:var(--stone);color:#fff;cursor:default;border-color:var(--stone);}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
+  .link{color:var(--cyan-dark);font-weight:600;cursor:pointer;text-decoration:underline;}
+
+  .banner{border-radius:10px;padding:12px 16px;font-size:12.5px;line-height:1.55;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;}
+  .banner.info{background:var(--navy-light);border:1px solid var(--navy);color:var(--navy);}
+  .banner.warn{background:var(--warn-bg);border:1px solid #e6c15a;color:#5c4300;}
+  .banner.ok{background:var(--success-bg);border:1px solid var(--success);color:#064e3b;}
+  .banner .ico{font-size:15px;line-height:1.2;}
+
+  .help{border:1px solid var(--divider);border-radius:10px;margin:12px 0 16px;overflow:hidden;background:#fff;}
+  .help>summary{padding:10px 14px;cursor:pointer;list-style:none;font-size:12px;font-weight:700;color:var(--navy);background:var(--navy-light);}
+  .help>summary::-webkit-details-marker{display:none;}
+  .help>summary::before{content:"ⓘ  ";}
+  .help-body{border-top:1px solid var(--divider);padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.6;}
+  .help-body b{color:var(--charcoal);}
+
+  /* Checkliste */
+  .check-group-title{padding:10px 18px 4px;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;}
+  .check-item{display:grid;grid-template-columns:26px 160px 1fr auto;gap:12px;align-items:center;padding:9px 18px;border-top:1px solid var(--divider);}
+  .check-group-title+.check-item{border-top:none;}
+  .state{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+  .state.ok{background:var(--success-bg);color:var(--success);}
+  .state.missing{background:var(--danger-tint);color:var(--danger);}
+  .state.check{background:var(--warn-bg);color:var(--warn);}
+  .state.later{background:var(--bg);color:var(--muted);}
+  .check-label{font-weight:600;font-size:12.5px;}
+  .check-value{font-size:12px;color:var(--muted);line-height:1.45;}
+  .check-value.mono{font-family:var(--font-mono);color:var(--charcoal);}
+  .check-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+  .inline-input{display:flex;gap:6px;align-items:center;}
+  .inline-input input{border:1.5px solid var(--danger);border-radius:7px;padding:6px 9px;font-family:var(--font-mono);font-size:12px;width:160px;}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .split ul{margin:0;padding-left:18px;line-height:1.7;font-size:12.5px;}
+
+  /* Tabellen */
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;padding:9px 12px;border-bottom:1px solid var(--divider);background:#fafbfc;}
+  td{padding:9px 12px;border-bottom:1px solid var(--divider);vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .mono{font-family:var(--font-mono);font-size:12px;}
+  .pill{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap;}
+  .pill.ok{background:var(--success-bg);color:var(--success);}
+  .pill.warn{background:var(--warn-bg);color:var(--warn);}
+  .pill.bad{background:var(--danger-tint);color:var(--danger);}
+  .pill.grey{background:var(--bg);color:var(--muted);}
+  .pill.cyan{background:var(--cyan-light);color:var(--cyan-dark);}
+  .chip{display:inline-block;font-family:var(--font-mono);font-size:11px;background:var(--navy-light);color:var(--navy);padding:2px 7px;border-radius:6px;margin-right:4px;}
+  tr.sub td{background:#fafbfc;font-size:12px;color:var(--muted);}
+  tr.sub td:first-child{padding-left:34px;}
+  tr.gone td{color:var(--stone);}
+  tr.gone td.mono, tr.gone td.num{text-decoration:line-through;}
+  tr.new td{background:#f3fbf7;}
+  .expander{cursor:pointer;user-select:none;}
+  .caret{display:inline-block;width:12px;color:var(--muted);transition:transform .15s;}
+  .open>td .caret,.expander.open .caret{transform:rotate(90deg);}
+  .icon-btn{border:none;background:none;cursor:pointer;color:var(--muted);font-size:13px;padding:2px 4px;}
+  .icon-btn:hover{color:var(--danger);}
+
+  .dropzone{border:2px dashed var(--stone);border-radius:12px;padding:20px;text-align:center;color:var(--muted);font-size:12.5px;background:#fafbfc;}
+  .dropzone b{color:var(--navy);}
+  .or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:11.5px;margin:10px 0;}
+  .or::before,.or::after{content:"";flex:1;height:1px;background:var(--divider);}
+
+  .manual-form{display:none;padding:14px 18px;border-top:1px solid var(--divider);background:#fafbfc;}
+  .manual-form.open{display:block;}
+  .form-grid{display:grid;grid-template-columns:110px 1.3fr 1.4fr 130px 90px;gap:10px;align-items:end;}
+  .field{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--muted);font-weight:600;}
+  .field input,.field select{border:1.5px solid var(--divider);border-radius:7px;padding:7px 9px;font-size:12.5px;color:var(--charcoal);background:#fff;}
+  .field input.mono{font-family:var(--font-mono);}
+  .form-hint{font-size:11.5px;color:var(--muted);margin-top:8px;}
+
+  .question-box{background:var(--navy);color:#fff;border-radius:14px;padding:18px 20px;margin-bottom:16px;}
+  .question-box h3{font-family:var(--font-display);font-weight:400;font-size:19px;margin:0 0 6px;}
+  .question-box p{margin:0 0 14px;font-size:12.5px;color:rgba(255,255,255,.8);line-height:1.6;}
+  .question-box .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.6);}
+
+  /* Spickzettel */
+  .page-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+  .page-tab{padding:8px 13px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:#fff;border:1.5px solid var(--divider);color:var(--muted);}
+  .page-tab .n{display:inline-block;width:17px;height:17px;border-radius:50%;background:var(--bg);font-size:10px;text-align:center;line-height:17px;margin-right:4px;}
+  .page-tab.active{background:var(--navy-light);border-color:var(--navy);color:var(--navy);}
+  .page-tab.done .n{background:var(--success);color:#fff;}
+  .row{display:grid;grid-template-columns:22px 1fr auto 30px;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--divider);}
+  .row:last-child{border-bottom:none;}
+  .row input[type=checkbox]{width:16px;height:16px;accent-color:var(--navy);}
+  .row-label{font-size:12px;color:var(--charcoal);line-height:1.35;}
+  .row-label .portal{display:block;font-size:10.5px;color:var(--muted);font-style:italic;}
+  .row-value{font-family:var(--font-mono);font-size:12.5px;font-weight:600;background:var(--bg);padding:4px 8px;border-radius:6px;white-space:nowrap;}
+  .row-value.assumption{background:var(--cyan-light);color:var(--cyan-dark);}
+  .copy-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--divider);background:#fff;cursor:pointer;font-size:13px;color:var(--navy);}
+  .copy-btn:hover{background:var(--navy-light);}
+  .copy-btn.copied{background:var(--success);color:#fff;border-color:var(--success);}
+  .year-picks{display:flex;gap:8px;flex-wrap:wrap;}
+  .year-pick{display:flex;align-items:center;gap:6px;border:1.5px solid var(--divider);border-radius:8px;padding:5px 10px;font-family:var(--font-mono);font-size:12.5px;font-weight:600;}
+  .year-pick.on{border-color:var(--cyan);background:var(--cyan-light);color:var(--cyan-dark);}
+  .year-pick.claimed{color:var(--stone);text-decoration:line-through;}
+  .year-head{padding:9px 18px;background:var(--navy-light);border-top:1px solid var(--divider);font-size:12px;font-weight:700;color:var(--navy);display:flex;justify-content:space-between;}
+  .asset-block-head{padding:10px 18px;background:var(--cyan-light);border-top:1px solid var(--divider);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;}
+  .asset-block-head b{color:var(--cyan-dark);}
+  .entry{display:grid;grid-template-columns:22px 1.3fr 1fr .6fr 80px;gap:10px;align-items:center;padding:8px 18px;border-top:1px solid var(--divider);}
+  .entry.head{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;background:#fafbfc;}
+  .entry .cv{display:flex;align-items:center;gap:6px;}
+  .entry .cv .row-value{font-size:12px;}
+  .entry .copy-btn{width:24px;height:24px;font-size:11px;}
+  .entry.done{background:#f3fbf7;}
+  .derivation{padding:10px 18px 12px 50px;font-size:11.5px;color:var(--muted);line-height:1.7;background:#fcfcfd;}
+  .derivation .fa{color:var(--danger);font-weight:600;} .derivation .fb{color:var(--warn);font-weight:600;}
+  .total-row{display:flex;justify-content:space-between;padding:12px 18px;border-top:2px solid var(--navy);font-weight:700;color:var(--navy);}
+  .plaus{margin:14px 18px;padding:12px;border:1px dashed var(--stone);border-radius:8px;background:var(--bg);font-size:12px;}
+  .plaus input{width:90px;padding:5px 7px;border:1.5px solid var(--divider);border-radius:6px;font-family:var(--font-mono);}
+
+  /* Status-Zeitleiste (gemeinsam DK + CH) */
+  .timeline{display:flex;padding:18px 18px 16px;}
+  .tl-step{flex:1;text-align:center;position:relative;font-size:11.5px;color:var(--muted);cursor:pointer;padding:0 4px;}
+  .tl-step::before{content:"";position:absolute;top:11px;left:-50%;width:100%;height:2px;background:var(--divider);z-index:0;}
+  .tl-step:first-child::before{display:none;}
+  .tl-dot{width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid var(--divider);margin:0 auto 6px;position:relative;z-index:1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+  .tl-step.done{color:var(--success);} .tl-step.done .tl-dot{background:var(--success);border-color:var(--success);color:#fff;}
+  .tl-step.done::before{background:var(--success);}
+  .tl-step.now{color:var(--navy);font-weight:700;} .tl-step.now .tl-dot{border-color:var(--cyan);color:var(--cyan);}
+  .tl-step.now::before{background:var(--success);}
+  .tl-step .where{display:block;font-size:10px;font-weight:500;color:var(--stone);margin-top:2px;}
+  .claim-id{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);}
+  .claim-id input{border:1.5px solid var(--divider);border-radius:7px;padding:6px 9px;font-family:var(--font-mono);font-size:12px;width:170px;}
+
+  .step-row{display:flex;gap:12px;align-items:flex-start;padding:8px 0;font-size:12.5px;line-height:1.5;}
+  .step-num{width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .step-row input[type=checkbox]{margin-top:4px;width:16px;height:16px;accent-color:var(--success);}
+  .download-btn{display:flex;align-items:center;gap:10px;background:var(--cyan);color:var(--navy);border:none;padding:13px 20px;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;}
+  .filename{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);margin-top:8px;}
+  .status-panel{background:var(--navy-light);border:1px solid var(--navy);border-radius:12px;padding:14px 18px;margin-bottom:16px;}
+  .status-panel-title{font-weight:700;color:var(--navy);margin-bottom:4px;}
+  .status-panel-text{font-size:12.5px;color:var(--navy);line-height:1.55;margin-bottom:10px;}
+  .summary-row{display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-bottom:1px solid var(--divider);font-size:12.5px;}
+  .summary-row:last-child{border-bottom:none;}
+  .summary-row span:first-child{color:var(--muted);}
+  .done-banner{padding:16px 18px;background:var(--success-bg);border:1px solid var(--success);border-radius:12px;display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+  .done-icon{width:36px;height:36px;border-radius:50%;background:var(--success);color:#fff;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .done-title{font-family:var(--font-display);font-size:18px;color:var(--success);}
+  .done-sub{font-size:12.5px;margin-top:2px;}
+
+  /* Modal (Platzhalter Anleitung) */
+  .modal-bg{position:fixed;inset:0;background:rgba(15,34,64,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:10;}
+  .modal-bg.open{display:flex;}
+  .modal{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:90vh;overflow:auto;}
+  .modal-head{background:var(--navy);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;}
+  .modal-head h3{font-family:var(--font-display);font-weight:400;font-size:19px;margin:0;}
+  .modal-close{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;}
+  .modal-body{padding:16px 20px 20px;}
+  .guide-step{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--divider);}
+  .guide-step:last-child{border-bottom:none;}
+  .guide-step .step-num{width:26px;height:26px;}
+  .guide-step b{display:block;font-size:13px;margin-bottom:2px;}
+  .guide-step .ph{margin-top:6px;height:70px;border:1.5px dashed var(--stone);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--stone);background:#fafbfc;}
+
+  /* Felder 1:1 wie style/base.css + screens/profile/profile.css */
+  .field-row{display:flex;flex-direction:column;gap:6px;}
+  .field-grid{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+  .field-grid:last-child{margin-bottom:0;}
+  .field-grid .field-row{flex:1;min-width:150px;}
+  .field-grid .field-row-wide{flex:2;}
+  .field-label,.confirmed-label{color:var(--muted);font-weight:400;font-size:11px;text-transform:uppercase;letter-spacing:.03em;line-height:15px;}
+  .field-optional{font-weight:400;color:var(--muted);font-size:10.5px;text-transform:none;}
+  .field-hint{font-size:11px;color:var(--muted);margin-top:4px;}
+  .field-input,.confirmed-input{border:1px solid var(--divider);border-radius:8px;padding:9px 12px;height:40px;font-size:13px;font-family:var(--font-body);color:var(--charcoal);background:#fff;min-width:0;}
+  .field-input:focus{outline:none;border-color:var(--navy);}
+  .confirmed-input{border-color:transparent;background:transparent;font-weight:600;}
+  .confirmed-input:hover,.confirmed-input:focus{border-color:var(--navy);background:#fff;outline:none;}
+  .field-input.mono,.confirmed-input.mono{font-family:var(--font-mono);font-size:12.5px;}
+  .profile-page .card-body{padding:20px 22px;}
+  .inline-fields{display:flex;gap:6px;flex-wrap:wrap;}
+  .inline-fields input{flex:1;min-width:110px;height:34px;padding:6px 10px;}
+  .inline-fields input.wide{flex:2;min-width:180px;}
+  .check-item.missing .field-input{border-color:var(--danger);}
+  .autosave-note{padding:9px 18px;border-top:1px solid var(--divider);background:#fafbfc;font-size:11.5px;color:var(--success);}
+  .autosave-note.boxed{border:1px solid var(--divider);border-radius:12px;margin-bottom:16px;}
+  .field-error{font-size:11px;color:var(--danger);}
+  .field-error:empty{display:none;}
+  input.is-invalid{border-color:var(--danger)!important;background:#fff!important;}
+  .sub-title{font-size:12px;font-weight:700;color:var(--navy);margin:4px 0 10px;}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:var(--navy);color:#fff;padding:10px 16px;border-radius:10px;font-size:12.5px;opacity:0;pointer-events:none;transition:all .2s;z-index:20;display:flex;gap:12px;align-items:center;}
+  .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto;}
+  .toast-undo{background:none;border:none;color:var(--cyan);font-weight:700;cursor:pointer;font-size:12.5px;padding:0;}
+  .placeholder-screen{border:2px dashed var(--divider);border-radius:14px;padding:40px 24px;text-align:center;color:var(--muted);line-height:1.6;}
+
+  @media (max-width:820px){
+    .app-shell{flex-direction:column;} .sidebar{width:100%;}
+    .check-item{grid-template-columns:26px 1fr;} .check-item>*:nth-child(n+3){grid-column:2;} .check-actions{justify-content:flex-start;}
+    .split{grid-template-columns:1fr;} .content{padding:16px;}
+    .form-grid{grid-template-columns:1fr 1fr;}
+    .timeline{flex-wrap:wrap;row-gap:14px;} .tl-step{flex:1 0 33%;} .tl-step::before{display:none;}
+  }
+  @media (max-width:600px){
+    .entry{grid-template-columns:22px 1fr 1fr;} .entry.head>*:nth-child(n+4){display:none;}
+    .entry>*:nth-child(4){grid-column:2;} .entry>*:nth-child(5){grid-column:3;}
+  }
+</style>
+<style>
+  /* 1:1 aus der App: DK-Upload (style/base.css, screens/shell/shell.css) */
+  .app-dropzone{border:2px dashed var(--navy);border-radius:12px;padding:18px;text-align:center;color:var(--navy);font-size:12.5px;background:#fff;margin-bottom:18px;cursor:pointer;}
+  .app-dropzone:hover{background:var(--navy-light);}
+  .app-dropzone .dz-icon{display:flex;justify-content:center;margin-bottom:8px;}
+  .app-dropzone .dz-main{font-weight:700;}
+  .app-dropzone .dz-sub{color:var(--muted);font-size:11px;margin-top:3px;}
+  .issues{border:1px solid #e6c15a;background:var(--warn-bg);border-radius:10px;margin-bottom:16px;overflow:hidden;}
+  .issues>summary{padding:10px 14px;cursor:pointer;list-style:none;display:flex;gap:8px;align-items:center;font-size:12.5px;font-weight:600;color:#5c4300;}
+  .issues>summary::-webkit-details-marker{display:none;}
+  .issues-sub{font-weight:400;color:var(--muted);font-size:11.5px;margin-left:auto;}
+  .flag-item{display:grid;grid-template-columns:22px 1fr auto;gap:10px;padding:10px 14px;background:#fff;border-top:1px solid var(--divider);font-size:12px;}
+  .flag-icon{color:var(--danger);font-weight:700;}
+  .flag-file{font-family:var(--font-mono);font-size:11.5px;font-weight:600;}
+  .flag-reason{color:var(--muted);margin-top:2px;line-height:1.45;}
+  .flag-meta{font-family:var(--font-mono);font-size:11px;color:var(--muted);}
+  .confirm-check{width:16px;height:16px;accent-color:var(--navy);cursor:pointer;}
+  .badge{font-size:10px;padding:3px 7px;border-radius:99px;font-weight:600;white-space:nowrap;}
+  .badge-extracted{background:var(--bg);color:var(--muted);border:1px solid var(--divider);}
+  .badge-confirmed{background:var(--success-bg);color:var(--success);}
+  .badge-warn{background:var(--warn-bg);color:var(--warn);}
+  .badge-none{background:var(--bg);color:var(--stone);}
+  tr.group-row td{background:var(--cyan-light);color:var(--navy);font-weight:600;padding:10px 12px 8px;}
+  tr.group-row .chip{margin-left:6px;}
+  tr.subtotal-row td{font-weight:600;color:var(--muted);border-top:1px solid var(--divider);text-align:right;}
+  tr.subtotal-row td:first-child{text-align:left;}
+  tr.grand-row td{font-weight:700;border-top:2px solid var(--navy);text-align:right;}
+  tr.grand-row td:first-child{text-align:left;}
+  .refund-banner{margin:18px;padding:18px 20px;background:var(--navy);border-radius:12px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+  .refund-banner.zero{background:var(--muted);}
+  .rb-label{font-size:12px;opacity:.85;}
+  .rb-amount{font-size:30px;font-weight:700;font-family:var(--font-mono);line-height:1.1;}
+  .rb-formula{font-size:11px;background:rgba(255,255,255,.12);padding:8px 12px;border-radius:8px;font-family:var(--font-mono);}
+  .bottom-bar{display:flex;align-items:center;justify-content:space-between;margin:22px 0 16px;flex-wrap:wrap;gap:12px;}
+  .progress-text{font-size:12.5px;color:var(--muted);}
+  .progress-text b{color:var(--navy);}
+  .next-btn{background:var(--navy);color:#fff;border:none;padding:11px 22px;border-radius:9px;font-size:13.5px;font-weight:600;cursor:pointer;}
+
+  /* Ergänzungen Italien */
+  .company-head{padding:11px 18px;background:var(--cyan-light);border-top:1px solid var(--divider);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;font-size:12.5px;}
+  .company-head b{color:var(--cyan-dark);font-size:13px;}
+  .company-head .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  tr.excluded td{color:var(--stone);background:#fafbfc;}
+  tr.warnrow td{background:#fffaf0;}
+  .rate{font-family:var(--font-mono);font-size:12px;font-weight:600;}
+  .reason{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4;}
+  .confirm-btn{font-size:11px;padding:4px 9px;border-radius:6px;border:1.5px solid var(--warn);background:#fff;color:var(--warn);font-weight:700;cursor:pointer;}
+  .forms-list .form-item{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:11px 18px;border-top:1px solid var(--divider);}
+  .forms-list .form-item:first-child{border-top:none;}
+  .form-item .t{font-weight:600;font-size:12.5px;}
+  .form-item .s{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .form-item .fn{font-family:var(--font-mono);font-size:11px;color:var(--stone);margin-top:4px;word-break:break-all;}
+  .sig-banner{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;}
+  .sig-box{border:1.5px dashed var(--navy);border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.45;background:#fff;}
+  .sig-box b{display:block;color:var(--navy);margin-bottom:2px;}
+  .sig-box.fa{border-color:var(--stone);color:var(--muted);}
+  .sig-box.fa b{color:var(--muted);}
+  .optional-box{border:1px dashed var(--stone);border-radius:10px;margin:0 18px 14px;background:#fafbfc;}
+  .optional-box>summary{padding:10px 14px;cursor:pointer;font-size:12px;font-weight:700;color:var(--navy);list-style:none;}
+  .optional-box>summary::-webkit-details-marker{display:none;}
+  .optional-box>summary::before{content:"＋  ";}
+  .optional-box[open]>summary::before{content:"−  ";}
+  .optional-box .inner{padding:0 14px 14px;}
+  .src{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:99px;}
+  .src.list{background:var(--success-bg);color:var(--success);}
+  .src.user{background:var(--cyan-light);color:var(--cyan-dark);}
+  .src.none{background:var(--bg);color:var(--muted);}
+  /* Papier-Vorschau */
+  .paper{background:#fff;border:1px solid var(--divider);box-shadow:0 2px 10px rgba(15,34,64,.08);border-radius:4px;padding:26px 30px;font-family:Georgia,"Times New Roman",serif;font-size:12px;color:#222;line-height:1.5;}
+  .paper h4{font-size:13px;text-align:center;margin:0 0 10px;letter-spacing:.02em;}
+  .paper .fill{font-family:Helvetica,Arial,sans-serif;color:#0b3a8f;font-size:11.5px;}
+  .paper table{font-family:Helvetica,Arial,sans-serif;font-size:10.5px;}
+  .paper th{font-size:9px;background:#f4f4f4;color:#333;text-transform:none;letter-spacing:0;padding:5px;border:1px solid #999;}
+  .paper td{border:1px solid #999;padding:5px;color:#0b3a8f;}
+  .paper .lbl{font-weight:700;}
+  .paper .box{border:1px solid #999;padding:6px 8px;margin-bottom:8px;}
+  .paper .hand{border-bottom:1px solid #999;display:inline-block;min-width:140px;color:var(--danger);font-family:var(--font-body);font-size:10.5px;font-style:italic;}
+  .paper .fa-area{border:1.5px dashed var(--stone);padding:8px;margin-top:10px;}
+  .letter{font-family:Helvetica,Arial,sans-serif;font-size:11.5px;line-height:1.55;}
+  .letter .right{text-align:right;}
+  .letter ul{margin:4px 0 8px;padding-left:18px;}
+  .pv-tabs{display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap;}
+  .addr{font-family:var(--font-mono);font-size:12.5px;line-height:1.6;background:var(--bg);padding:10px 14px;border-radius:8px;display:inline-block;}
+  @media (max-width:820px){ .sig-banner{grid-template-columns:1fr;} .paper{padding:16px;} }
+</style>
+</head>
+<body>
+
+<div class="mock-bar">
+  <span>🧪 <b>Mockup Italien v1</b> · Personendaten fiktiv · <b>Italmobiliare</b> = Referenzfall (echte Beträge) · Enel, Generali, „Muster Holding“ = fiktive Beispiele für Formular-Aufteilung und abweichende Steuersätze</span>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div style="width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,.13);display:flex;align-items:center;justify-content:center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12L9 17" stroke="white" stroke-width="2.6" stroke-linecap="round"/><path d="M9 17L20 5M20 5L14.9 7.1M20 5L18.4 10.3" stroke="#00B4D8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="sidebar-wordmark">DivRebound</div>
+    </div>
+    <div>
+      <button class="sidebar-btn">📂 Bearbeitung laden</button>
+      <button class="sidebar-btn">💾 Bearbeitung speichern</button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-link">Home</div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Nutzer</div>
+      <div class="sidebar-link">Persönliche Daten</div>
+      <div class="sidebar-link">Anschreiben Finanzamt</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Quellensteuer</div>
+      <div class="sidebar-new">＋ Neuer DivRebound</div>
+      <div class="nav-country muted">› Dänemark</div>
+      <div class="nav-country muted">› Schweiz</div>
+      <div class="nav-country">⌄ Italien <span class="new-tag">neu</span></div>
+      <div class="nav-case-group">
+        <div class="nav-case active">DivRebound 10/2026</div>
+        <div class="nav-steps" id="steps-it"></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- IT 1 Unterlagen prüfen -->
+    <section class="screen" id="it-1">
+      <h1 class="content-title">Unterlagen prüfen</h1>
+      <div class="content-breadcrumb">Italien › DivRebound 10/2026 › <b>1 von 5</b></div>
+      <p class="lead">Die Erstattung der italienischen Quellensteuer läuft komplett auf Papier. DivRebound füllt für jedes italienische Unternehmen das offizielle <b>Form A</b> aus. Ihr Finanzamt bestätigt es, danach schicken Sie es per Post nach Italien. Was schon in Ihrem Profil steht, ist bereits abgehakt.</p>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Checkliste</span><span class="card-sub">7 von 9 vollständig</span></div>
+        <div class="check-group-title">Unterlagen</div>
+        <div class="check-item"><span class="state later">!</span><span class="check-label">Dividendenabrechnungen</span><span class="check-value">Italienische Aktien (ISIN beginnt mit IT), Zahltag in den letzten 48 Monaten</span><span class="check-actions"><span class="pill grey">in Schritt 2</span></span></div>
+        <div class="check-group-title">Persönliche Daten</div>
+        <div class="check-item"><span class="state ok">✓</span><span class="check-label">Name</span><span class="check-value">Max Mustermann</span><span></span></div>
+        <div class="check-item"><span class="state ok">✓</span><span class="check-label">Geburtsdatum und -ort</span><span class="check-value">14.06.1975, Augsburg</span><span></span></div>
+        <div class="check-item"><span class="state ok">✓</span><span class="check-label">Adresse</span><span class="check-value">Musterstraße 1, 80331 München</span><span></span></div>
+        <div class="check-item"><span class="state ok">✓</span><span class="check-label">Steuer-ID</span><span class="check-value mono">12345678901</span><span></span></div>
+        <div class="check-item"><span class="state missing">✕</span><span class="check-label">Steuernummer</span><span class="check-value">Wird auf Form A neben der Steuer-ID angegeben</span><span class="check-actions"><span class="pill bad">in Schritt 3</span></span></div>
+        <div class="check-group-title">Bank und Finanzamt</div>
+        <div class="check-item"><span class="state ok">✓</span><span class="check-label">Bankverbindung</span><span class="check-value mono">DE89 3704 0044 0532 0130 00 · COBADEFFXXX</span><span></span></div>
+        <div class="check-item"><span class="state later">–</span><span class="check-label">Adresse der Bank <span class="field-optional">(optional, neu)</span></span><span class="check-value">Steht auf Form A Seite 3, für Konten in der Eurozone nicht Pflicht</span><span class="check-actions"><span class="pill grey">in Schritt 3</span></span></div>
+        <div class="check-item"><span class="state ok">✓</span><span class="check-label">Finanzamt</span><span class="check-value">Finanzamt München, Deroystraße 18, 80335 München</span><span></span></div>
+      </div>
+      <div class="split">
+        <div class="card"><div class="card-head"><span class="card-title">Das übernimmt DivRebound</span></div><div class="card-body"><ul>
+          <li>Abrechnungen auslesen, Steuersatz prüfen</li>
+          <li>Form A ausfüllen, eines pro Unternehmen</li>
+          <li>Anschreiben ans Finanzamt</li>
+          <li>Begleitschreiben nach Italien (Englisch)</li>
+        </ul></div></div>
+        <div class="card"><div class="card-head"><span class="card-title">Das machen Sie selbst</span></div><div class="card-body"><ul>
+          <li>Form A ausdrucken und zweimal unterschreiben</li>
+          <li>Per Post ans Finanzamt schicken</li>
+          <li>Bestätigtes Form A mit Abrechnungen nach Italien schicken</li>
+        </ul></div></div>
+      </div>
+      <div class="actions"><button class="btn" data-go="it-2">Weiter: Dividendenabrechnungen →</button></div>
+    </section>
+
+    <!-- IT 2 Dividendenabrechnungen -->
+    <section class="screen" id="it-2">
+      <h1 class="content-title">Dividendenabrechnungen</h1>
+      <div class="content-breadcrumb">Italien › DivRebound 10/2026 › <b>2 von 5</b></div>
+      <p class="lead">Laden Sie Ihre Dividendenabrechnungen italienischer Aktien hoch. DivRebound liest die relevanten Informationen aus und bereitet die Erstellung von Formularen vor.</p>
+      <div class="app-dropzone">
+        <div class="dz-icon"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 17v-6"/><path d="m9 14 3-3 3 3"/></svg></div>
+        <div class="dz-main">Dividendenabrechnung(en) hochladen oder hierher ziehen</div>
+        <div class="dz-sub">PDF · Mehrfachauswahl möglich · z.B. mehrere Jahre oder mehrere Aktien auf einmal</div>
+      </div>
+      <details class="issues" open>
+        <summary><span class="issues-icon">⚠</span><span>1 Hinweis(e) zu Ihren Dateien</span><span class="issues-sub">1 nicht übernommen · 0 ggf. bereits beantragt</span></summary>
+        <div class="flag-item"><span class="flag-icon">✕</span><div><div class="flag-file">dividende_stellantis_2025.pdf</div><div class="flag-reason">ISIN „NL00150001Q9“ beginnt nicht mit „IT“ – Sitz der Gesellschaft in den Niederlanden, Italien ist nicht zuständig. Wird nicht übernommen.</div></div><span class="flag-meta">NL00150001Q9</span></div>
+      </details>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Erfasste Ausschüttungen — Italien</span><span class="pill ok" id="it2-sub"></span></div>
+        <div style="overflow-x:auto;">
+          <table class="dist-table" style="min-width:860px;">
+            <thead><tr><th style="width:28px;"><input type="checkbox" class="confirm-check" id="select-all" title="Alle auswählen/abwählen"></th><th>Zahltag</th><th class="num">Stück</th><th class="num">Dividende brutto (EUR)</th><th class="num">Quellensteuer (EUR)</th><th>Satz</th><th class="num">Erstattbar (EUR)</th><th>Status</th><th></th></tr></thead>
+            <tbody id="company-groups"></tbody>
+          </table>
+        </div>
+        <div class="refund-banner" id="refund-banner">
+          <div><div class="rb-label">Voraussichtliche Erstattung (Schätzung)</div><div class="rb-amount"><span id="it2-total"></span> EUR</div></div>
+          <div class="rb-formula">Quellensteuer − Brutto × 15% DBA</div>
+        </div>
+      </div>
+      <div class="bottom-bar">
+        <div class="progress-text" id="it2-progress"></div>
+        <button class="next-btn" data-go="it-3">Weiter →</button>
+      </div>
+      <details class="help">
+        <summary>Wie DivRebound den Steuersatz prüft</summary>
+        <div class="help-body">Italien behält auf Dividenden an Nicht-Ansässige im Regelfall <b>26 %</b> ein, nach dem Doppelbesteuerungsabkommen dürfen es nur <b>15 %</b> sein. DivRebound liest den Satz von der Abrechnung und rechnet zur Kontrolle Steuer ÷ Brutto nach.<br><br>
+        <b>26 %:</b> Regelfall, wird übernommen.<br>
+        <b>zwischen 15 % und 26 %:</b> z. B. Ausschüttung teilweise aus Kapitalrücklagen – wird übernommen, Sie bestätigen die Zeile.<br>
+        <b>15 % oder weniger:</b> nichts zu erstatten (Bank hat den DBA-Satz schon angewendet oder es war keine Dividende im steuerlichen Sinn) – kommt nicht ins Formular.<br><br>
+        Erstattet wird immer: <b>tatsächlich gezahlte Steuer − 15 % vom Brutto</b>. Frist: 48 Monate ab dem Steuerabzug.</div>
+      </details>
+    </section>
+
+    <!-- IT 3 Fehlende Angaben -->
+    <section class="screen" id="it-3">
+      <h1 class="content-title">Fehlende Angaben</h1>
+      <div class="content-breadcrumb">Italien › DivRebound 10/2026 › <b>3 von 5</b></div>
+      <p class="lead">Hier steht nur noch, was nach dem Einlesen Ihrer Abrechnungen offen ist. Alles, was Sie hier eintragen, wird in Ihren persönlichen Daten gespeichert – beim nächsten Mal ist es schon da.</p>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Bitte noch ergänzen</span><span class="card-sub">Pflicht für Form A</span></div>
+        <div class="check-item missing"><span class="state missing">✕</span><span class="check-label">Steuernummer</span><span class="check-value"><input class="field-input mono" placeholder="z. B. 143/123/45678" style="height:34px;width:200px;"></span><span></span></div>
+        <div class="autosave-note">✓ Wird beim Verlassen des Felds automatisch gespeichert</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">Optional</span><span class="card-sub">blockiert nicht – Weiter geht auch ohne</span></div>
+        <div class="check-item"><span class="state later">–</span><span class="check-label">Adresse der Bank</span><span class="check-value"><input class="field-input" placeholder="z. B. Commerzbank AG, Kaiserplatz, 60311 Frankfurt" style="height:34px;width:100%;"></span><span></span></div>
+        <div class="check-group-title" style="padding-top:14px;">Angaben zu den Unternehmen (Form A Seite 4, „Italian dividend payer“)</div>
+        <div id="issuer-rows"></div>
+      </div>
+      <div class="actions"><button class="btn" data-go="it-4">Weiter: Formular &amp; Finanzamt →</button></div>
+    </section>
+
+    <!-- IT 4 Formular & Finanzamt -->
+    <section class="screen" id="it-4">
+      <h1 class="content-title">Formular &amp; Finanzamt</h1>
+      <div class="content-breadcrumb">Italien › DivRebound 10/2026 › <b>4 von 5</b></div>
+      <p class="lead">DivRebound hat für jedes Unternehmen ein Form A ausgefüllt. Drucken Sie alle Seiten aus, unterschreiben Sie zweimal und senden Sie die Formulare mit dem Anschreiben an Ihr Finanzamt. Das Finanzamt bestätigt auf Seite 5 Ihre Ansässigkeit.</p>
+      <div class="timeline-card"></div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Form A</span><span class="card-sub" id="forms-sub"></span></div>
+        <div class="forms-list" id="forms-list"></div>
+        <div class="forms-list" style="border-top:1px solid var(--divider);background:#fafbfc;">
+          <div class="form-item"><div><div class="t">Alle Formulare in einem PDF</div><div class="s">zum Ausdrucken · <span id="forms-pages"></span></div><div class="fn">FormA_Italien_Mustermann_2023-2026.pdf</div></div>
+            <div class="actions" style="margin:0;"><button class="btn small">⬇ PDF</button></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">Wer unterschreibt wo?</span><span class="card-sub">pro Formular</span></div>
+        <div class="card-body">
+          <div class="sig-banner">
+            <div class="sig-box"><b>Seite 3 · Sie</b>„Signature“ unter dem Zahlungsweg</div>
+            <div class="sig-box"><b>Seite 5 oben · Sie</b>„Place and date“ ist vorausgefüllt, nur unterschreiben</div>
+            <div class="sig-box fa"><b>Seite 5 unten · Finanzamt</b>Ort, Steuerjahre, „Germany“ und Artikel 10 sind vorausgefüllt – das Finanzamt ergänzt Datum, Stempel und Unterschrift</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Anschreiben an das Finanzamt</span><span class="card-sub">Finanzamt München</span></div>
+        <div class="forms-list">
+          <div class="form-item"><div><div class="t">Anschreiben an das Finanzamt</div><div class="s">Bitte um Bestätigung der Ansässigkeit auf den beigefügten Formularen (Form A, Seite 5), mit Steuer-ID und Steuernummer.</div><div class="fn">Anschreiben_Finanzamt_Mustermann_Italien_2023-2026.pdf</div></div>
+            <div class="actions" style="margin:0;"><button class="btn ghost small">👁 Vorschau</button><button class="btn small">⬇ PDF</button></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Nächste Schritte</span></div>
+        <div class="card-body">
+          <div class="step-row"><span class="step-num">1</span><span>Formulare ausdrucken, auf Seite 3 und Seite 5 unterschreiben.</span></div>
+          <div class="step-row"><span class="step-num">2</span><span>Formulare und Anschreiben per Post an das Finanzamt senden.</span></div>
+          <div class="step-row"><span class="step-num">3</span><span>Das Finanzamt bestätigt auf Seite 5 und schickt die Formulare zurück.</span></div>
+          <div class="step-row"><span class="step-num">4</span><span>Danach geht es weiter mit <span class="link" data-go="it-5">Schritt 5: Versand nach Italien</span>.</span></div>
+        </div>
+      </div>
+      <div class="status-panel">
+        <div class="status-panel-title">Bearbeitung pausiert</div>
+        <div class="status-panel-text">Die weitere Bearbeitung benötigt die Bestätigung durch das Finanzamt (Wartezeit meist 2–3 Wochen). Bearbeitungsstand jetzt speichern, um später einfach fortfahren zu können.</div>
+        <div class="actions"><button class="btn ghost small">💾 Bearbeitungsstand speichern</button><button class="btn ghost small">📅 Erinnerung herunterladen (.ics)</button></div>
+      </div>
+    </section>
+
+    <!-- IT 5 Versand nach Italien -->
+    <section class="screen" id="it-5">
+      <h1 class="content-title">Versand nach Italien</h1>
+      <div class="content-breadcrumb">Italien › DivRebound 10/2026 › <b>5 von 5</b></div>
+      <p class="lead">Sobald das Finanzamt die Formulare bestätigt zurückgeschickt hat, gehen sie zusammen mit Kopien Ihrer Abrechnungen und dem Begleitschreiben per Post an die italienische Steuerbehörde.</p>
+      <div class="timeline-card"></div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Begleitschreiben (Englisch)</span><span class="card-sub">an die Agenzia delle Entrate</span></div>
+        <div class="forms-list">
+          <div class="form-item"><div><div class="t">Begleitschreiben an die Agenzia delle Entrate</div><div class="s">Antrag auf Erstattung, Liste der Unternehmen, Anlagen und Bankverbindung – auf Englisch, bitte unterschreiben.</div><div class="fn">Cover_Letter_Agenzia_Entrate_Mustermann_2023-2026.pdf</div></div>
+            <div class="actions" style="margin:0;"><button class="btn ghost small" data-preview="letter">👁 Vorschau</button><button class="btn small">⬇ PDF</button></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Das kommt in den Umschlag</span><span class="card-sub" id="env-count"></span></div>
+        <div class="card-body" id="envelope"></div>
+      </div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">Adresse</span><span class="card-sub">Einschreiben mit Rückschein empfohlen</span></div>
+        <div class="card-body">
+          <div class="addr">Agenzia delle Entrate<br>Centro Operativo di Pescara<br>Via Rio Sparto 21<br>65129 Pescara<br>ITALY</div>
+          <div class="actions" style="margin-top:10px;"><button class="btn ghost small" id="copy-addr">⧉ Adresse kopieren</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head navy"><span class="card-title">DivRebound abschließen</span></div>
+        <div class="card-body" id="finish-body"></div>
+      </div>
+      <div class="banner info"><span class="ico">⏳</span><div><b>Geduld nötig:</b> Erstattungen aus Pescara dauern erfahrungsgemäß lange, oft ein bis mehrere Jahre. Die Frist (48 Monate) ist mit dem Versand gewahrt.</div></div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-bg" id="preview">
+  <div class="modal" style="max-width:720px;">
+    <div class="modal-head"><h3 id="pv-title">Vorschau</h3><button class="modal-close" data-close>✕</button></div>
+    <div class="modal-body" id="pv-body"></div>
+  </div>
+</div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Daten (Italmobiliare = echte Beträge des Referenzfalls, Rest fiktiv)
+// ---------------------------------------------------------------------------
+const TREATY = 0.15, STANDARD = 0.26;
+const profile = { name:"Max Mustermann", nameCaps:"Max MUSTERMANN", birth:"14.06.1975", birthPlace:"Augsburg", tin:"12345678901", taxNumber:"143/123/45678",
+  address:"Musterstraße 1 ; 80331 München ; Germany", email:"max.mustermann@example.de", bank:"Commerzbank AG", iban:"DE89 3704 0044 0532 0130 00", bic:"COBADEFFXXX", taxOfficeCity:"München", city:"München", phone:"+49 171 1234567" };
+
+const companies = [
+  { isin:"IT0005253205", name:"Italmobiliare S.p.A.", source:"none", taxCode:"", seat:"",
+    rows:[ { pay:"2024-05-08", shares:100, dps:3.00, gross:300.00, tax:78.00 },
+           { pay:"2025-05-07", shares:240, dps:0.90, gross:216.00, tax:56.16 },
+           { pay:"2026-05-06", shares:260, dps:1.10, gross:286.00, tax:74.36 } ] },
+  { isin:"IT0003128367", name:"Enel S.p.A.", source:"list", taxCode:"00811720580", seat:"Viale Regina Margherita 137, 00198 Roma",
+    rows:[ { pay:"2023-01-25", shares:500, dps:0.20,  gross:100.00, tax:26.00 },
+           { pay:"2023-07-26", shares:500, dps:0.23,  gross:115.00, tax:29.90 },
+           { pay:"2024-01-24", shares:500, dps:0.215, gross:107.50, tax:27.95 },
+           { pay:"2024-07-24", shares:500, dps:0.215, gross:107.50, tax:27.95 },
+           { pay:"2025-01-22", shares:500, dps:0.22,  gross:110.00, tax:28.60 } ] },
+  { isin:"IT0000062072", name:"Assicurazioni Generali S.p.A.", source:"list", taxCode:"00079760328", seat:"Piazza Duca degli Abruzzi 2, 34132 Trieste",
+    rows:[ { pay:"2025-05-21", shares:200, dps:1.43, gross:286.00, tax:57.20, printedRate:20 } ] },
+  { isin:"IT0000000001", name:"Muster Holding S.p.A.", source:"none", taxCode:"", seat:"",
+    rows:[ { pay:"2025-06-10", shares:150, dps:1.00, gross:150.00, tax:0 } ] },
+];
+
+const r2 = (v) => Math.round(v * 100) / 100;
+const eur = (v) => v.toLocaleString("de-DE", { minimumFractionDigits:2, maximumFractionDigits:2 }) + " €";
+const dps = (v) => v.toLocaleString("de-DE", { minimumFractionDigits:2, maximumFractionDigits:3 }) + " €";
+const de = (iso) => iso.split("-").reverse().join(".");
+const year = (iso) => iso.slice(0, 4);
+
+// Einstufung des Quellensteuersatzes (Konzept §5)
+function classify(row) {
+  const eff = row.gross ? row.tax / row.gross : 0;
+  if (row.tax === 0 || eff <= TREATY + 0.0001) return { kind:"none", eff, label:"nichts zu erstatten" };
+  if (Math.abs(eff - STANDARD) <= 0.005) return { kind:"ok", eff, label:"26 % Regelfall" };
+  if (eff > STANDARD + 0.005) return { kind:"high", eff, label:"unplausibel – prüfen" };
+  return { kind:"partial", eff, label:"abweichend" };
+}
+function refundOf(row) { const due = r2(row.gross * TREATY); return { due, refund: r2(row.tax - due) }; }
+// Wie bei DK: ausgelesen = "automatisch erkannt", erst bestätigte Zeilen kommen ins Formular.
+// Für die Demo sind Italmobiliare und Enel schon bestätigt, Generali (20 %) noch nicht.
+companies.forEach((c) => c.rows.forEach((r) => { r.confirmed = classify(r).kind === "ok"; }));
+function eligibleRows(c) { return c.rows.filter((r) => classify(r).kind !== "none" && r.confirmed); }
+function chunks(rows) { const out = []; for (let i = 0; i < rows.length; i += 4) out.push(rows.slice(i, i + 4)); return out; }
+function totalRefund() { return r2(companies.flatMap(eligibleRows).reduce((s, r) => s + refundOf(r).refund, 0)); }
+
+// ---------------------------------------------------------------------------
+// Navigation
+// ---------------------------------------------------------------------------
+const STEPS = [ ["it-1","Unterlagen prüfen"], ["it-2","Dividendenabrechnungen"], ["it-3","Fehlende Angaben"], ["it-4","Formular & Finanzamt"], ["it-5","Versand nach Italien"] ];
+let current = "it-1";
+function go(id) {
+  current = id;
+  document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("active", s.id === id));
+  renderSteps(); renderAll(); window.scrollTo(0, 0);
+}
+function renderSteps() {
+  const idx = STEPS.findIndex(([id]) => id === current);
+  document.getElementById("steps-it").innerHTML = STEPS.map(([id, t], i) =>
+    `<div class="nav-step ${i < idx ? "done" : ""} ${id === current ? "current" : ""}" data-go="${id}"><span class="dot">${i < idx ? "✓" : i + 1}</span>${t}</div>`).join("");
+}
+document.addEventListener("click", (e) => {
+  const g = e.target.closest("[data-go]"); if (g) go(g.dataset.go);
+  const c = e.target.closest("[data-confirm]");
+  if (c) { const [ci, ri] = c.dataset.confirm.split(":").map(Number); companies[ci].rows[ri].confirmed = c.checked; renderAll(); }
+  if (e.target.id === "select-all") { companies.forEach((co) => co.rows.forEach((r) => { if (classify(r).kind !== "none") r.confirmed = e.target.checked; })); renderAll(); }
+  const t = e.target.closest("[data-tl]"); if (t) { timelineDone = Number(t.dataset.tl); renderAll(); }
+  const p = e.target.closest("[data-preview]"); if (p) openPreview(p.dataset.preview);
+  if (e.target.closest("[data-close]") || e.target.id === "preview") document.getElementById("preview").classList.remove("open");
+  if (e.target.id === "copy-addr") toast("Adresse kopiert");
+  if (e.target.id === "mark-sent") { sent = true; timelineDone = Math.max(timelineDone, 4); renderAll(); }
+});
+function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 1800); }
+
+// ---------------------------------------------------------------------------
+// Schritt 2: Gruppen je Unternehmen
+// ---------------------------------------------------------------------------
+// Gleicher Tabellenaufbau wie DK Schritt 2 (Auswahl, Status-Badge, Zwischensummen),
+// gruppiert nach Unternehmen statt nach Steuerjahr - pro Unternehmen ein Form A.
+const num = (v) => v.toLocaleString("de-DE", { minimumFractionDigits:2, maximumFractionDigits:2 });
+// Brutto und Steuer über alle Zeilen, Erstattung nur über erstattungsfähige
+function sumRow(label, rows, cls) {
+  const add = (f) => num(rows.reduce((s, r) => s + f(r), 0));
+  return `<tr class="${cls}"><td colspan="3">${label}</td><td class="mono">${add((r) => r.gross)}</td><td class="mono">${add((r) => r.tax)}</td><td></td>
+    <td class="mono">${add((r) => (classify(r).kind === "none" ? 0 : refundOf(r).refund))}</td><td colspan="2"></td></tr>`;
+}
+function renderGroups() {
+  const all = companies.flatMap((c) => c.rows.filter((r) => classify(r).kind !== "none"));
+  document.getElementById("company-groups").innerHTML = companies.map((c, ci) => {
+    const elig = eligibleRows(c);
+    const forms = chunks(elig).length;
+    const rows = c.rows.map((r, ri) => {
+      const k = classify(r); const { refund } = refundOf(r);
+      const rate = `${(k.eff * 100).toFixed(0)} %`;
+      const ratePill = { ok:`<span class="pill ok">${rate}</span>`, partial:`<span class="pill warn">${rate}</span>`, none:`<span class="pill grey">${rate}</span>`, high:`<span class="pill bad">${rate}</span>` }[k.kind];
+      let note = "", badge;
+      if (k.kind === "none") {
+        note = `<div class="reason">Keine bzw. höchstens 15 % Quellensteuer einbehalten – nichts zu erstatten.</div>`;
+        badge = `<span class="badge badge-none">nichts zu erstatten</span>`;
+      } else if (k.kind === "partial") {
+        note = `<div class="reason">Abrechnung weist ${r.printedRate} % statt 26 % aus (z. B. teilweise aus Kapitalrücklagen). Erstattet wird nur der tatsächliche Abzug über 15 %. Bitte prüfen und bestätigen.</div>`;
+        badge = r.confirmed ? `<span class="badge badge-confirmed">bestätigt</span>` : `<span class="badge badge-warn">⚠ Satz abweichend</span>`;
+      } else {
+        badge = r.confirmed ? `<span class="badge badge-confirmed">bestätigt</span>` : `<span class="badge badge-extracted">automatisch erkannt</span>`;
+      }
+      const cls = k.kind === "none" ? "excluded" : (k.kind === "partial" && !r.confirmed ? "warnrow" : "");
+      return `<tr class="${cls}"><td><input type="checkbox" class="confirm-check" data-confirm="${ci}:${ri}" ${r.confirmed ? "checked" : ""} ${k.kind === "none" ? "disabled" : ""}></td>
+        <td style="min-width:200px;"><span class="mono">${de(r.pay)}</span>${note}</td><td class="num mono">${r.shares}</td><td class="num mono">${num(r.gross)}</td><td class="num mono">${num(r.tax)}</td><td>${ratePill}</td>
+        <td class="num mono">${k.kind === "none" ? "–" : num(refund)}</td><td>${badge}</td><td><button class="icon-btn" title="Entfernen">✕</button></td></tr>`;
+    }).join("");
+    const formPill = forms > 1 ? `<span class="pill cyan">${forms} Formulare</span>` : (forms === 1 ? `<span class="pill cyan">1 Formular</span>` : "");
+    return `<tr class="group-row"><td colspan="9">${c.name}<span class="chip">${c.isin}</span> ${formPill}</td></tr>${rows}${sumRow(`Zwischensumme ${c.name.replace(/ S\.p\.A\.$/, "")}`, c.rows, "subtotal-row")}`;
+  }).join("") + sumRow("Gesamt", companies.flatMap((c) => c.rows), "grand-row");
+  const confirmed = all.filter((r) => r.confirmed).length;
+  document.getElementById("it2-sub").textContent = `${all.length} übernommen · ${companies.length} Unternehmen`;
+  document.getElementById("it2-total").textContent = num(totalRefund());
+  document.getElementById("refund-banner").classList.toggle("zero", confirmed === 0);
+  document.getElementById("select-all").checked = confirmed === all.length;
+  document.getElementById("it2-progress").innerHTML = `<b>${confirmed}</b> von <b>${all.length}</b> Ausschüttungen bestätigt <span style="opacity:.75;">— nicht ausgewählte Ausschüttungen werden vorerst nicht eingereicht.</span>`;
+}
+
+// ---------------------------------------------------------------------------
+// Schritt 3: optionale Unternehmensangaben
+// ---------------------------------------------------------------------------
+function renderIssuers() {
+  document.getElementById("issuer-rows").innerHTML = companies.filter((c) => c.rows.some((r) => classify(r).kind !== "none")).map((c) => {
+    if (c.source === "list") return `<div class="check-item"><span class="state ok">✓</span><span class="check-label">${c.name}</span><span class="check-value">${c.seat}<br><span class="mono">C.F. ${c.taxCode}</span></span><span class="check-actions"><span class="src list">aus DivRebound-Liste</span></span></div>`;
+    return `<div class="check-item" style="align-items:start;"><span class="state later">–</span><span class="check-label">${c.name}</span>
+      <span class="check-value">Nicht in der DivRebound-Liste. Ins Formular kommt nur der Name – das reicht aus.
+        <details class="optional-box" style="margin:8px 0 0;"><summary>Sitz und Steuernummer ergänzen (optional)</summary><div class="inner">
+          <div class="field-grid"><div class="field-row field-row-wide"><label class="field-label">Sitz (Adresse)</label><input class="field-input" placeholder="z. B. Via Borgonuovo 20, 20121 Milano"></div>
+          <div class="field-row"><label class="field-label">Codice fiscale</label><input class="field-input mono" placeholder="11 Ziffern"></div></div>
+          <div class="field-hint">Zu finden im Impressum bzw. auf der Investor-Relations-Seite des Unternehmens („C.F.“ oder „P.IVA“).</div></div></details>
+      </span><span class="check-actions"><span class="src none">nur Name</span></span></div>`;
+  }).join("");
+}
+
+// ---------------------------------------------------------------------------
+// Zeitleiste
+// ---------------------------------------------------------------------------
+const TL = [ ["Formular erstellt","DivRebound"], ["Unterschrieben & ans Finanzamt","Post"], ["Vom Finanzamt bestätigt","Finanzamt"], ["Nach Italien versendet","Post"], ["Ausgezahlt","Konto"] ];
+let timelineDone = 1, sent = false;
+function renderTimeline() {
+  const html = `<div class="card"><div class="card-head navy"><span class="card-title">Status · Form A Italien</span><span class="card-sub">zum Aktualisieren anklicken</span></div>
+    <div class="timeline">${TL.map(([l, w], i) => `<div class="tl-step ${i < timelineDone ? "done" : ""} ${i === timelineDone ? "now" : ""}" data-tl="${i + 1}"><div class="tl-dot">${i < timelineDone ? "✓" : i + 1}</div>${l}<span class="where">${w}</span></div>`).join("")}</div></div>`;
+  document.querySelectorAll(".timeline-card").forEach((el) => (el.innerHTML = html));
+}
+
+// ---------------------------------------------------------------------------
+// Schritt 4: Formulare
+// ---------------------------------------------------------------------------
+function formsFlat() {
+  return companies.flatMap((c, ci) => { const parts = chunks(eligibleRows(c)); return parts.map((rows, pi) => ({ c, ci, rows, part: pi + 1, of: parts.length })); });
+}
+function renderForms() {
+  const forms = formsFlat();
+  document.getElementById("forms-list").innerHTML = forms.map((f, i) => {
+    const years = [...new Set(f.rows.map((r) => year(r.pay)))].join(", ");
+    const sum = r2(f.rows.reduce((s, r) => s + refundOf(r).refund, 0));
+    return `<div class="form-item"><div><div class="t">${f.c.name}${f.of > 1 ? ` · Teil ${f.part} von ${f.of}` : ""}</div>
+      <div class="s">${f.rows.length} ${f.rows.length === 1 ? "Ausschüttung" : "Ausschüttungen"} · Steuerjahre ${years} · Erstattung ${eur(sum)}</div></div>
+      <div class="actions" style="margin:0;"><button class="btn ghost small" data-preview="form:${i}">👁 Vorschau</button><button class="btn small">⬇ PDF</button></div></div>`;
+  }).join("");
+  document.getElementById("forms-sub").textContent = `${forms.length} Formulare · je 5 Seiten`;
+  document.getElementById("forms-pages").textContent = `${forms.length * 5} Seiten`;
+}
+
+// ---------------------------------------------------------------------------
+// Schritt 5: Umschlag und Abschluss
+// ---------------------------------------------------------------------------
+function renderEnvelope() {
+  const forms = formsFlat(); const statements = companies.flatMap(eligibleRows).length;
+  const items = [
+    `<b>${forms.length} × Form A</b> im Original, je 5 Seiten, vom Finanzamt auf Seite 5 gestempelt und unterschrieben`,
+    `Ihre Unterschriften auf <b>Seite 3 und Seite 5</b> jedes Formulars`,
+    `<b>Kopien der ${statements} Dividendenabrechnungen</b>`,
+    `<b>Begleitschreiben</b>, unterschrieben`,
+  ];
+  document.getElementById("envelope").innerHTML = items.map((t) => `<div class="step-row"><input type="checkbox"><span>${t}</span></div>`).join("");
+  document.getElementById("env-count").textContent = `${forms.length} Formulare · ${statements} Abrechnungen`;
+  document.getElementById("finish-body").innerHTML = sent
+    ? `<div class="done-banner" style="margin-bottom:12px;"><div class="done-icon">✓</div><div><div class="done-title">DivRebound abgeschlossen</div><div class="done-sub">Am ${new Date().toLocaleDateString("de-DE")} nach Italien versendet · erwartete Erstattung ${eur(totalRefund())}</div></div></div>
+       <div class="sub-title">Erstattung erhalten? (optional)</div>
+       <div class="field-grid"><div class="field-row"><label class="field-label">Betrag</label><input class="field-input mono" placeholder="${eur(totalRefund())}"></div><div class="field-row"><label class="field-label">Datum</label><input type="date" class="field-input mono"></div></div>`
+    : `<p style="margin:0 0 12px;font-size:12.5px;color:var(--muted);line-height:1.6;">Wenn der Umschlag unterwegs ist, ist Ihr DivRebound abgeschlossen. Die Erstattung können Sie später hier eintragen.</p>
+       <button class="btn success" id="mark-sent">✓ Als versendet markieren</button>`;
+}
+
+// ---------------------------------------------------------------------------
+// Vorschau: Form A (Seiten 4 und 5) und Begleitschreiben
+// ---------------------------------------------------------------------------
+function openPreview(what) {
+  const body = document.getElementById("pv-body"), title = document.getElementById("pv-title");
+  if (what === "letter") { title.textContent = "Vorschau Begleitschreiben"; body.innerHTML = letterHtml(); }
+  else { const f = formsFlat()[Number(what.split(":")[1])]; title.textContent = `Vorschau Form A · ${f.c.name}${f.of > 1 ? ` · Teil ${f.part}/${f.of}` : ""}`; body.innerHTML = formHtml(f, 4); bindPvTabs(f); }
+  document.getElementById("preview").classList.add("open");
+}
+function bindPvTabs(f) {
+  document.querySelectorAll("[data-pv]").forEach((b) => b.onclick = () => { document.getElementById("pv-body").innerHTML = formHtml(f, Number(b.dataset.pv)); bindPvTabs(f); });
+}
+function formHtml(f, page) {
+  const tabs = `<div class="pv-tabs">${[1,3,4,5].map((p) => `<button class="page-tab ${p === page ? "active" : ""}" data-pv="${p}">Seite ${p}</button>`).join("")}</div>
+    <div class="field-hint" style="margin-bottom:10px;">Vereinfachte Darstellung – <span class="fill" style="color:#0b3a8f;font-weight:600;">blau</span> = von DivRebound eingetragen, <span style="color:var(--danger);font-style:italic;">rot</span> = von Hand.</div>`;
+  const years = [...new Set(f.rows.map((r) => year(r.pay)))];
+  const yearText = years.length > 1 ? years.slice(0, -1).join(", ") + " and " + years.at(-1) : years[0];
+  if (page === 1) return tabs + `<div class="paper"><h4>COVER PAGE</h4>
+    <div class="box">☒ dividends (FORM A) ☐ interest ☐ royalties ☐ other income</div>
+    <div class="box"><span class="lbl">☒ DETAILS OF THE BENEFICIAL OWNER</span><br>Natural person · Surname <span class="fill">Mustermann</span> · Name <span class="fill">Max</span> · Place of Birth <span class="fill">${profile.birthPlace}</span> · Date of Birth <span class="fill">${profile.birth}</span><br>
+    Legal person · Business Name <span class="fill">---</span><br>Foreign TIN No. <span class="fill">Tax Number: ${profile.taxNumber} ; Tax ID: ${profile.tin}</span><br>Italian TIN <span class="fill">---</span><br>
+    Residence · State <span class="fill">Germany</span> · Full address <span class="fill">${profile.address}</span><br>Domicile <span class="fill">--- / ---</span><br>E-MAIL <span class="fill">${profile.email}</span></div></div>`;
+  if (page === 3) return tabs + `<div class="paper"><h4>COVER PAGE</h4><div class="box" style="color:#999;">DETAILS OF THE PROXY … (leer)</div>
+    <div class="box"><span class="lbl">PAYMENT METHOD (for refunds)</span><br>FINANCIAL INSTITUTION: <span class="fill">${profile.bank}</span><br>BANK ACCOUNT HOLDER <span class="fill">${profile.nameCaps}</span><br>BIC <span class="fill">${profile.bic}</span> IBAN <span class="fill">${profile.iban}</span><br>ADDRESS OF THE FINANCIAL INSTITUTION <span class="fill" style="color:#999;">(falls angegeben)</span><br><br>
+    SIGNATURE <span class="hand">✍ Ihre Unterschrift</span><br>ATTACHMENTS: <span class="fill">Copies of dividend statements (${f.rows.length})</span></div></div>`;
+  if (page === 5) return tabs + `<div class="paper"><h4>FORM A - DIVIDENDS</h4>
+    The undersigned <span class="fill">${profile.nameCaps}</span> acting as <span class="fill">beneficial owner</span><br>
+    − to reside / that the entity <span class="fill">${profile.nameCaps}</span> is resident in <span class="fill">Germany</span> pursuant to the Convention with <span class="fill">Germany</span> for the tax period / periods <span class="fill">${yearText}</span>;<br>
+    ☒ to be subject to tax for the specified dividends in the Country of residence;<br>☒ refund of taxes regarding the income specified above;<br><br>
+    Place and date <span class="fill">${profile.city} ${new Date().toLocaleDateString("de-DE")}</span> &nbsp; Signature <span class="hand">✍ Ihre Unterschrift</span>
+    <div class="fa-area"><span class="lbl">CERTIFICATION OF THE TAX AUTHORITY</span><br>The Tax Authority of <span class="fill">${profile.taxOfficeCity}</span> certifies that for the tax period/s <span class="fill">${years.join(" & ")}</span> the beneficiary described above is resident in <span class="fill">Germany</span> according to Article <span class="fill">10</span> of the Convention with Italy …<br>
+    Date <span class="hand">Finanzamt</span> &nbsp; Signature and Office stamp <span class="hand">Finanzamt</span></div></div>`;
+  const payer = f.c.source === "list" ? `${f.c.name}</span><br>Italian TIN <span class="fill">${f.c.taxCode}</span><br>Residence · Full address <span class="fill">${f.c.seat}` : `${f.c.name}</span><br>Italian TIN <span class="fill" style="color:#999;">(leer)</span><br>Residence · Full address <span class="fill" style="color:#999;">(leer)`;
+  const rows = f.rows.map((r) => { const { due, refund } = refundOf(r); return `<tr><td>${year(r.pay)}</td><td>${de(r.pay)}</td><td>${r.shares}</td><td></td><td>${dps(r.dps)}</td><td>${eur(r.gross)}</td><td>${eur(r.tax)}</td><td>${eur(due)}</td><td>${eur(refund)}</td></tr>`; });
+  while (rows.length < 4) rows.push(`<tr>${"<td>&nbsp;</td>".repeat(9)}</tr>`);
+  const total = r2(f.rows.reduce((s, r) => s + refundOf(r).refund, 0));
+  return tabs + `<div class="paper"><h4>FORM A - DIVIDENDS</h4>☐ EXEMPTION … &nbsp; ☒ REFUND<br>Article <span class="fill">10</span> of the Convention for the avoidance of double taxation between Italy and <span class="fill">Germany</span><br><br>
+    <div class="box"><span class="lbl">ITALIAN DIVIDEND PAYER</span><br>Business Name <span class="fill">${payer}</span></div>
+    <div class="box" style="color:#999;"><span class="lbl">DEPOSITARY BANK</span> (leer)</div>
+    <table><thead><tr><th>Business year</th><th>Payment date</th><th>Number of shares</th><th>Percentage</th><th>Dividends per share</th><th>Gross</th><th>Tax paid in Italy</th><th>Tax due</th><th>Requested refund</th></tr></thead><tbody>${rows.join("")}
+    <tr><td colspan="8" style="text-align:right;color:#222;font-weight:700;border:none;">TOTAL</td><td>${eur(total)}</td></tr></tbody></table></div>`;
+}
+function letterHtml() {
+  const names = companies.filter((c) => eligibleRows(c).length).map((c) => `<li>“${c.name}” (${c.isin})</li>`).join("");
+  const years = [...new Set(companies.flatMap(eligibleRows).map((r) => year(r.pay)))].sort();
+  const n = formsFlat().length;
+  return `<div class="paper letter">
+    <div class="right">${profile.name}<br>Musterstraße 1<br>80331 München, ${new Date().toLocaleDateString("en-GB", { day:"numeric", month:"long", year:"numeric" })}<br>${profile.phone}<br>${profile.email}</div><br>
+    Agenzia delle Entrate<br>Centro Operativo di Pescara<br>Via Rio Sparto 21<br>65129 Pescara<br>Italy<br><br>
+    <b>Subject: Request for Refund of Withholding Tax on Dividends</b><br><br>Dear Sir or Madam,<br><br>
+    I am writing to formally request a refund of the withholding tax levied on dividends from shares of the following Italian companies:<ul>${names}</ul>
+    As a resident of Germany, I am seeking a tax refund in accordance with the Double Taxation Agreement (DTA) between Italy and Germany. My German tax ID is ${profile.tin.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/, "$1 $2 $3 $4")}.<br><br>
+    Please find the following documents enclosed for your review:<ul><li>The completed tax refund application forms (Form A, ${n} forms), certified by the German tax office.</li><li>Dividend statements for the fiscal years ${years.join(", ")}, confirming the amount of withholding tax paid.</li></ul>
+    I kindly request that you process this refund application and transfer the due amount to my bank account.<br>(IBAN: ${profile.iban} | BIC ${profile.bic})<br><br>Thank you for your time and assistance.<br><br>Sincerely,<br><br><span class="hand" style="min-width:160px;">✍ Ihre Unterschrift</span><br>${profile.name}</div>`;
+}
+
+function renderAll() { renderGroups(); renderIssuers(); renderTimeline(); renderForms(); renderEnvelope(); }
+go("it-1");
+</script>
+</body>
+</html>

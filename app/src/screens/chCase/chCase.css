@@ -439,19 +439,6 @@
   justify-content: center;
   flex-shrink: 0;
 }
-#divrebound-app details.ch-summary-card > summary {
-  cursor: pointer;
-  list-style: none;
-}
-#divrebound-app details.ch-summary-card > summary::-webkit-details-marker {
-  display: none;
-}
-#divrebound-app details.ch-summary-card > summary .card-title::before {
-  content: "›  ";
-}
-#divrebound-app details.ch-summary-card[open] > summary .card-title::before {
-  content: "⌄  ";
-}
 #divrebound-app .ch-done-banner {
   margin: 0 0 14px;
 }

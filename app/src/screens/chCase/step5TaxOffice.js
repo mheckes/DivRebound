@@ -1,6 +1,6 @@
 // Schritt 5 "Formular & Finanzamt" (docs/konzept-schweiz.md §1a). Gleicher
-// Aufbau wie künftig bei Dänemark: Status-Zeitleiste, Formular, Anschreiben,
-// nächste Schritte, "Bearbeitung pausiert", Zusammenfassung. Bei der Schweiz
+// Aufbau wie bei Dänemark: Status-Zeitleiste, Formular, Anschreiben,
+// nächste Schritte, "Bearbeitung pausiert". Bei der Schweiz
 // erzeugt das ePortal das Formular (Antrag DIP-0085) - DivRebound liefert das
 // Anschreiben und merkt sich Antrags-ID und Status.
 
@@ -8,6 +8,7 @@ import { getState } from "../../store/store.js";
 import { navigate } from "../../router/router.js";
 import { buildTaxOfficeLetter } from "../../lib/buildTaxOfficeLetter.js";
 import { normalizeTaxOffice } from "../../util/taxOffice.js";
+import { openPdfPreview } from "../../util/pdfPreview.js";
 import { exportEncrypted, exportPlain, triggerJsonDownload } from "../../crypto/exportImport.js";
 import { openExportOptionsModal } from "../../components/modal.js";
 import { statusTimelineHtml, bindStatusTimeline } from "../../components/statusTimeline.js";
@@ -51,6 +52,10 @@ function downloadBlob(bytes, fileName, mimeType) {
   URL.revokeObjectURL(url);
 }
 
+function letterFileName(profile, yearsLabel) {
+  return `Anschreiben_Finanzamt_${profile.residence.lastName || "DivRebound"}_Schweiz${yearsLabel ? `_${yearsLabel}` : ""}.pdf`;
+}
+
 function render(container, reclaimCase, transactions) {
   const profile = getState().currentProfile;
   const results = entitlementsFor(reclaimCase, transactions, profile);
@@ -83,14 +88,18 @@ function render(container, reclaimCase, transactions) {
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Anschreiben an das Finanzamt</span><span class="ch-head-sub">${esc(taxOffice.name || "Finanzamt fehlt")}</span></div>
-      <div class="card-body">
-        <p class="ch-text">Bitte um Bestätigung der Ansässigkeit auf dem beigefügten Antrag${reclaimCase.ch.claimId ? ` <span class="mono">${esc(reclaimCase.ch.claimId)}</span>` : ""}${yearsLabel ? ` (Jahre ${esc(yearsLabel)})` : ""}, mit Steuer-ID und Steuernummer.</p>
-        <button class="download-btn" data-action="letter" ${taxOfficeComplete ? "" : "disabled"} type="button">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 11v6"/><path d="m9 14 3 3 3-3"/></svg>
-          Anschreiben herunterladen (PDF)
-        </button>
-        ${taxOfficeComplete ? "" : `<div class="field-hint" style="margin-top:8px;">Bitte zuerst die Anschrift des Finanzamts in <a href="#" data-go-step="1">Schritt 1</a> ergänzen.</div>`}
+      <div class="doc-item">
+        <div>
+          <div class="doc-title">Anschreiben an das Finanzamt</div>
+          <div class="doc-sub">Bitte um Bestätigung der Ansässigkeit auf dem beigefügten Antrag${reclaimCase.ch.claimId ? ` <span class="mono">${esc(reclaimCase.ch.claimId)}</span>` : ""}${yearsLabel ? ` (Jahre ${esc(yearsLabel)})` : ""}, mit Steuer-ID und Steuernummer.</div>
+          <div class="doc-file">${esc(letterFileName(profile, yearsLabel))}</div>
+        </div>
+        <div class="doc-actions">
+          <button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Vorschau</button>
+          <button class="btn-accent btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ PDF</button>
+        </div>
       </div>
+      ${taxOfficeComplete ? "" : `<div class="doc-status field-hint">Bitte zuerst die Anschrift des Finanzamts in <a href="#" data-go-step="1">Schritt 1</a> ergänzen.</div>`}
     </div>
 
     <div class="card">
@@ -110,20 +119,6 @@ function render(container, reclaimCase, transactions) {
         <button class="status-btn" data-action="reminder" type="button">📅 Erinnerung herunterladen (.ics)</button>
       </div>
     </div>
-
-    <details class="card ch-summary-card">
-      <summary class="card-head"><span class="card-title">Zusammenfassung des Antrags</span><span class="ch-head-sub">${yearsLabel ? `Jahre ${esc(years.join(", "))} · ` : ""}${formatChf(total)}</span></summary>
-      <div class="card-body">
-        <div class="summary-row"><span class="summary-label">Antragsteller</span><span class="summary-value">${esc(`${profile.residence.firstName} ${profile.residence.lastName}, ${profile.residence.address}, ${profile.residence.postalCode} ${profile.residence.city}`)}</span></div>
-        ${years
-          .map((y) => {
-            const amount = results.filter((r) => Number(r.distribution.paymentDate.slice(0, 4)) === y).reduce((s, r) => s + (r.refund ?? 0), 0);
-            return `<div class="summary-row"><span class="summary-label">Erstattung ${y}</span><span class="summary-value mono">${formatChf(amount)}</span></div>`;
-          })
-          .join("")}
-        <div class="summary-row"><span class="summary-label">Überweisung auf</span><span class="summary-value mono">${esc(profile.bank.iban)}</span></div>
-      </div>
-    </details>
 
     ${stepNavHtml(5)}
     </div>`;
@@ -154,14 +149,16 @@ function render(container, reclaimCase, transactions) {
     toastSaved("Antrags-ID");
   });
 
-  container.querySelector('[data-action="letter"]').addEventListener("click", async () => {
+  const buildLetter = () => {
     const reference = reclaimCase.ch.claimId
       ? `Antrag ${reclaimCase.ch.claimId} auf Rückerstattung der schweizerischen Verrechnungssteuer`
       : "Antrag auf Rückerstattung der schweizerischen Verrechnungssteuer";
-    const bytes = await buildTaxOfficeLetter(getState().currentProfile, { reference });
-    const lastName = profile.residence.lastName || "DivRebound";
-    downloadBlob(bytes, `Anschreiben_Finanzamt_${lastName}_Schweiz${yearsLabel ? `_${yearsLabel}` : ""}.pdf`, "application/pdf");
+    return buildTaxOfficeLetter(getState().currentProfile, { reference });
+  };
+  container.querySelector('[data-action="letter"]').addEventListener("click", async () => {
+    downloadBlob(await buildLetter(), letterFileName(profile, yearsLabel), "application/pdf");
   });
+  container.querySelector('[data-action="letter-preview"]').addEventListener("click", () => openPdfPreview(buildLetter));
 
   container.querySelectorAll("[data-go-step]").forEach((a) =>
     a.addEventListener("click", (e) => {

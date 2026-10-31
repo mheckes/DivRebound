@@ -5,60 +5,55 @@
    .card-title, .count-pill, .btn-primary, .info-banner, .mono, table/thead/tbody),
    werden hier nicht erneut definiert. */
 
-#divrebound-app .summary-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+/* ---------- Formular als kompakte Zeile (gleiche Darstellung DK/CH/IT) ---------- */
+#divrebound-app .doc-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
   gap: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--divider);
+  align-items: center;
+  padding: 14px 18px;
 }
-#divrebound-app .summary-row:last-child {
-  border-bottom: none;
+#divrebound-app .doc-item + .doc-item {
+  border-top: 1px solid var(--divider);
 }
-#divrebound-app .summary-label {
-  font-size: 11px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-#divrebound-app .summary-value {
-  font-size: 13.5px;
+#divrebound-app .doc-title {
   font-weight: 600;
-  font-family: var(--font-mono);
-  text-align: right;
-}
-
-#divrebound-app .empty-hint {
-  font-size: 12.5px;
-  color: var(--muted);
-  margin: 0;
-}
-
-/* ---------- Ausschüttungstabelle + Erstattungssumme ---------- */
-#divrebound-app .dist-table th:nth-child(n + 3),
-#divrebound-app .dist-table td:nth-child(n + 3) {
-  text-align: right;
-}
-#divrebound-app .dist-total-row td {
-  font-weight: 700;
-  border-top: 2px solid var(--navy);
+  font-size: 13px;
   color: var(--charcoal);
 }
-/* .dist-total-row hat wegen colspan="2" auf der ersten Zelle nur 4 statt 5
-   <td>, d.h. nth-child zählt dort anders als in den Datenzeilen - ohne diese
-   Regel würde die Brutto-Summe (das 2. <td> dieser Zeile) fälschlich
-   linksbündig statt wie die Spalte darüber rechtsbündig stehen. */
-#divrebound-app .dist-total-row td:nth-child(n + 2) {
-  text-align: right;
+#divrebound-app .doc-sub {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+#divrebound-app .doc-file {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--stone);
+  margin-top: 4px;
+  word-break: break-all;
+}
+#divrebound-app .doc-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+#divrebound-app .doc-status {
+  padding: 0 18px 14px;
+}
+#divrebound-app .doc-status:empty {
+  display: none;
+}
+#divrebound-app .doc-status .download-status {
+  margin-top: 0;
+}
+@media (max-width: 600px) {
+  #divrebound-app .doc-item {
+    grid-template-columns: 1fr;
+  }
 }
 
-/* ---------- Zusammenklappbare Karten (Wiederholungen aus Schritt 1) ---------- */
-/* "Angaben für die Wohnsitzbescheinigung" und "Bestätigte Ausschüttungen"
-   wiederholen nur, was der Nutzer schon auf den vorigen zwei Screens gesehen
-   hat - hier standardmäßig eingeklappt, damit sie nicht wie neue Information
-   wirken, aber bei Bedarf (z.B. kurz vor dem Ausdrucken) trotzdem einsehbar
-   bleiben, statt sie ganz zu entfernen. */
+/* ---------- Zusammenklappbare Karten ---------- */
 #divrebound-app summary.card-head {
   cursor: pointer;
   list-style: none;
@@ -92,35 +87,6 @@
 #divrebound-app details.card:not([open]) > summary.card-head .count-pill {
   background: rgba(15, 34, 64, 0.12);
   color: var(--navy);
-}
-
-#divrebound-app .refund-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
-  padding: 14px 16px;
-  background: var(--navy-light);
-  border-radius: 10px;
-}
-#divrebound-app .refund-summary-label {
-  font-size: 12px;
-  color: var(--navy);
-  font-weight: 600;
-}
-#divrebound-app .refund-summary-value {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--navy);
-}
-#divrebound-app .refund-summary-eur {
-  font-weight: 400;
-  font-size: 11.5px;
-  color: var(--muted);
-  margin-left: 8px;
 }
 
 /* ---------- Dokument-Erstellung ---------- */
