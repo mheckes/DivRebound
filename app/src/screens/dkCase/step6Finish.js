@@ -6,7 +6,7 @@
 import { formatDateDe } from "../../util/format.js";
 import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
 import { dkTimelineHtml, bindDkTimeline } from "./dkTimeline.js";
-import { corridor, stepHeader, stepNavHtml, bindStepNav, saveCase } from "./dkShared.js";
+import { stepHeader, stepNavHtml, bindStepNav, saveCase } from "./dkShared.js";
 
 const SUBMIT_CHECKS = [
   ["attached", "Die vom Finanzamt bestätigte Wohnsitzbescheinigung ist im SKAT-Formular hochgeladen."],
@@ -44,11 +44,7 @@ function render(container, reclaimCase) {
                   <div class="done-sub">Bei SKAT eingereicht${doneAt}. Wenn die Erstattung da ist, können Sie sie in Schritt 7 festhalten (optional).</div>
                 </div>
               </div>`
-            : `<div class="ch-inline-actions">
-                <a class="btn-secondary btn-small" href="${corridor.onlinePortalUrl}" target="_blank" rel="noopener">SKAT-Formular öffnen ↗</a>
-              </div>
-              <p class="ch-text">Sobald der Antrag bei SKAT abgeschickt ist, schließen Sie den DivRebound ab. Erst dann zählt er als erledigt.</p>
-              <button class="btn-primary" data-action="finish" ${allChecked ? "" : "disabled"} type="button">✓ Eingereicht – DivRebound abschließen</button>
+            : `<button class="btn-primary" data-action="finish" ${allChecked ? "" : "disabled"} type="button">✓ Eingereicht – DivRebound abschließen</button>
               ${allChecked ? "" : `<div class="field-hint" style="margin-top:6px;">Bitte zuerst die drei Punkte oben abhaken.</div>`}`
         }
       </div>

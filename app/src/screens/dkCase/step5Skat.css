@@ -220,15 +220,9 @@
 /* Auf schmalen Bildschirmen (z.B. neben der Sidebar wenig Platz) gibt es
    ohnehin keinen freien Raum neben der 600px-Spalte - dann lieber ganz
    ausblenden statt hässlich darunter umzubrechen. */
-#divrebound-app .cheat-portal-inline {
-  display: none;
-}
 @media (max-width: 1080px) {
   #divrebound-app .cheat-illustration {
     display: none;
-  }
-  #divrebound-app .cheat-portal-inline {
-    display: flex;
   }
 }
 #divrebound-app .browser-mock {
@@ -308,10 +302,6 @@
   font-size: 11px;
   color: var(--muted);
   line-height: 1.5;
-}
-#divrebound-app .cheat-illustration-btn {
-  display: inline-block;
-  margin-top: 10px;
 }
 
 #divrebound-app .pane {

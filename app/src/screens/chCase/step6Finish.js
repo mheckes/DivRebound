@@ -57,8 +57,7 @@ function render(container, reclaimCase, transactions) {
                 </div>
               </div>
               <p class="ch-text">Wenn die Erstattung da ist, können Sie sie in Schritt 7 festhalten (optional).</p>`
-            : `<p class="ch-text">Sobald der bestätigte Antrag hochgeladen ist, schließen Sie den DivRebound ab. Erst dann zählt er als erledigt.</p>
-              <button class="btn-primary" data-action="finish" ${allChecked ? "" : "disabled"} type="button">✓ Hochgeladen – DivRebound abschließen</button>
+            : `<button class="btn-primary" data-action="finish" ${allChecked ? "" : "disabled"} type="button">✓ Hochgeladen – DivRebound abschließen</button>
               ${allChecked ? "" : `<div class="field-hint" style="margin-top:6px;">Bitte zuerst die drei Punkte oben abhaken.</div>`}`
         }
       </div>

@@ -18,7 +18,7 @@
 import * as caseRepo from "../../db/caseRepo.js";
 import { corridors } from "../../config/corridors.js";
 import { buildSubmissionChunks } from "../../util/chunking.js";
-import { portalSideHtml, portalInlineHtml } from "../../components/portalSide.js";
+import { portalBoxHtml, portalSideHtml } from "../../components/portalSide.js";
 import { skatTabs, buildSharePages, shareHelpNote } from "./skatFieldMap.js";
 import { stepHeader, stepNavHtml, bindStepNav, saveCase, dkRefund } from "./dkShared.js";
 
@@ -49,12 +49,15 @@ function infoSvg() {
 
 export function mount(container, reclaimCase, profile) {
   const corridor = corridors.DK;
-  const portal = {
+  const portalBox = {
+    title: "SKAT-Formular",
+    sub: "kein Login und keine MitID nötig",
+    docTitle: "„Refusion af udbytteskat / Claim for refund of Danish dividend tax“",
+    text: "Öffnen Sie das Formular in einem zweiten Fenster und ordnen Sie es neben dieser Seite an. Dann übertragen Sie die Werte unten Seite für Seite.",
     url: corridor.onlinePortalUrl,
-    host: "udbytterefusion.skat.dk",
-    caption: "Öffnen Sie das SKAT-Formular „Claim for refund of Danish dividend tax“ in einem zweiten Fenster und ordnen Sie es hier daneben an. Kein Login und keine MitID nötig.",
     buttonLabel: "SKAT-Formular öffnen ↗",
   };
+  const portalSide = { host: "udbytterefusion.skat.dk", caption: "Hier daneben: das SKAT-Formular im zweiten Fenster." };
   // Nur bestätigte, erstattungsfähige Ausschüttungen kommen ins SKAT-Formular
   const eligible = dkRefund(reclaimCase, profile).eligible;
 
@@ -321,10 +324,10 @@ export function mount(container, reclaimCase, profile) {
 
     container.innerHTML = `
       ${stepHeader(reclaimCase, 5)}
+      ${portalBoxHtml(portalBox)}
 
       <div class="cheat-layout-row">
         <div class="cheat-main">
-          ${portalInlineHtml(portal)}
           <div class="cheat-progress-row">
             <span class="card-title">Spickzettel</span>
             <div class="progress-wrap">
@@ -364,7 +367,7 @@ export function mount(container, reclaimCase, profile) {
           </div>
         </div>
 
-        ${portalSideHtml(portal)}
+        ${portalSideHtml(portalSide)}
       </div>
 
       ${stepNavHtml(5)}

@@ -1,22 +1,41 @@
-// Rechte Spalte neben einem Spickzettel (DK: SKAT-Formular, CH: ESTV-ePortal).
-// Links steht die 600px breite Übertragungshilfe, rechts bleibt Platz für ein
-// zweites Browserfenster mit dem echten Portal. Die Skizze deutet das nur an,
-// ohne Layout oder Branding der Behördenseite nachzubilden. Auf schmalen
-// Bildschirmen per CSS ausgeblendet (.cheat-illustration, dkCase/step5Skat.css);
-// dort zeigt portalInlineHtml() Hinweis und Button oberhalb des Spickzettels.
+// Portal neben einem Spickzettel (DK: SKAT-Formular, CH: ESTV-ePortal).
+// portalBoxHtml(): Box ganz oben mit Hinweis und "… öffnen"-Button.
+// portalSideHtml(): rechte Spalte neben der 600px breiten Übertragungshilfe -
+// dort bleibt Platz für ein zweites Browserfenster mit dem echten Portal. Die
+// Skizze deutet das nur an, ohne Layout oder Branding der Behördenseite
+// nachzubilden. Auf schmalen Bildschirmen per CSS ausgeblendet
+// (.cheat-illustration, dkCase/step5Skat.css).
 
 function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 }
 
 /**
- * @param {{ url: string, host: string, caption: string, buttonLabel: string }} options
+ * @param {{ title: string, sub?: string, docTitle: string, text: string, url: string, buttonLabel: string }} options
+ *   text darf einfaches HTML enthalten (z.B. <b>)
+ */
+export function portalBoxHtml({ title, sub, docTitle, text, url, buttonLabel }) {
+  return `
+    <div class="card">
+      <div class="card-head head-navy"><span class="card-title">${esc(title)}</span>${sub ? `<span class="ch-head-sub">${esc(sub)}</span>` : ""}</div>
+      <div class="doc-item">
+        <div>
+          <div class="doc-title">${esc(docTitle)}</div>
+          <div class="doc-sub">${text}</div>
+        </div>
+        <div class="doc-actions"><a class="btn-accent btn-small" href="${esc(url)}" target="_blank" rel="noopener">${esc(buttonLabel)}</a></div>
+      </div>
+    </div>`;
+}
+
+/**
+ * @param {{ host: string, caption: string }} options
  *   host: Adresse in der angedeuteten Adresszeile, z.B. "eportal.admin.ch"
  */
-export function portalSideHtml({ url, host, caption, buttonLabel }) {
+export function portalSideHtml({ host, caption }) {
   return `
-    <aside class="cheat-illustration">
-      <div class="browser-mock" aria-hidden="true">
+    <aside class="cheat-illustration" aria-hidden="true">
+      <div class="browser-mock">
         <div class="browser-mock-bar">
           <span class="browser-mock-dot"></span>
           <span class="browser-mock-dot"></span>
@@ -31,16 +50,6 @@ export function portalSideHtml({ url, host, caption, buttonLabel }) {
           <div class="browser-mock-btn"></div>
         </div>
       </div>
-      <div class="cheat-illustration-caption">${caption}</div>
-      <a class="btn-accent btn-small cheat-illustration-btn" href="${esc(url)}" target="_blank" rel="noopener">${esc(buttonLabel)}</a>
+      <div class="cheat-illustration-caption">${esc(caption)}</div>
     </aside>`;
-}
-
-/** Gleicher Hinweis kompakt, nur sichtbar, wenn die rechte Spalte ausgeblendet ist */
-export function portalInlineHtml({ url, caption, buttonLabel }) {
-  return `
-    <div class="info-banner cheat-portal-inline"><span class="icon">🔗</span><div>
-      ${caption}
-      <div style="margin-top:8px;"><a class="btn-accent btn-small" href="${esc(url)}" target="_blank" rel="noopener">${esc(buttonLabel)}</a></div>
-    </div></div>`;
 }

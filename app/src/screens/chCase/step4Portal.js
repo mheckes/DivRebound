@@ -10,18 +10,21 @@ import { PROFILE_FIELDS } from "../../util/profileFields.js";
 import { chStepRoute } from "../../config/caseSteps.js";
 import { computeLots } from "../../lib/holdings.js";
 import { shareNames } from "../../util/shareNames.js";
-import { portalSideHtml, portalInlineHtml } from "../../components/portalSide.js";
+import { portalBoxHtml, portalSideHtml } from "../../components/portalSide.js";
 import {
   esc, corridor, saveCase, loadTransactions, entitlementsFor, completeDistributions, isTimeBarred,
   formatChf, formatDatePortal, stepHeader, stepNavHtml, bindStepNav, copyToClipboard,
 } from "./chShared.js";
 
-const PORTAL = {
+const PORTAL_BOX = {
+  title: "ePortal",
+  sub: "eigener Zugang nötig",
+  docTitle: "ePortal der Eidgenössischen Steuerverwaltung",
+  text: "Öffnen Sie das ePortal in einem zweiten Fenster, melden Sie sich an und wählen Sie die Kachel <b>„Verrechnungssteuer“</b> → <b>Neuen Antrag anlegen</b>. Die Reiter unten folgen der Reihenfolge im Portal.",
   url: corridor.onlinePortalUrl,
-  host: "eportal.admin.ch",
-  caption: "Öffnen Sie das ePortal in einem zweiten Fenster und ordnen Sie es hier daneben an. Dort anmelden und die Kachel <b>„Verrechnungssteuer“</b> → <b>Neuen Antrag anlegen</b> wählen. Die Reiter folgen der Reihenfolge im Portal.",
   buttonLabel: "ePortal öffnen ↗",
 };
+const PORTAL_SIDE = { host: "eportal.admin.ch", caption: "Hier daneben: das ePortal im zweiten Fenster." };
 
 const PAGES = [
   ["general", "Allgemeine Angaben"],
@@ -218,10 +221,10 @@ function render(container, reclaimCase) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 4)}
+    ${portalBoxHtml(PORTAL_BOX)}
 
     <div class="cheat-layout-row">
       <div class="cheat-main">
-        ${portalInlineHtml(PORTAL)}
         <div class="cheat-progress-row"><span class="card-title">Spickzettel</span></div>
 
         <div class="page-tabs">
@@ -239,7 +242,7 @@ function render(container, reclaimCase) {
         </div>
       </div>
 
-      ${portalSideHtml(PORTAL)}
+      ${portalSideHtml(PORTAL_SIDE)}
     </div>
 
     ${stepNavHtml(4)}
