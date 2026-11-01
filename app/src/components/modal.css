@@ -141,3 +141,21 @@
     padding: 16px;
   }
 }
+#divrebound-app .feedback-privacy {
+  margin: -6px 0 14px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+#divrebound-app .feedback-privacy summary {
+  cursor: pointer;
+  width: fit-content;
+  color: var(--navy);
+  font-weight: 600;
+}
+#divrebound-app .feedback-privacy p {
+  margin: 6px 0 0;
+  line-height: 1.55;
+}
+#divrebound-app .feedback-privacy a {
+  color: var(--cyan-dark);
+}

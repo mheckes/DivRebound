@@ -5,7 +5,6 @@
 
 import { FEEDBACK_ENDPOINT, FEEDBACK_EMAIL, FEEDBACK_KINDS } from "../config/feedback.js";
 import { showToast } from "./toast.js";
-import pkg from "../../package.json";
 
 const MAX_QUOTE = 500;
 
@@ -38,7 +37,7 @@ function screenContext() {
       .filter(Boolean)
       .join(" · "),
     route,
-    version: pkg.version,
+    version: __APP_VERSION__,
     browser: navigator.userAgent,
     time: new Date().toISOString(),
   };
@@ -65,6 +64,10 @@ export function openFeedbackModal({ quote = "" } = {}) {
     <form class="dr-modal feedback-modal" novalidate>
       <h2 class="dr-modal-title">Feedback zur Beta</h2>
       <p class="dr-modal-hint">Danke fürs Testen! Bildschirm, App-Version und Browserinformation werden automatisch mitgeschickt. Nicht gesendet werden deine persönlichen Daten, Finanz- und Steuerdaten.</p>
+      <details class="feedback-privacy">
+        <summary>Datenschutzhinweis</summary>
+        <p>Dein Feedback wird über den Dienst Formspree (USA) übermittelt und per E-Mail an den Betreiber von DivRebound weitergeleitet. Formspree speichert die Meldung bis zu 30 Tage.</p>
+      </details>
 
       <div class="feedback-context">📍 ${esc(ctx.screen || ctx.route || "Startseite")}</div>
 
