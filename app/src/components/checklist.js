@@ -82,7 +82,7 @@ export function optionalProfileRow(profile, item) {
   return checklistRow(isItemFilled(profile, item) ? "ok" : "later", item.label, profileInputsHtml(profile, item), "", `data-optional-item="${Object.keys(PROFILE_ITEM).find((k) => PROFILE_ITEM[k] === item) ?? ""}"`);
 }
 
-export const AUTOSAVE_ROW = `<div class="ch-autosave-row autosave-note">✓ Zum Ändern ins Feld klicken – Änderungen werden automatisch in Ihren persönlichen Daten gespeichert.</div>`;
+export const AUTOSAVE_ROW = `<div class="ch-autosave-row autosave-note">✓ Zum Ändern ins Feld klicken. Änderungen werden automatisch in Ihren persönlichen Daten gespeichert.</div>`;
 
 export function setRowState(row, state) {
   row.classList.remove("ok", "missing", "check", "later");

@@ -43,7 +43,7 @@ export function refundReceivedHtml(reclaimCase, { headerHtml, navHtml, expected 
   return `
     <div class="ch-page">
     ${headerHtml}
-    <p class="ch-lead"><b>Optional:</b> Halten Sie fest, ob und wann die Erstattung angekommen ist und wie hoch sie war. Manchmal ist der Betrag höher als erwartet – zum Beispiel, weil die Wartezeit verzinst wird. Die Angaben fließen in Ihre Statistik auf der Startseite ein.</p>
+    <p class="ch-lead"><b>Optional:</b> Halten Sie fest, ob und wann die Erstattung angekommen ist und wie hoch sie war. Die Angaben fließen in Ihre Statistik ein.</p>
     ${submitted ? "" : `<div class="info-banner"><span class="icon">ℹ</span><div>Dieser DivRebound ist noch nicht als eingereicht markiert. Sie können die Angaben trotzdem schon eintragen.</div></div>`}
 
     <div class="card">
@@ -59,7 +59,7 @@ export function refundReceivedHtml(reclaimCase, { headerHtml, navHtml, expected 
                 <div class="field-row"><label class="field-label" for="refund-date">Erhalten am</label><input id="refund-date" class="field-input" type="date" data-refund="date" value="${esc(r.date)}"></div>
                 <div class="field-row"><label class="field-label" for="refund-amount">Betrag (EUR)</label><input id="refund-amount" class="field-input mono" inputmode="decimal" data-refund="amountEur" placeholder="${esc(expected?.eur ? eur(expected.eur).replace(" €", "") : "z.B. 42,80")}" value="${esc(r.amountEur)}"></div>
               </div>
-              <div class="field-hint">Betrag so, wie er auf Ihrem Konto eingegangen ist – inklusive eventueller Zinsen.</div>`
+              <div class="field-hint">Betrag so, wie er auf Ihrem Konto eingegangen ist, inklusive etwaiger Verzugszinsen.</div>`
             : ""
         }
         <div class="refund-facts">${factsHtml(reclaimCase, expected)}</div>

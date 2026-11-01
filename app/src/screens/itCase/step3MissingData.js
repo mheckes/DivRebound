@@ -28,7 +28,7 @@ function issuerRow(group, profile) {
   return checklistRow(
     details.source === "user" ? "ok" : "later",
     details.name || group.isin,
-    `<span class="ch-check-text">${details.source === "user" ? "Ihre Angaben werden ins Formular übernommen." : "Nicht in der DivRebound-Liste. Ins Formular kommt nur der Name – das reicht aus."}</span>
+    `<span class="ch-check-text">${details.source === "user" ? "Ihre Angaben werden ins Formular übernommen." : "Nicht in der DivRebound-Liste. Ins Formular kommt nur der Name."}</span>
      <details class="it-optional" ${details.source === "user" ? "open" : ""}>
        <summary>Sitz und Steuernummer ergänzen (optional)</summary>
        <div class="ch-inline-fields">
@@ -48,7 +48,7 @@ function render(container, reclaimCase, profile) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 3)}
-    <p class="ch-lead">Hier steht nur noch, was nach dem Einlesen Ihrer Dividendenabrechnungen offen ist. Alles, was Sie hier eintragen, wird in Ihren persönlichen Daten gespeichert – beim nächsten Mal ist es schon da.</p>
+    <p class="ch-lead">Hier steht nur noch, was nach dem Einlesen Ihrer Dividendenabrechnungen offen ist.</p>
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Bitte noch ergänzen</span><span class="count-pill">${missing.length ? `${missing.length} offen` : "nichts offen"}</span></div>

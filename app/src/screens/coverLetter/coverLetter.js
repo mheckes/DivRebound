@@ -103,7 +103,7 @@ function render(container) {
           ${field(profile, "taxOfficePostalCode", "Postleitzahl", { placeholder: "z.B. 80335" })}
           ${field(profile, "taxOfficeCity", "Ort", { placeholder: "z.B. München" })}
         </div>
-        <div class="field-hint">Bitte prüfen. Aus Ihren persönlichen Daten – Änderungen hier werden automatisch dort gespeichert.</div>
+        <div class="field-hint">Bitte prüfen. Aus Ihren persönlichen Daten übernommen.</div>
       </div>
     </div>
 
@@ -112,7 +112,7 @@ function render(container) {
       <div class="doc-item">
         <div>
           <div class="doc-title">Anschreiben an das Finanzamt</div>
-          <div class="doc-sub">Allgemeines Anschreiben mit der Bitte, die beigefügten Formulare zu bestätigen – unabhängig von einem DivRebound.</div>
+          <div class="doc-sub">Allgemeines Anschreiben mit der Bitte, die beigefügten Formulare zu bestätigen.</div>
           <div class="doc-file">${esc(fileNamePreview)}</div>
         </div>
         <div class="doc-actions">
@@ -120,7 +120,7 @@ function render(container) {
           <button class="btn-accent btn-small" data-action="download" type="button">⬇ PDF</button>
         </div>
       </div>
-      <div class="doc-status field-hint" data-incomplete-hint>Bitte zuerst die vollständige Anschrift des Finanzamts oben eintragen.</div>
+      <div class="doc-status field-hint" data-incomplete-hint>Bitte zuerst die vollständige Anschrift des Finanzamts eintragen.</div>
       <div class="doc-status" id="download-status"></div>
     </div>
     </div>

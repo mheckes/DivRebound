@@ -97,8 +97,8 @@ function render(container) {
             </div>
           </div>`
         : lastTx
-        ? `<div class="info-banner"><span class="icon">ℹ</span><div>Zuletzt erfasst: ${lastTx.type === "buy" ? "Kauf" : "Verkauf"} vom <b>${esc(formatDateDe(lastTx.tradeDate))}</b>. Ergänzen Sie hier Käufe und Verkäufe, die seitdem dazugekommen sind oder noch fehlen.</div></div>`
-        : `<p class="holdings-lead">Erfassen Sie <b>alle Käufe und Verkäufe</b> Ihrer Schweizer Aktien, lückenlos ab dem ersten Kauf. Am einfachsten per Upload der Abrechnungen: DivRebound liest Handelstag, Stückzahl und ISIN aus. Beim nächsten DivRebound ergänzen Sie nur noch, was neu dazugekommen ist.</p>`
+        ? `<div class="info-banner"><span class="icon">ℹ</span><div>Zuletzt erfasst: ${lastTx.type === "buy" ? "Kauf" : "Verkauf"} vom <b>${esc(formatDateDe(lastTx.tradeDate))}</b>. Ergänzen Sie hier Käufe und Verkäufe, die seitdem dazugekommen sind oder noch fehlen. Daraus berechnet DivRebound das Erwerbsdatum Ihrer Aktien, das im ePortal anzugeben ist.</div></div>`
+        : `<p class="holdings-lead">Im ePortal geben Sie zu jeder Dividende an, wann Sie die Aktien gekauft haben, die Sie am Stichtag hielten (Erwerbsdatum). Damit DivRebound das berechnen kann, erfassen Sie hier <b>alle Käufe und Verkäufe</b> Ihrer Schweizer Aktien, lückenlos ab dem ersten Kauf. Am einfachsten per Upload der Abrechnungen: DivRebound liest Handelstag, Stückzahl und ISIN aus. Beim nächsten DivRebound ergänzen Sie nur noch, was neu dazugekommen ist.</p>`
     }
 
     ${askForChanges ? "" : renderCaptureCard()}
@@ -112,7 +112,7 @@ function render(container) {
       <div class="help-disclosure-body">
         <p>Bei Teilverkäufen gilt: <b>zuerst gekaufte Aktien werden zuerst verkauft</b>. Ist eine Tranche ganz verkauft, entfällt sie. Ist sie teilweise verkauft, bleibt ihr ursprüngliches Erwerbsdatum, nur die Stückzahl sinkt.</p>
         <p><b>Abgleich:</b> Legen Sie die Tabelle neben Ihren aktuellen Depotauszug. Weicht eine Stückzahl ab, fehlt eine Abrechnung. Zusätzlich prüft DivRebound später, ob die Stückzahlen auf den Tax Vouchern zum berechneten Bestand passen.</p>
-        <p><b>Erwerbsdatum</b> ist immer der Handelstag (steht auf der Abrechnung unter „Details zur Ausführung“), nicht das Auftragsdatum und nicht die Valuta.</p>
+        <p><b>Erwerbsdatum</b> ist immer der Handelstag, nicht das Auftragsdatum und nicht die Valuta.</p>
       </div>
     </details>
     ${embeddedCase ? stepNavHtml(2) : ""}
@@ -131,7 +131,7 @@ function renderCaptureCard() {
         <div class="dropzone" id="dropzone">
           <input type="file" id="file-input" multiple accept="application/pdf" hidden />
           <div class="dz-main">Wertpapierabrechnungen hochladen oder hierher ziehen</div>
-          <div class="dz-sub">PDF · Mehrfachauswahl möglich · bereits erfasste Abrechnungen werden erkannt und übersprungen</div>
+          <div class="dz-sub">PDF · Mehrfachauswahl möglich</div>
         </div>
         <div class="holdings-or">oder</div>
         <div style="text-align:center;">
@@ -164,7 +164,7 @@ function renderManualForm() {
       </div>
       <datalist id="holdings-isins">${Object.keys(knownShares()).sort().map((isin) => `<option value="${esc(isin)}"></option>`).join("")}</datalist>
       <datalist id="holdings-names">${Object.values(knownShares()).sort((a, b) => a.localeCompare(b, "de")).map((name) => `<option value="${esc(name)}"></option>`).join("")}</datalist>
-      <div class="field-hint">Handelstag = Tag der Ausführung (auf der Abrechnung unter „Details zur Ausführung“), nicht Auftragsdatum oder Valuta.</div>
+      <div class="field-hint">Handelstag = Tag der Ausführung, nicht Auftragsdatum oder Valuta.</div>
       <div class="field-error" data-mf-error hidden></div>
       <div class="holdings-actions">
         <button class="btn-primary" data-action="save-manual" type="button">Übernehmen</button>
@@ -340,7 +340,7 @@ function attachTableListeners(container) {
     if (isin.length < 12) isinHint.textContent = "";
     // Nur ein Hinweis, kein Hindernis: Übernehmen bleibt möglich.
     else if (!isValidIsin(isin)) isinHint.textContent = "ISIN unbekannt";
-    else if (!name) isinHint.textContent = "Nicht in der Liste der SIX – bitte Namen der Aktie eintragen.";
+    else if (!name) isinHint.textContent = "Nicht in der Liste. Bitte Namen der Aktie eintragen.";
     else isinHint.textContent = "";
   };
   isinInput?.addEventListener("input", applyIsin);

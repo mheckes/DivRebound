@@ -210,7 +210,7 @@ function render(container, reclaimCase) {
     <div class="ch-page">
     ${stepHeader(reclaimCase, 4)}
     <div class="info-banner"><span class="icon">🔗</span><div>
-      Öffnen Sie das ePortal, melden Sie sich an und wählen Sie die Kachel <b>„Verrechnungssteuer“</b> → <b>Neuen Antrag anlegen</b>. Ein Antrag kann <b>mehrere Jahre</b> umfassen. Die Reiter unten folgen der Reihenfolge im Portal.
+      Öffnen Sie das ePortal, melden Sie sich an und wählen Sie die Kachel <b>„Verrechnungssteuer“</b> → <b>Neuen Antrag anlegen</b>. Die Reiter unten folgen der Reihenfolge im Portal.
       <div style="margin-top:8px;"><a class="btn-accent btn-small" href="${corridor.onlinePortalUrl}" target="_blank" rel="noopener">ePortal öffnen ↗</a></div>
     </div></div>
 

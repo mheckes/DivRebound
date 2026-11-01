@@ -425,7 +425,7 @@ export function mount(container, reclaimCase, profile) {
               <p>Das Cheat Sheet ist eine Hilfestellung zum Ausfüllen des offiziellen SKAT-Formulars. Übertragen Sie die Einträge in den Tab mit dem geöffneten SKAT-Formular. Die Reihenfolge der Felder entspricht 1:1 dem SKAT-Formular. <a href="${
                 corridor.onlinePortalUrl
               }" target="_blank" rel="noopener">Formular nicht mehr offen? Erneut öffnen ↗</a></p>
-              <p><b>Bitte beachten:</b> Das Formular hat mehrere Seiten — bitte dort auf "Next" klicken und hier ebenfalls zur nächsten Seite weiterklicken.</p>
+              <p><b>Bitte beachten:</b> Das Formular hat mehrere Seiten. Bitte im Online Formular auf "Next" klicken und ebenfalls zur nächsten Seite weiterklicken.</p>
             </div>
           </details>
 

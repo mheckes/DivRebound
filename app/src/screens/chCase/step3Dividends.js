@@ -274,7 +274,7 @@ function render(container, reclaimCase) {
       <summary>Warum mehrere Tax Voucher für eine Dividende? Was ist der Stichtag?</summary>
       <div class="help-disclosure-body">
         <p>Manche Banken stellen für eine Dividende mehrere Voucher aus (z.B. 20 und 5 Stück). Entscheidend ist, dass die <b>Summe</b> dem Bestand am Stichtag entspricht. Weicht sie ab, fehlt entweder ein Voucher oder eine Kauf-/Verkaufsabrechnung in Schritt 2.</p>
-        <p><b>Stichtag:</b> Anspruch hat, wer die Aktie am Ende des Handelstags vor dem Ex-Tag hält. Der Dividendentermin steht auf dem Voucher nur als Bild – DivRebound übernimmt ihn aus der Dividendenabrechnung, oder Sie tragen ihn ein. Den Ex-Tag müssen Sie im ePortal nicht angeben; DivRebound braucht ihn nur, um den Bestand am Stichtag zu berechnen. Er wird aus der Dividendenabrechnung übernommen oder geschätzt und nur dann zur Prüfung angezeigt, wenn Sie kurz vor der Fälligkeit gekauft oder verkauft haben.</p>
+        <p><b>Stichtag:</b> Anspruch hat, wer die Aktie am Ende des Handelstags vor dem Ex-Tag hält. DivRebound benötigt den Stichtag nur, um den Bestand an diesem Tag zu berechnen. Er wird aus der Dividendenabrechnung übernommen oder geschätzt und nur dann zur Prüfung angezeigt, wenn Sie kurz vor der Fälligkeit gekauft oder verkauft haben.</p>
       </div>
     </details>
 

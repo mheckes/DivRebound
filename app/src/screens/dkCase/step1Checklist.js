@@ -35,13 +35,13 @@ export function mount(container) {
       <h1 class="content-title">Unterlagen prüfen</h1>
       <div class="content-breadcrumb">Dänemark <b>›</b> ${caseLabel(reclaimCase)} <b>›</b> 1 von ${DK_STEPS.length}</div>
     </div>
-    <p class="ch-lead">Für die Erstattung der dänischen Quellensteuer erzeugt DivRebound eine Wohnsitzbescheinigung, die Ihr Finanzamt bestätigt. Anschließend tragen Sie Ihren Antrag im Online-Formular von SKAT ein. Was schon in Ihren persönlichen Daten steht, ist bereits abgehakt.</p>
+    <p class="ch-lead">Für die Erstattung der dänischen Quellensteuer erzeugt DivRebound eine Wohnsitzbescheinigung, die Ihr deutsches Finanzamt bestätigt. Anschließend tragen Sie Ihren Antrag im Online-Formular von SKAT ein.</p>
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Checkliste</span><span class="count-pill" data-summary></span></div>
 
       <div class="ch-check-group">Zugang</div>
-      ${textRow("ok", "SKAT-Online-Formular", "Kein Login nötig – DivRebound verlinkt direkt auf das Formular für ausländische Aktionäre.")}
+      ${textRow("ok", "SKAT-Online-Formular", "DivRebound verlinkt direkt auf das Formular für ausländische Aktionäre.")}
 
       <div class="ch-check-group">Persönliche Daten</div>
       ${PROFILE_ITEMS.map((item) => profileRow(profile, item)).join("")}
@@ -53,7 +53,7 @@ export function mount(container) {
           ? textRow("ok", "Dividendenabrechnungen", `${confirmed} Ausschüttung${confirmed === 1 ? "" : "en"} erfasst.`, `<span class="badge badge-extracted">Schritt 2</span>`)
           : textRow("later", "Dividendenabrechnungen", "Je eine pro Ausschüttung einer dänischen Aktie (ISIN beginnt mit DK), höchstens 3 Jahre zurück.", `<span class="badge badge-extracted">Schritt 2</span>`)
       }
-      ${textRow("later", "Zeitraum der Ansässigkeit", "Wird aus den Zahltagen Ihrer Abrechnungen abgeleitet – Sie bestätigen ihn nur noch.", `<span class="badge badge-extracted">Schritt 3</span>`)}
+      ${textRow("later", "Zeitraum der Ansässigkeit", "Wird aus den Zahltagen Ihrer Abrechnungen abgeleitet.", `<span class="badge badge-extracted">Schritt 3</span>`)}
     </div>
 
     <div class="ch-two-col">

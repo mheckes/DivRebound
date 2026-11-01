@@ -75,13 +75,13 @@ function render(container, reclaimCase, profile) {
       <h1 class="content-title">Fehlende Angaben</h1>
       <div class="content-breadcrumb">Dänemark <b>›</b> ${escapeHtml(caseLabel(reclaimCase))} <b>›</b> 3 von ${DK_STEPS.length}</div>
     </div>
-    <p class="ch-lead">Hier steht nur noch, was nach dem Einlesen Ihrer Dividendenabrechnungen offen ist. Alles andere stammt aus Ihren persönlichen Daten.</p>
+    <p class="ch-lead">Folgende Daten werden für die weitere Bearbeitung noch benötigt.</p>
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Aus den Abrechnungen abgeleitet – bitte bestätigen</span></div>
       <div class="card-body">
         <div class="md-period-title">Zeitraum der Ansässigkeit</div>
-        <div class="field-hint" style="margin-bottom:12px;">„Von“ ist der früheste Zahltag Ihrer Ausschüttungen – Ihre Abrechnungen lauten ab dann auf Ihre deutsche Adresse. Die Wohnsitzbescheinigung muss alle Zahltage abdecken.</div>
+        <div class="field-hint" style="margin-bottom:12px;">„Von“ ist der früheste Zahltag Ihrer Ausschüttungen. Die Wohnsitzbescheinigung muss alle Zahltage abdecken.</div>
         <div class="md-period">
           <div class="field-row">
             <label class="field-label" for="res-from">Von</label>

@@ -140,14 +140,14 @@ function render(container) {
   container.innerHTML = `
     ${stepHeader(reclaimCase, 4)}
 
-    <p class="ch-lead">Die Wohnsitzbescheinigung (Formular 02.050) muss vom deutschen Finanzamt bestätigt werden. DivRebound füllt sie für Sie aus. Drucken Sie sie aus, unterschreiben Sie sie und senden Sie sie mit dem Anschreiben an Ihr Finanzamt.</p>
+    <p class="ch-lead">Die Wohnsitzbescheinigung (Formular 02.050) muss vom deutschen Finanzamt bestätigt werden. DivRebound hat das Formular für Sie ausgefüllt.</p>
 
     ${dkTimelineHtml(reclaimCase)}
 
     <div class="card">
       <div class="card-head head-navy">
         <span class="card-title">Formular</span>
-        <span class="ch-head-sub">wird von DivRebound erzeugt</span>
+        <span class="ch-head-sub">von DivRebound erzeugt</span>
       </div>
       <div class="doc-item">
         <div>

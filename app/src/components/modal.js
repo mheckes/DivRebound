@@ -23,7 +23,7 @@ export function openPassphraseModal(mode) {
         : "Bearbeitung laden";
     const hint =
       mode === "export"
-        ? `Mit dieser Passphrase wird die Datei verschlüsselt (mind. ${MIN_PASSPHRASE_LENGTH} Zeichen). Ohne sie ist die Datei später nicht mehr entschlüsselbar – gut aufbewahren.`
+        ? `Mit dieser Passphrase wird die Datei verschlüsselt (mind. ${MIN_PASSPHRASE_LENGTH} Zeichen). Ohne sie ist die Datei später nicht mehr entschlüsselbar.`
         : "Gib die Passphrase ein, mit der diese Datei gesichert wurde.";
 
     const overlay = mountOverlay(`
@@ -88,12 +88,12 @@ export function openExportOptionsModal() {
       </label>
 
       <div id="encrypt-fields">
-        <p class="dr-modal-hint">Mit dieser Passphrase wird die Datei verschlüsselt (mind. ${MIN_PASSPHRASE_LENGTH} Zeichen). Ohne sie ist die Datei später nicht mehr entschlüsselbar – gut aufbewahren, z.B. in einem Passwort-Manager.</p>
+        <p class="dr-modal-hint">Mit dieser Passphrase wird die Datei verschlüsselt (mind. ${MIN_PASSPHRASE_LENGTH} Zeichen). Ohne sie ist die Datei später nicht mehr entschlüsselbar.</p>
         <input type="password" class="field-input dr-modal-input" autocomplete="off" placeholder="Passphrase" />
       </div>
       <div id="plain-warning" class="info-banner" style="display:none;margin-top:4px;">
         <span class="icon">⚠</span>
-        <div>Ohne Passwort ist die Datei für jeden lesbar, der Zugriff darauf bekommt (z.B. bei Cloud-Sync, als E-Mail-Anhang oder bei Verlust des Geräts). Sie enthält Name, Adresse, Geburtsdatum, Steuer-ID und Bankverbindung im Klartext.</div>
+        <div>Ohne Passwort ist die Datei für jeden lesbar, der Zugriff darauf bekommt. Sie enthält Name, Adresse, Geburtsdatum, Steuer-ID und Bankverbindung im Klartext.</div>
       </div>
 
       <p class="field-error dr-modal-error" hidden></p>

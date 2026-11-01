@@ -17,13 +17,13 @@ export function mount(container, reclaimCase, profile) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 1)}
-    <p class="ch-lead">Die Erstattung der italienischen Quellensteuer läuft komplett auf Papier. DivRebound füllt für jedes italienische Unternehmen das offizielle Form A aus. Ihr Finanzamt bestätigt es, danach schicken Sie es per Post nach Italien. Was schon in Ihren persönlichen Daten steht, ist bereits abgehakt.</p>
+    <p class="ch-lead">Die Erstattung der italienischen Quellensteuer läuft komplett auf Papier. DivRebound füllt für jedes italienische Unternehmen das offizielle Form A aus. Ihr Finanzamt bestätigt es, danach schicken Sie es per Post nach Italien.</p>
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Checkliste</span><span class="count-pill" data-summary></span></div>
 
       <div class="ch-check-group">Formular</div>
-      ${textRow("ok", "Form A (Agenzia delle Entrate)", "Kein Portal und kein Login – DivRebound füllt das Papierformular für Sie aus.")}
+      ${textRow("ok", "Form A", "DivRebound füllt das Papierformular der „Agenzia delle Entrate“ für Sie aus.")}
 
       <div class="ch-check-group">Persönliche Daten</div>
       ${REQUIRED_ITEMS.map((k) => profileRow(profile, PROFILE_ITEM[k])).join("")}
@@ -48,7 +48,7 @@ export function mount(container, reclaimCase, profile) {
       <div class="card"><div class="card-head"><span class="card-title">Das machen Sie selbst</span></div><div class="card-body"><ul class="ch-list">
         <li>Form A ausdrucken und zweimal unterschreiben</li>
         <li>Per Post ans Finanzamt schicken</li>
-        <li>Bestätigtes Form A mit Kopien der Abrechnungen nach Italien schicken</li>
+        <li>Bestätigtes Form A mit Kopien der Abrechnungen nach Italien senden</li>
       </ul></div></div>
     </div>
 

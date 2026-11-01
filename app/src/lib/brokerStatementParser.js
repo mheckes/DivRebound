@@ -111,7 +111,7 @@ export function parseStatementLines(lines) {
     let executions = parseExecutions(lines);
 
     if (executions.length === 0) {
-      warnings.push("Handelstag nicht gefunden – bitte aus der Abrechnung übernehmen (nicht das Auftragsdatum).");
+      warnings.push("Handelstag nicht gefunden. Bitte aus der Abrechnung händisch übernehmen.");
       executions = [{ quantity: header.quantity, tradeDate: null }];
     }
     const sum = executions.reduce((s, e) => s + (e.quantity ?? 0), 0);
@@ -154,5 +154,5 @@ export function parseStatementLines(lines) {
     };
   }
 
-  return { kind: "unknown", broker, warnings: ["Dokument nicht erkannt – keine Wertpapierabrechnung und kein Tax Voucher."] };
+  return { kind: "unknown", broker, warnings: ["Dokument nicht erkannt oder keine Wertpapierabrechnung / kein Tax Voucher."] };
 }

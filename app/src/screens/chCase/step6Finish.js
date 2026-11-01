@@ -12,7 +12,7 @@ import { esc, corridor, saveCase, loadTransactions, entitlementsFor, stepHeader,
 
 const UPLOAD_CHECKS = [
   ["stamp", "<b>Prüfen:</b> Stempel, Unterschrift und Datum des Finanzamts sind auf Seite 1 vorhanden."],
-  ["scan", "<b>Einscannen:</b> alle Seiten als <b>ein</b> PDF, gut lesbar (eine Scan-App auf dem Handy genügt)."],
+  ["scan", "<b>Einscannen:</b> alle Seiten als <b>ein</b> PDF, gut lesbar."],
   ["upload", "<b>Hochladen:</b> im ePortal unter „Verrechnungssteuer“ → Antragsübersicht → Antrag öffnen und das PDF hochladen."],
 ];
 
@@ -31,7 +31,7 @@ function render(container, reclaimCase, transactions) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 6)}
-    <p class="ch-lead">Der vom Finanzamt bestätigte Antrag wird im ePortal hochgeladen. Erst danach prüft die Eidgenössische Steuerverwaltung Ihren Antrag und überweist die Erstattung.</p>
+    <p class="ch-lead">Der vom deutschen Finanzamt bestätigte Antrag wird im ePortal hochgeladen. Erst danach prüft die Eidgenössische Steuerverwaltung Ihren Antrag und überweist die Erstattung.</p>
 
     ${statusTimelineHtml({ title: timelineTitle(reclaimCase, total), steps: CH_TIMELINE, doneCount: chTimelineDone(reclaimCase) })}
 
@@ -55,7 +55,7 @@ function render(container, reclaimCase, transactions) {
                 <div class="done-icon">✓</div>
                 <div>
                   <div class="done-title">DivRebound abgeschlossen</div>
-                  <div class="done-sub">Hochgeladen am ${esc(formatDateDe(reclaimCase.ch.completedAt.slice(0, 10)))}. Die Eidgenössische Steuerverwaltung prüft jetzt Ihren Antrag – die Auszahlung dauert erfahrungsgemäß einige Monate.</div>
+                  <div class="done-sub">Hochgeladen am ${esc(formatDateDe(reclaimCase.ch.completedAt.slice(0, 10)))}. Die Eidgenössische Steuerverwaltung prüft jetzt Ihren Antrag. Die Auszahlung dauert erfahrungsgemäß einige Wochen.</div>
                 </div>
               </div>
               <p class="ch-text">Wenn die Erstattung da ist, können Sie sie in Schritt 7 festhalten (optional).</p>`

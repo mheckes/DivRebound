@@ -76,11 +76,9 @@ function render(container, reclaimCase, transactions) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 5)}
-    <p class="ch-lead">Ihr Antrag muss vom deutschen Finanzamt bestätigt werden. Speichern Sie ihn im ePortal als PDF, drucken Sie ihn aus, unterschreiben Sie ihn und senden Sie ihn mit dem Anschreiben an Ihr Finanzamt.</p>
+    <p class="ch-lead">Ihr Antrag muss vom deutschen Finanzamt bestätigt werden. Speichern Sie ihn als PDF, unterschreiben Sie ihn und senden Sie ihn mit dem Anschreiben an Ihr Finanzamt.</p>
 
     ${statusTimelineHtml({ title: timelineTitle(reclaimCase, total), steps: CH_TIMELINE, doneCount: chTimelineDone(reclaimCase) })}
-
-    <div class="ch-warning">⚠️ Keine handschriftlichen Korrekturen auf dem ausgedruckten Antrag – die ESTV lehnt solche Anträge ab. Fehler im Portal korrigieren und neu ausdrucken.</div>
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Formular</span><span class="ch-head-sub">wird im ePortal erzeugt</span></div>

@@ -38,7 +38,7 @@ function render(container, reclaimCase, profile, transactions) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 1)}
-    <p class="ch-lead">Die Rückerstattung der Schweizer Verrechnungssteuer läuft vollständig über das ePortal der Eidgenössischen Steuerverwaltung. DivRebound bereitet alle Angaben so vor, dass Sie sie dort nur noch übertragen müssen. Was schon in Ihren persönlichen Daten steht, ist bereits abgehakt.</p>
+    <p class="ch-lead">Die Rückerstattung der Schweizer Verrechnungssteuer läuft vollständig über das ePortal der Eidgenössischen Steuerverwaltung. DivRebound bereitet alle Angaben so vor, dass Sie sie dort nur noch übertragen müssen.</p>
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Checkliste</span><span class="count-pill" data-summary></span></div>
@@ -62,7 +62,7 @@ function render(container, reclaimCase, profile, transactions) {
       ${
         transactions.length
           ? textRow("check", "Käufe und Verkäufe", `${transactions.length} Transaktionen erfasst${lastTx ? ` · letzte am ${formatDateDe(lastTx.tradeDate)}` : ""} · seitdem etwas gekauft oder verkauft?`, `<button class="btn-secondary btn-small" data-go-step="2" type="button">Bestand prüfen</button>`)
-          : textRow("missing", "Käufe und Verkäufe", "Noch keine erfasst. Alle Käufe und Verkäufe Ihrer Schweizer Aktien ab dem ersten Kauf – per Abrechnung oder manuell.", `<button class="btn-primary btn-small" data-go-step="2" type="button">Erfassen</button>`)
+          : textRow("missing", "Käufe und Verkäufe", "Noch keine erfasst. Das ePortal verlangt das Erwerbsdatum Ihrer Aktien, deshalb werden alle Käufe und Verkäufe Ihrer Schweizer Aktien ab dem ersten Kauf benötigt, per Abrechnung oder manuell.", `<button class="btn-primary btn-small" data-go-step="2" type="button">Erfassen</button>`)
       }
 
       <div class="ch-check-group">Dividenden</div>

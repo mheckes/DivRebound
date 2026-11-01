@@ -44,12 +44,12 @@ function reasons(corridor) {
   const treaty = pct(corridor.treatyRateByResidence.DE);
   const months = corridor.limitationPeriodYears * 12;
   return {
-    none: `Höchstens ${treaty} Quellensteuer einbehalten – nichts zu erstatten. Kommt nicht ins Formular.`,
-    expired: `Zahltag liegt mehr als ${months} Monate zurück – die Frist für die Erstattung ist abgelaufen.`,
+    none: `Höchstens ${treaty} Quellensteuer einbehalten. Es gibt keine Erstattung.`,
+    expired: `Zahltag liegt mehr als ${months} Monate zurück. Die Frist für die Erstattung ist abgelaufen.`,
     partial: `Weniger als ${std} einbehalten (z. B. Ausschüttung teilweise aus Kapitalrücklagen). Erstattet wird nur der tatsächliche Abzug über ${treaty}. Bitte prüfen und bestätigen.`,
     partialConfirmed: `Erstattet wird nur der tatsächliche Abzug über ${treaty}.`,
     high: `Mehr als ${std} einbehalten – das ist ungewöhnlich. Bitte die Beträge mit der Abrechnung vergleichen. Erstattet werden höchstens ${pct(corridor.standardWithholdingRate - corridor.treatyRateByResidence.DE)} vom Brutto.`,
-    invalid: `Bruttobetrag oder Quellensteuer in ${corridor.nativeCurrency} nicht erkannt – bitte aus der Abrechnung eintragen.`,
+    invalid: `Bruttobetrag oder Quellensteuer in ${corridor.nativeCurrency} nicht erkannt. Bitte aus der Abrechnung eintragen.`,
   };
 }
 
@@ -211,7 +211,7 @@ export function mountDividendUpload(container, reclaimCase, options) {
           </svg>
         </div>
         <div class="dz-main">Dividendenabrechnung(en) hochladen oder hierher ziehen</div>
-        <div class="dz-sub">PDF · Mehrfachauswahl möglich · z.B. mehrere Jahre oder mehrere Aktien auf einmal</div>
+        <div class="dz-sub">PDF · Mehrfachauswahl möglich</div>
       </div>
 
       ${issuesHtml()}

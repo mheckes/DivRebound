@@ -146,7 +146,7 @@ function render(container, profile) {
           ${field(profile, "city", "Ort")}
         </div>
         <div class="field-grid">
-          ${field(profile, "email", "Email")}
+          ${field(profile, "email", "E-Mail")}
           ${field(profile, "phone", "Telefon", { placeholder: "inkl. Ländervorwahl" })}
         </div>
       </div>
@@ -200,9 +200,9 @@ function render(container, profile) {
       </summary>
       <div class="help-disclosure-body">
         <ul class="help-list">
-          <li>Alles hier bleibt lokal auf diesem Gerät — nichts wird an einen Server übertragen.</li>
+          <li>Alles hier bleibt lokal auf diesem Gerät, es werden keine Daten an einen Server übertragen.</li>
           <li>Für die Bearbeitung an einem anderen Gerät: verschlüsselte <span class="mono">.divrebound.json</span>-Datei exportieren und dort wieder importieren.</li>
-          <li>Andere Nutzer dieser App sehen ausschließlich ihre eigenen Daten — nie Ihre.</li>
+          <li>Andere Nutzer dieser App sehen ausschließlich ihre eigenen Daten.</li>
           <li>Löschen des Browser-/App-Speichers löscht auch diese Daten unwiderruflich, sofern kein Export vorher gespeichert wurde.</li>
         </ul>
       </div>

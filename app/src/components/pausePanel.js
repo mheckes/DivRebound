@@ -21,7 +21,7 @@ const NOTES = {
   taxOffice: { label: "Bearbeitung pausiert", text: () => "Wartet auf die Bestätigung durch das Finanzamt (meist 2–3 Wochen)." },
   payout: { label: "Bearbeitung pausiert", text: (c) => `Jetzt ist ${AUTHORITY[c.targetCountry]} am Zug – die Auszahlung dauert meist mehrere Monate.` },
   // letzter Schritt, Erstattung eingetragen: Endstand aufbewahren
-  done: { label: "Abgeschlossen", text: () => "Erstattung erhalten – Bearbeitungsstand speichern, um alles aufzubewahren." },
+  done: { label: "Abgeschlossen", text: () => "Erstattung erhalten. Bearbeitungsstand speichern, um alles aufzubewahren." },
 };
 
 /** @param {"taxOffice"|"payout"|"done"} kind */
