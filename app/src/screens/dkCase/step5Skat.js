@@ -53,7 +53,7 @@ export function mount(container, reclaimCase, profile) {
     title: "SKAT-Formular",
     sub: "kein Login und keine MitID nötig",
     docTitle: "„Refusion af udbytteskat / Claim for refund of Danish dividend tax“",
-    text: "Öffnen Sie das Formular in einem zweiten Fenster und ordnen Sie es neben dieser Seite an. Dann übertragen Sie die Werte unten Seite für Seite.",
+    text: "Öffnen Sie das Formular in einem zweiten Fenster und ordnen Sie es neben dieser Seite an. Halten Sie die vom Finanzamt bestätigte Wohnsitzbescheinigung bereit, Sie laden sie auf Seite 4 hoch.",
     url: corridor.onlinePortalUrl,
     buttonLabel: "SKAT-Formular öffnen ↗",
   };
@@ -319,33 +319,26 @@ export function mount(container, reclaimCase, profile) {
     const activeTabDef = tabs.find((t) => t.id === activeTabId) ?? tabs[0];
     const paneBodyHtml = renderPaneBody(activeTabDef, tickedIds);
     const activeTabIndex = tabs.findIndex((t) => t.id === activeTabDef.id);
-    const isFirstTab = activeTabIndex <= 0;
-    const isLastTab = activeTabIndex >= tabs.length - 1;
 
     container.innerHTML = `
+      <div class="ch-page">
       ${stepHeader(reclaimCase, 5)}
       ${portalBoxHtml(portalBox)}
 
+      <section class="cheat-section">
+      <div class="cheat-section-head">
+        <div>
+          <div class="cheat-section-title">Spickzettel</div>
+          <div class="cheat-section-sub">Werte Reiter für Reiter ins SKAT-Formular übertragen. Die Reiter folgen den Seiten des Formulars.</div>
+        </div>
+        <div class="progress-wrap">
+          <span>${done} von ${total} übertragen</span>
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        </div>
+      </div>
+
       <div class="cheat-layout-row">
         <div class="cheat-main">
-          <div class="cheat-progress-row">
-            <span class="card-title">Spickzettel</span>
-            <div class="progress-wrap">
-              <span>${done} von ${total} übertragen</span>
-              <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-            </div>
-          </div>
-
-          <details class="help-disclosure cheat-help-disclosure">
-            <summary>${chevronSvg()} ${infoSvg()} Wie diese Seite funktioniert</summary>
-            <div class="help-disclosure-body">
-              <p><b>Voraussetzung:</b> die vom Finanzamt bestätigte Wohnsitzbescheinigung aus Schritt 4. Sie laden sie auf Seite 4 des SKAT-Formulars hoch.</p>
-              <p>Das Cheat Sheet ist eine Hilfestellung zum Ausfüllen des offiziellen SKAT-Formulars. Übertragen Sie die Einträge in den Tab mit dem geöffneten SKAT-Formular. Die Reihenfolge der Felder entspricht 1:1 dem SKAT-Formular. <a href="${
-                corridor.onlinePortalUrl
-              }" target="_blank" rel="noopener">Formular nicht mehr offen? Erneut öffnen ↗</a></p>
-              <p><b>Bitte beachten:</b> Das Formular hat mehrere Seiten. Bitte im Online Formular auf "Next" klicken und ebenfalls zur nächsten Seite weiterklicken.</p>
-            </div>
-          </details>
 
           ${chunkSelectorHtml}
 
@@ -361,16 +354,14 @@ export function mount(container, reclaimCase, profile) {
             </div>
           </div>
 
-          <div class="cheat-bottom-bar">
-            <button class="btn-secondary" id="prev-tab-btn" type="button" ${isFirstTab ? "disabled" : ""}>← Zurück</button>
-            <button class="btn-primary" id="next-tab-btn" type="button" ${isLastTab ? "disabled" : ""}>Weiter →</button>
-          </div>
         </div>
 
         ${portalSideHtml(portalSide)}
       </div>
+      </section>
 
       ${stepNavHtml(5)}
+      </div>
     `;
 
     bindStepNav(container, reclaimCase, 5);
@@ -405,19 +396,6 @@ export function mount(container, reclaimCase, profile) {
         activeTabId = "p1";
         render();
       });
-    });
-
-    container.querySelector("#prev-tab-btn").addEventListener("click", () => {
-      if (activeTabIndex > 0) {
-        activeTabId = tabs[activeTabIndex - 1].id;
-        render();
-      }
-    });
-    container.querySelector("#next-tab-btn").addEventListener("click", () => {
-      if (activeTabIndex < tabs.length - 1) {
-        activeTabId = tabs[activeTabIndex + 1].id;
-        render();
-      }
     });
 
     if (activeTabDef.dynamic) {

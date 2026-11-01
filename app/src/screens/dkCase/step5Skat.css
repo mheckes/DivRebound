@@ -6,13 +6,32 @@
    style/base.css enthalten - dieser Screen ist komplex genug, um eigene
    Bausteine (Zeilen, Pläsibilitäts-Check, Seiten-Tabs, Chunk-Auswahl) zu brauchen. */
 
-#divrebound-app .cheat-progress-row {
+/* Spickzettel-Bereich (DK Schritt 5, CH Schritt 4): eigene, farbig
+   hinterlegte Fläche mit Überschrift, klar abgesetzt von der Portal-Box darüber. */
+#divrebound-app .cheat-section {
+  margin: 28px 0 22px;
+  padding: 18px;
+  background: var(--bg);
+  border: 1px solid var(--divider);
+  border-radius: 14px;
+}
+#divrebound-app .cheat-section-head {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  margin: 6px 0 10px;
+  margin-bottom: 14px;
+}
+#divrebound-app .cheat-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--navy);
+}
+#divrebound-app .cheat-section-sub {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
 }
 #divrebound-app .progress-wrap {
   display: flex;
@@ -149,16 +168,6 @@
   flex-wrap: wrap;
 }
 
-/* Eigene Klasse statt des globalen .bottom-bar, damit andere Screens (die
-   die volle Breite nutzen) unberührt bleiben - Breite kommt von .cheat-main. */
-#divrebound-app .cheat-bottom-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 22px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
 #divrebound-app .page-tab {
   padding: 8px 13px;
   border-radius: 8px;
@@ -202,7 +211,7 @@
 #divrebound-app .cheat-layout-row {
   display: flex;
   align-items: flex-start;
-  gap: 32px;
+  gap: 24px;
 }
 #divrebound-app .cheat-main {
   flex: 0 0 600px;
@@ -212,8 +221,7 @@
 
 #divrebound-app .cheat-illustration {
   flex: 1;
-  min-width: 240px;
-  padding-top: 12px;
+  min-width: 200px;
   position: sticky;
   top: 16px;
 }

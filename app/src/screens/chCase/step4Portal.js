@@ -20,7 +20,7 @@ const PORTAL_BOX = {
   title: "ePortal",
   sub: "eigener Zugang nötig",
   docTitle: "ePortal der Eidgenössischen Steuerverwaltung",
-  text: "Öffnen Sie das ePortal in einem zweiten Fenster, melden Sie sich an und wählen Sie die Kachel <b>„Verrechnungssteuer“</b> → <b>Neuen Antrag anlegen</b>. Die Reiter unten folgen der Reihenfolge im Portal.",
+  text: "Öffnen Sie das ePortal in einem zweiten Fenster, melden Sie sich an und wählen Sie die Kachel <b>„Verrechnungssteuer“</b> → <b>Neuen Antrag anlegen</b>.",
   url: corridor.onlinePortalUrl,
   buttonLabel: "ePortal öffnen ↗",
 };
@@ -223,9 +223,16 @@ function render(container, reclaimCase) {
     ${stepHeader(reclaimCase, 4)}
     ${portalBoxHtml(PORTAL_BOX)}
 
+    <section class="cheat-section">
+    <div class="cheat-section-head">
+      <div>
+        <div class="cheat-section-title">Spickzettel</div>
+        <div class="cheat-section-sub">Werte Reiter für Reiter ins ePortal übertragen. Die Reiter folgen der Reihenfolge im Portal.</div>
+      </div>
+    </div>
+
     <div class="cheat-layout-row">
       <div class="cheat-main">
-        <div class="cheat-progress-row"><span class="card-title">Spickzettel</span></div>
 
         <div class="page-tabs">
           ${PAGES.map(([id, label], i) => `<div class="page-tab ${id === currentPage ? "active" : ""}" data-page="${id}">${i < pageIdx ? '<span class="done-mark">✓</span>' : `${i + 1}.`} ${label}</div>`).join("")}
@@ -235,15 +242,11 @@ function render(container, reclaimCase) {
           <div class="pane-head"><span class="pane-title">${PAGES[pageIdx][1]}</span></div>
           ${body}
         </div>
-
-        <div class="ch-pane-nav">
-          ${pageIdx > 0 ? `<button class="btn-secondary" data-page="${PAGES[pageIdx - 1][0]}" type="button">← ${PAGES[pageIdx - 1][1]}</button>` : "<span></span>"}
-          ${pageIdx < PAGES.length - 1 ? `<button class="btn-secondary" data-page="${PAGES[pageIdx + 1][0]}" type="button">${PAGES[pageIdx + 1][1]} →</button>` : ""}
-        </div>
       </div>
 
       ${portalSideHtml(PORTAL_SIDE)}
     </div>
+    </section>
 
     ${stepNavHtml(4)}
     </div>`;
