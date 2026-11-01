@@ -12,6 +12,11 @@ export default function (eleventyConfig) {
 
   eleventyConfig.addDataExtension("yml", (contents) => yaml.load(contents));
 
+  // Versionskennung je Build für CSS/JS-Links (?v=...). GitHub Pages lässt
+  // Browser Dateien 10 Minuten zwischenspeichern; ohne neue URL käme nach
+  // einem Deployment sonst neues HTML mit altem CSS zusammen.
+  eleventyConfig.addGlobalData("assetVersion", Date.now().toString(36));
+
   eleventyConfig.addPassthroughCopy({ "site/assets": "assets" });
   // Design-Tokens und Fonts haben genau eine Quelle: die App. Die Website
   // bekommt beim Build eine Kopie, damit beide nicht auseinanderlaufen.
