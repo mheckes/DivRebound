@@ -10,6 +10,7 @@ import {
   PROFILE_ITEM, profileRow, textRow, updateChecklistSummary, bindChecklistAutosave, AUTOSAVE_ROW,
 } from "../../components/checklist.js";
 import { DK_STEPS, dkStepRoute } from "../../config/caseSteps.js";
+import { feedbackLinkHtml } from "../../components/feedbackModal.js";
 
 const PROFILE_ITEMS = ["name", "address", "birthDate", "birthPlace", "tin", "taxOffice", "bank", "bic"].map((k) => PROFILE_ITEM[k]);
 
@@ -33,7 +34,7 @@ export function mount(container) {
     <div class="ch-page">
     <div class="content-header">
       <h1 class="content-title">Unterlagen prüfen</h1>
-      <div class="content-breadcrumb">Dänemark <b>›</b> ${caseLabel(reclaimCase)} <b>›</b> 1 von ${DK_STEPS.length}</div>
+      <div class="content-breadcrumb">Dänemark <b>›</b> ${caseLabel(reclaimCase)} <b>›</b> 1 von ${DK_STEPS.length}${feedbackLinkHtml()}</div>
     </div>
     <p class="ch-lead">Für die Erstattung der dänischen Quellensteuer erzeugt DivRebound eine Wohnsitzbescheinigung, die Ihr deutsches Finanzamt bestätigt. Anschließend tragen Sie Ihren Antrag im Online-Formular von SKAT ein.</p>
 

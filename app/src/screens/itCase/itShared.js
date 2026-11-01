@@ -9,6 +9,7 @@ import { IT_STEPS, itStepRoute } from "../../config/caseSteps.js";
 import { statusTimelineHtml, bindStatusTimeline, timelineTitle } from "../../components/statusTimeline.js";
 import { refundReceived } from "../../util/caseProgress.js";
 import { isEligible, formsFor, yearsOf, totalRefund } from "../../lib/italy.js";
+import { feedbackLinkHtml } from "../../components/feedbackModal.js";
 
 export function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -56,7 +57,7 @@ export function stepHeader(reclaimCase, n) {
   return `
     <div class="content-header">
       <h1 class="content-title">${esc(step.title)}</h1>
-      <div class="content-breadcrumb">Italien <b>›</b> ${esc(caseLabel(reclaimCase))} <b>›</b> ${n} von ${IT_STEPS.length}</div>
+      <div class="content-breadcrumb">Italien <b>›</b> ${esc(caseLabel(reclaimCase))} <b>›</b> ${n} von ${IT_STEPS.length}${feedbackLinkHtml()}</div>
     </div>`;
 }
 

@@ -90,3 +90,54 @@
   color: var(--muted);
   background: var(--divider);
 }
+
+#divrebound-app .feedback-modal {
+  max-width: 460px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+#divrebound-app .feedback-context {
+  font-size: 12px;
+  color: var(--navy);
+  background: var(--navy-light);
+  border-radius: 8px;
+  padding: 7px 10px;
+  margin-bottom: 14px;
+}
+#divrebound-app .feedback-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+#divrebound-app .feedback-field[hidden] {
+  display: none;
+}
+#divrebound-app .feedback-field textarea.field-input {
+  height: auto;
+  resize: vertical;
+  line-height: 1.5;
+}
+#divrebound-app .feedback-quote {
+  font-style: italic;
+  background: var(--bg);
+}
+#divrebound-app .feedback-tip {
+  margin: 0 0 4px;
+}
+#divrebound-app .feedback-step-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 10px;
+  font: inherit;
+  color: var(--cyan-dark);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+@media (max-width: 760px) {
+  #divrebound-app .dr-modal-overlay {
+    padding: 16px;
+  }
+}

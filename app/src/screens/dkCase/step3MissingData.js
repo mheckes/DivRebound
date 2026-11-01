@@ -19,6 +19,7 @@ import {
 } from "../../components/checklist.js";
 import { showToast } from "../../components/toast.js";
 import { DK_STEPS, dkStepRoute } from "../../config/caseSteps.js";
+import { feedbackLinkHtml } from "../../components/feedbackModal.js";
 
 // Pflichtangaben der Wohnsitzbescheinigung 02.050 (fillResidencyCertificate.js)
 const REQUIRED = ["name", "address", "birthDate", "birthPlace", "tin"];
@@ -73,7 +74,7 @@ function render(container, reclaimCase, profile) {
     <div class="ch-page">
     <div class="content-header">
       <h1 class="content-title">Fehlende Angaben</h1>
-      <div class="content-breadcrumb">Dänemark <b>›</b> ${escapeHtml(caseLabel(reclaimCase))} <b>›</b> 3 von ${DK_STEPS.length}</div>
+      <div class="content-breadcrumb">Dänemark <b>›</b> ${escapeHtml(caseLabel(reclaimCase))} <b>›</b> 3 von ${DK_STEPS.length}${feedbackLinkHtml()}</div>
     </div>
     <p class="ch-lead">Folgende Daten werden für die weitere Bearbeitung noch benötigt.</p>
 

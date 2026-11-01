@@ -7,6 +7,7 @@ import * as transactionRepo from "../../db/transactionRepo.js";
 import { computeEntitlements } from "../../lib/holdings.js";
 import { corridors } from "../../config/corridors.js";
 import { CH_STEPS, chStepRoute } from "../../config/caseSteps.js";
+import { feedbackLinkHtml } from "../../components/feedbackModal.js";
 
 export const corridor = corridors.CH;
 
@@ -85,7 +86,7 @@ export function stepHeader(reclaimCase, n) {
   return `
     <div class="content-header">
       <h1 class="content-title">${esc(step.title)}</h1>
-      <div class="content-breadcrumb">Schweiz <b>›</b> ${esc(caseLabel(reclaimCase))} <b>›</b> ${n} von ${CH_STEPS.length}</div>
+      <div class="content-breadcrumb">Schweiz <b>›</b> ${esc(caseLabel(reclaimCase))} <b>›</b> ${n} von ${CH_STEPS.length}${feedbackLinkHtml()}</div>
     </div>`;
 }
 

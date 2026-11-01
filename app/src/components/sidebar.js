@@ -63,7 +63,10 @@ export function renderSidebar(container) {
           <path d="M9 17L20 5M20 5L14.9 7.1M20 5L18.4 10.3" stroke="#00B4D8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <div class="sidebar-wordmark">DivRebound</div>
+      <div class="sidebar-wordmark-wrap">
+        <div class="sidebar-wordmark">DivRebound</div>
+        <span class="sidebar-beta">Beta</span>
+      </div>
     </div>
 
     <div class="sidebar-actions">
@@ -107,6 +110,8 @@ export function renderSidebar(container) {
         </div>
       </details>
     </div>
+
+    <button class="sidebar-btn sidebar-feedback" type="button" data-feedback="sidebar">💬 Feedback geben</button>
 
     <nav class="sidebar-foot" aria-label="Rechtliches">
       ${legalLinks.map((l) => `<a href="${l.href}">${l.title}</a>`).join("")}

@@ -79,7 +79,7 @@ function render(container) {
 
   container.innerHTML = `
     <div class="content-header">
-      <h1 class="content-title">Willkommen${profile ? " zurück" + greetingName : " bei DivRebound"}</h1>
+      <h1 class="content-title" data-feedback-skip>Willkommen${profile ? " zurück" + greetingName : " bei DivRebound"}</h1>
       <div class="content-breadcrumb">Startseite</div>
     </div>
 

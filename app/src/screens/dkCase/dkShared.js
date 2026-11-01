@@ -8,6 +8,7 @@ import { corridors } from "../../config/corridors.js";
 import { DK_STEPS, dkStepRoute } from "../../config/caseSteps.js";
 import { isEligible, totalRefund } from "../../lib/withholding.js";
 import { formatNumberDe } from "../../util/format.js";
+import { feedbackLinkHtml } from "../../components/feedbackModal.js";
 
 export const corridor = corridors.DK;
 // Nur zur Anzeige einer groben EUR-Näherung - keine externe FX-Anbindung im MVP
@@ -47,7 +48,7 @@ export function stepHeader(reclaimCase, n) {
   return `
     <div class="content-header">
       <h1 class="content-title">${esc(step.title)}</h1>
-      <div class="content-breadcrumb">Dänemark <b>›</b> ${esc(caseLabel(reclaimCase))} <b>›</b> ${n} von ${DK_STEPS.length}</div>
+      <div class="content-breadcrumb">Dänemark <b>›</b> ${esc(caseLabel(reclaimCase))} <b>›</b> ${n} von ${DK_STEPS.length}${feedbackLinkHtml()}</div>
     </div>`;
 }
 

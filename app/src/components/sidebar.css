@@ -15,11 +15,29 @@
   align-items: center;
   gap: 10px;
 }
+#divrebound-app .sidebar-wordmark-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
 #divrebound-app .sidebar-wordmark {
   font-family: var(--font-display);
   font-size: 22px;
+  line-height: 1.1;
   letter-spacing: -0.015em;
   white-space: nowrap;
+}
+#divrebound-app .sidebar-beta {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cyan);
+  border: 1px solid rgba(0, 180, 216, 0.55);
+  background: rgba(0, 180, 216, 0.12);
+  border-radius: 4px;
+  padding: 1px 6px;
 }
 #divrebound-app .sidebar-actions {
   display: flex;
@@ -323,4 +341,11 @@
   #divrebound-app .sidebar-divider {
     display: none;
   }
+}
+
+#divrebound-app .sidebar-feedback {
+  margin-top: auto;
+}
+#divrebound-app .sidebar-feedback + .sidebar-foot {
+  margin-top: 0;
 }
