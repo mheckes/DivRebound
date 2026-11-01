@@ -123,7 +123,7 @@ export function openNewCaseWizard() {
 
       close({ profile, reclaimCase });
       const firstStep = { CH: `#/ch/${reclaimCase.caseId}/1`, IT: `#/it/${reclaimCase.caseId}/1` };
-      navigate(firstStep[targetCountry] ?? `#/dk/${reclaimCase.caseId}/checklist`);
+      navigate(firstStep[targetCountry] ?? `#/dk/${reclaimCase.caseId}/1`);
     });
   });
 }

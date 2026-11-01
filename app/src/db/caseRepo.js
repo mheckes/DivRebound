@@ -61,7 +61,6 @@ export function createSwissCaseData() {
     timelineStep: 0,
     uploadChecks: [],
     completedAt: null,
-    receivedRefund: { date: "", amountEur: "" },
   };
 }
 
@@ -74,7 +73,6 @@ export function createItalianCaseData() {
     /** abgehakte Punkte der Umschlag-Checkliste (Schritt 5) */
     envelopeChecks: [],
     mailedAt: null,
-    receivedRefund: { date: "", amountEur: "" },
   };
 }
 

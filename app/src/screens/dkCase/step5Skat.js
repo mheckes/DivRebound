@@ -1,5 +1,8 @@
-// Schritt 2 · Cheat Sheet - seitengetreue Übertragungshilfe für die 6 echten
-// SKAT-Formularseiten (siehe Mock Up Status 08-2026/divrebound_cheatsheet_v3_mockup.html).
+// Dänemark, Schritt 5 "SKAT-Portal ausfüllen" - eine Seite wie das ePortal bei
+// der Schweiz: Zeitleiste, SKAT-Formular öffnen, Spickzettel mit Reitern je
+// Formularseite, "DivRebound abschließen". Der Spickzettel ist eine
+// seitengetreue Übertragungshilfe für die 6 echten SKAT-Formularseiten
+// (siehe Mock Up Status 08-2026/divrebound_cheatsheet_v3_mockup.html).
 // Der Nutzer hat das echte SKAT-Formular in einem zweiten Browser-Tab offen
 // und überträgt Feld für Feld von hier - deshalb ist die Feldreihenfolge
 // bewusst 1:1 aus dem Mockup übernommen (skatFieldMap.js), nicht neu sortiert.
@@ -11,13 +14,19 @@
 // sichtbares Kurz-Feedback vorsieht (Kopier-Häkchen-Flash, Zeilen-Highlight) -
 // das würde ein voller Re-Render mitten in der Animation zerstören.
 
-import { getState, setState } from "../../store/store.js";
-import * as caseRepo from "../../db/caseRepo.js";
 import { corridors } from "../../config/corridors.js";
 import { buildSubmissionChunks } from "../../util/chunking.js";
-import { openExportOptionsModal } from "../../components/modal.js";
-import { exportEncrypted, exportPlain, triggerJsonDownload } from "../../crypto/exportImport.js";
+import { formatDateDe } from "../../util/format.js";
 import { skatTabs, buildSharePages, shareHelpNote } from "./skatFieldMap.js";
+import { dkTimelineHtml, bindDkTimeline } from "./dkTimeline.js";
+import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
+import { stepHeader, stepNavHtml, bindStepNav, saveCase, dkRefund } from "./dkShared.js";
+
+const SUBMIT_CHECKS = [
+  ["attached", "Die vom Finanzamt bestätigte Wohnsitzbescheinigung ist im SKAT-Formular hochgeladen."],
+  ["sent", "Der Antrag ist bei SKAT mit <b>„Send“</b> abgeschickt."],
+  ["receipt", "Die Bestätigungsseite nach dem Absenden ist gespeichert oder ausgedruckt."],
+];
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (ch) => {
@@ -46,7 +55,7 @@ function infoSvg() {
 
 // Rein dekorative, abstrahierte Skizze eines Browserfensters für den frei
 // bleibenden Bereich rechts neben der (bewusst auf 600px begrenzten, siehe
-// cheatSheet.css) Tabelle - visualisiert nur die Idee "hier daneben öffnest
+// step5Skat.css) Tabelle - visualisiert nur die Idee "hier daneben öffnest
 // du das echte SKAT-Formular", ohne das tatsächliche SKAT-Layout/-Branding
 // nachzubilden (fremde Behördenseite, kein Grund, deren Design zu kopieren).
 // Wird auf schmalen Bildschirmen per CSS ausgeblendet (siehe .cheat-illustration).
@@ -72,37 +81,71 @@ function browserMockHtml() {
     </div>`;
 }
 
-function formatCaseLabel(reclaimCase) {
-  const d = new Date(reclaimCase.createdAt);
-  return `DivRebound ${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+/** Zeitleiste, Hinweis und "SKAT-Formular öffnen" über dem Spickzettel */
+function introHtml(reclaimCase, corridor) {
+  return `
+    ${dkTimelineHtml(reclaimCase)}
+    <div class="info-banner">
+      <span class="icon">⚠</span>
+      <div><b>Voraussetzung:</b> Die vom Finanzamt bestätigte Wohnsitzbescheinigung aus Schritt 4 muss vorliegen – Sie laden sie im SKAT-Formular hoch.</div>
+    </div>
+    <div class="card">
+      <div class="card-head head-navy"><span class="card-title">SKAT-Formular</span><span class="ch-head-sub">kein Login und keine MitID nötig</span></div>
+      <div class="doc-item">
+        <div>
+          <div class="doc-title">„Refusion af udbytteskat / Claim for refund of Danish dividend tax“</div>
+          <div class="doc-sub">Öffnen Sie das Formular in einem neuen Tab und ordnen Sie beide Fenster nebeneinander an – dann übertragen Sie die Werte unten Seite für Seite.</div>
+        </div>
+        <div class="doc-actions"><a class="btn-accent btn-small" href="${corridor.onlinePortalUrl}" target="_blank" rel="noopener">SKAT-Formular öffnen ↗</a></div>
+      </div>
+    </div>`;
 }
 
-export function mount(container, params) {
-  const state = getState();
-  const profile = state.currentProfile;
-  const reclaimCase = state.currentCase;
+/** "DivRebound abschließen" - gleicher Ablauf wie Schweiz (Schritt 6) und Italien (Schritt 5) */
+function finishHtml(reclaimCase) {
+  const checks = new Set(reclaimCase.dkSubmitChecks ?? []);
+  const allChecked = SUBMIT_CHECKS.every(([id]) => checks.has(id));
+  const done = reclaimCase.status === "submitted";
+  const doneAt = reclaimCase.submittedAt ? ` am ${formatDateDe(reclaimCase.submittedAt.slice(0, 10))}` : "";
+  return `
+    <div class="card">
+      <div class="card-head head-navy"><span class="card-title">DivRebound abschließen</span></div>
+      <div class="card-body">
+        ${SUBMIT_CHECKS.map(([id, text]) => `<label class="ch-step-row"><input type="checkbox" data-submit-check="${id}" ${checks.has(id) || done ? "checked" : ""} ${done ? "disabled" : ""}><span>${text}</span></label>`).join("")}
+        ${
+          done
+            ? `<div class="done-banner ch-done-banner">
+                <div class="done-icon">✓</div>
+                <div>
+                  <div class="done-title">DivRebound abgeschlossen</div>
+                  <div class="done-sub">Bei SKAT eingereicht${doneAt}. Wenn die Erstattung da ist, können Sie sie in Schritt 6 festhalten (optional).</div>
+                </div>
+              </div>`
+            : `<p class="ch-text">Sobald der Antrag bei SKAT abgeschickt ist, schließen Sie den DivRebound ab. Erst dann zählt er als erledigt.</p>
+              <button class="btn-primary" data-action="finish" ${allChecked ? "" : "disabled"} type="button">✓ Eingereicht – DivRebound abschließen</button>
+              ${allChecked ? "" : `<div class="field-hint" style="margin-top:6px;">Bitte zuerst die drei Punkte oben abhaken.</div>`}`
+        }
+      </div>
+    </div>`;
+}
 
-  if (!profile || !reclaimCase || reclaimCase.caseId !== params.caseId) {
+export function mount(container, reclaimCase, profile) {
+  const corridor = corridors.DK;
+  // Nur bestätigte, erstattungsfähige Ausschüttungen kommen ins SKAT-Formular
+  const eligible = dkRefund(reclaimCase, profile).eligible;
+
+  // Seite 3 wiederholt sich pro Distribution - ohne mindestens eine
+  // erstattungsfähige Ausschüttung gäbe es keinen aktiven Chunk.
+  if (eligible.length === 0) {
     container.innerHTML = `
-      <div class="content-header"><h1 class="content-title">Cheat Sheet</h1></div>
-      <p class="field-hint">Kein Fall geladen.</p>
-    `;
+      <div class="ch-page">
+      ${stepHeader(reclaimCase, 5)}
+      <div class="info-banner"><span class="icon">ℹ</span><div>Für diesen Fall ist noch keine Ausschüttung bestätigt – bitte zuerst Schritt 2 abschließen.</div></div>
+      ${stepNavHtml(5)}
+      </div>`;
+    bindStepNav(container, reclaimCase, 5);
     return;
   }
-
-  // Seite 3 wiederholt sich pro Distribution - ohne mindestens eine erfasste
-  // Ausschüttung gäbe es 0 SubmissionChunks und damit keinen aktiven Chunk.
-  // Regulär nicht erreichbar (Schritt 1 muss vorher mind. eine Distribution
-  // liefern), aber defensiv abfangen statt hart abzustürzen.
-  if (!reclaimCase.distributions || reclaimCase.distributions.length === 0) {
-    container.innerHTML = `
-      <div class="content-header"><h1 class="content-title">Cheat Sheet</h1></div>
-      <p class="field-hint">Für diesen Fall sind noch keine Ausschüttungen erfasst - bitte zuerst Schritt 2 abschließen.</p>
-    `;
-    return;
-  }
-
-  const corridor = corridors[reclaimCase.targetCountry] ?? corridors.DK;
 
   let activeChunkIndex = 0;
   let activeTabId = "p1";
@@ -207,7 +250,6 @@ export function mount(container, params) {
   }
 
   function renderSummaryBody() {
-    const isDone = reclaimCase.status === "submitted";
     return `
       <div class="summary-check-list">
         <div class="summary-check-item"><span>✓</span> Name, Adresse, TIN korrekt?</div>
@@ -219,16 +261,8 @@ export function mount(container, params) {
         <div class="done-icon">✓</div>
         <div>
           <div class="done-title">Geschafft!</div>
-          <div class="done-sub">Ihr Antrag ist vollständig ausgefüllt. Jetzt bei SKAT ausdrucken oder als PDF speichern, dann auf "Send" klicken.</div>
+          <div class="done-sub">Ihr Antrag ist vollständig ausgefüllt. Jetzt bei SKAT ausdrucken oder als PDF speichern, auf „Send“ klicken und den DivRebound unten abschließen.</div>
         </div>
-      </div>
-      <div class="done-actions">
-        <button class="done-btn ${isDone ? "is-done" : ""}" data-action="mark-done" ${isDone ? "disabled" : ""}>${
-      isDone ? "✓ Eingereicht" : "Als eingereicht markieren"
-    }</button>
-        <button class="save-history-btn" data-action="save-history" ${isDone ? "" : "disabled"} title="${
-      isDone ? "" : "Erst verfügbar, sobald der Fall als eingereicht markiert ist"
-    }">💾 Bearbeitungsstand speichern</button>
       </div>`;
   }
 
@@ -329,26 +363,14 @@ export function mount(container, params) {
     }
   }
 
-  async function onMarkDone() {
+  async function onFinish() {
     if (reclaimCase.status === "submitted") return;
     reclaimCase.status = "submitted";
-    await caseRepo.put(reclaimCase);
-    const s = getState();
-    setState({
-      currentCase: reclaimCase,
-      cases: s.cases.map((c) => (c.caseId === reclaimCase.caseId ? reclaimCase : c)),
-    });
+    reclaimCase.submittedAt = new Date().toISOString();
+    reclaimCase.timelineStep = Math.max(reclaimCase.timelineStep ?? 0, 4);
+    reclaimCase.dkStepsDone = [...new Set([...(reclaimCase.dkStepsDone ?? []), 1, 2, 3, 4, 5])].sort();
+    await saveCase(reclaimCase);
     render();
-  }
-
-  async function onSaveHistory() {
-    if (reclaimCase.status !== "submitted") return;
-    const choice = await openExportOptionsModal();
-    if (!choice) return;
-    const payload = { investorProfiles: [profile], reclaimCases: [reclaimCase] };
-    const fileJson = choice.encrypt ? await exportEncrypted(payload, choice.passphrase) : exportPlain(payload);
-    const lastName = profile.residence.lastName || "divrebound";
-    triggerJsonDownload(fileJson, `DivRebound_${reclaimCase.targetCountry}_${lastName}_eingereicht.divrebound.json`);
   }
 
   function render() {
@@ -365,7 +387,6 @@ export function mount(container, params) {
     const done = tickedIds.filter((id) => allRowIds.has(id)).length;
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
-    const caseLabel = formatCaseLabel(reclaimCase);
     const chunkSelectorHtml = chunks.length > 1 ? renderChunkSelector(chunks) : "";
 
     const tabsHtml = tabs
@@ -385,11 +406,11 @@ export function mount(container, params) {
     const isLastTab = activeTabIndex >= tabs.length - 1;
 
     container.innerHTML = `
-      <div class="content-header">
-        <div>
-          <h1 class="content-title">SKAT-Portal ausfüllen</h1>
-          <div class="content-breadcrumb">Dänemark <b>›</b> ${escapeHtml(caseLabel)} <b>›</b> 5 von 5</div>
-        </div>
+      ${stepHeader(reclaimCase, 5)}
+      ${introHtml(reclaimCase, corridor)}
+
+      <div class="cheat-progress-row">
+        <span class="card-title">Spickzettel</span>
         <div class="progress-wrap">
           <span>${done} von ${total} übertragen</span>
           <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
@@ -430,7 +451,25 @@ export function mount(container, params) {
 
         ${browserMockHtml()}
       </div>
+
+      ${finishHtml(reclaimCase)}
+      ${reclaimCase.status === "submitted" ? pausePanelHtml(reclaimCase, "payout") : ""}
+      ${stepNavHtml(5)}
     `;
+
+    bindStepNav(container, reclaimCase, 5);
+    bindPausePanel(container, reclaimCase);
+    bindDkTimeline(container, reclaimCase, render);
+    container.querySelectorAll("[data-submit-check]").forEach((box) =>
+      box.addEventListener("change", async () => {
+        const set = new Set(reclaimCase.dkSubmitChecks ?? []);
+        box.checked ? set.add(box.dataset.submitCheck) : set.delete(box.dataset.submitCheck);
+        reclaimCase.dkSubmitChecks = [...set];
+        await saveCase(reclaimCase);
+        render();
+      })
+    );
+    container.querySelector('[data-action="finish"]')?.addEventListener("click", onFinish);
 
     container.querySelectorAll('input[type="checkbox"][data-row-id]').forEach((cb) => {
       cb.addEventListener("change", () => {
@@ -502,27 +541,16 @@ export function mount(container, params) {
       });
     }
 
-    const markBtn = container.querySelector('[data-action="mark-done"]');
-    if (markBtn) markBtn.addEventListener("click", onMarkDone);
-    const saveBtn = container.querySelector('[data-action="save-history"]');
-    if (saveBtn) saveBtn.addEventListener("click", onSaveHistory);
   }
 
   async function init() {
-    const chunkedCount = (reclaimCase.submissionChunks ?? []).reduce((sum, c) => sum + c.distributionIds.length, 0);
-    const needsRebuild =
-      !reclaimCase.submissionChunks ||
-      reclaimCase.submissionChunks.length === 0 ||
-      chunkedCount !== reclaimCase.distributions.length;
-
-    if (needsRebuild) {
-      reclaimCase.submissionChunks = buildSubmissionChunks(reclaimCase.distributions, corridor.maxDistributionsPerClaim);
-      await caseRepo.put(reclaimCase);
-      const s = getState();
-      setState({
-        currentCase: reclaimCase,
-        cases: s.cases.map((c) => (c.caseId === reclaimCase.caseId ? reclaimCase : c)),
-      });
+    // Anträge (max. 20 Ausschüttungen je Antrag) aus den bestätigten,
+    // erstattungsfähigen Ausschüttungen - neu bilden, wenn sich die Auswahl geändert hat.
+    const chunkedIds = (reclaimCase.submissionChunks ?? []).flatMap((c) => c.distributionIds).sort().join();
+    const eligibleIds = eligible.map((d) => d.distributionId).sort().join();
+    if (chunkedIds !== eligibleIds) {
+      reclaimCase.submissionChunks = buildSubmissionChunks(eligible, corridor.maxDistributionsPerClaim);
+      await saveCase(reclaimCase);
     }
 
     render();

@@ -47,6 +47,8 @@ test("Steuersatz: 26 % Regelfall, abweichend, nichts zu erstatten, unplausibel",
   assert.equal(classifyWithholding(dist({ withheldTax: 45, withholdingRatePercent: 15 }), TODAY).kind, "none");
   assert.equal(classifyWithholding(dist({ withheldTax: 0, withholdingRatePercent: null }), TODAY).kind, "none");
   assert.equal(classifyWithholding(dist({ withheldTax: 90 }), TODAY).kind, "high");
+  // über dem Regelsatz: Erstattung höchstens 26 % − 15 % = 11 % vom Brutto
+  assert.equal(refundFor(dist({ withheldTax: 90 })).refund, 33);
   assert.equal(classifyWithholding(dist({ grossDividend: null }), TODAY).kind, "invalid");
   // ausgewiesener Satz passt nicht zum Betrag -> Warnung, Betrag gilt
   const mismatch = classifyWithholding(dist({ withheldTax: 60, withholdingRatePercent: 26 }), TODAY);
@@ -96,6 +98,19 @@ test("Angaben zum Zahler: eigene Eingabe > Liste > nur Name", () => {
   assert.equal(own.taxCode, "123");
   assert.equal(own.source, "user");
   assert.deepEqual(issuerDetails("IT0000000000", "Unbekannt S.p.A.", {}), { name: "Unbekannt S.p.A.", taxCode: "", address: "", source: "none" });
+});
+
+test("Dänemark: Erstattung aus der tatsächlich einbehaltenen Steuer (27 % → 15 %)", async () => {
+  const w = await import("../src/lib/withholding.js");
+  const dk = corridors.DK;
+  const d = { grossDividend: 239, withheldTax: 64.53, withholdingRatePercent: 27, paymentDate: "2025-03-27" };
+  assert.equal(w.classifyWithholding(d, dk, { today: TODAY }).kind, "ok");
+  assert.deepEqual(w.refundFor(d, dk), { taxDue: 35.85, refund: 28.68 });
+  // nur 15 % einbehalten -> nichts zu erstatten statt pauschal 12 %
+  assert.equal(w.classifyWithholding({ ...d, withheldTax: 35.85 }, dk, { today: TODAY }).kind, "none");
+  assert.equal(w.classifyWithholding({ ...d, paymentDate: "2023-10-30" }, dk, { today: TODAY }).kind, "expired");
+  // Lesefehler mit 40 %: höchstens 12 % vom Brutto (28,68 DKK), nicht 25 %
+  assert.equal(w.refundFor({ ...d, withheldTax: 95.6 }, dk).refund, 28.68);
 });
 
 test("Unternehmensliste: gültige IT-ISINs, Codice fiscale mit 11 Ziffern", () => {

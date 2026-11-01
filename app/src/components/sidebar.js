@@ -14,16 +14,8 @@ import {
 import { openPassphraseModal, openExportOptionsModal, openInfoModal, openConfirmModal } from "./modal.js";
 import { openNewCaseWizard } from "./newCaseWizard.js";
 import { legalLinks } from "../config/siteLinks.js";
-import { CH_STEPS, chStepRoute, DK_STEPS, dkStepRoute, dkStepFromHash, IT_STEPS, itStepRoute } from "../config/caseSteps.js";
-
-const STATUS_ORDER = [
-  "draft",
-  "residency_form_generated",
-  "awaiting_tax_office",
-  "ready_for_skat_submission",
-  "skat_form_verified",
-  "submitted",
-];
+import { stepFromHash } from "../config/caseSteps.js";
+import { stepsFor, stepRoute, isStepDone } from "../util/caseNav.js";
 
 function caseLabel(reclaimCase) {
   const d = new Date(reclaimCase.createdAt);
@@ -34,16 +26,11 @@ function chevron() {
   return `<svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 }
 
-// Dänemark: nummerierte Schritte wie bei der Schweiz (docs/konzept-schweiz.md §1a).
-// Erledigt: mit "Weiter" verlassen (reclaimCase.dkStepsDone), aus dem Status
-// abgeleitet (Formular erzeugt = Schritte 1-4, eingereicht = alle) oder vor dem
-// gerade geöffneten Schritt.
-function renderCase(reclaimCase, activeCaseId) {
+// Nummerierte Schritte je Fall (Ziffer im Kreis, erledigt = ✓), gleich für
+// alle Länder - Fortschritt aus util/caseNav.js.
+function renderCaseNav(reclaimCase, activeCaseId) {
   const isActive = reclaimCase.caseId === activeCaseId;
-  const currentStep = isActive ? dkStepFromHash(window.location.hash) : 0;
-  const statusIdx = STATUS_ORDER.indexOf(reclaimCase.status);
-  const done = new Set(reclaimCase.dkStepsDone ?? []);
-  const isDone = (n) => done.has(n) || (statusIdx >= 2 && n <= 4) || statusIdx >= 5 || (currentStep > 0 && n < currentStep);
+  const currentStep = isActive ? stepFromHash(window.location.hash, reclaimCase.targetCountry.toLowerCase()) : 0;
   return `
     <details class="nav-case ${isActive ? "active" : ""}" ${isActive ? "open" : ""} data-case-id="${reclaimCase.caseId}">
       <summary>
@@ -52,58 +39,10 @@ function renderCase(reclaimCase, activeCaseId) {
         <button class="nav-case-delete" data-action="delete-case" data-case-id="${reclaimCase.caseId}" title="Fall löschen">✕</button>
       </summary>
       <div class="nav-steps">
-        ${DK_STEPS.map((s) => {
-          const cls = s.n === currentStep ? "current" : isDone(s.n) ? "done" : "";
-          return `<div class="nav-step nav-step-numbered ${cls}" data-nav="${dkStepRoute(reclaimCase.caseId, s.n)}"><span class="nav-step-num">${cls === "done" ? "✓" : s.n}</span>${s.title}</div>`;
-        }).join("")}
-      </div>
-    </details>`;
-}
-
-// Schweiz: nummerierte Schritte (Ziffer im Kreis, erledigt = ✓), siehe
-// docs/konzept-schweiz.md §1a. Erledigt ist ein Schritt, wenn er mit "Weiter"
-// verlassen wurde (reclaimCase.ch.stepsDone) bzw. der Fall abgeschlossen ist.
-function renderSwissCase(reclaimCase, activeCaseId) {
-  const isActive = reclaimCase.caseId === activeCaseId;
-  const currentStep = isActive ? Number(window.location.hash.match(/^#\/ch\/[^/]+\/(\d)$/)?.[1] ?? 0) : 0;
-  const done = new Set(reclaimCase.ch?.stepsDone ?? []);
-  const completed = Boolean(reclaimCase.ch?.completedAt);
-  return `
-    <details class="nav-case ${isActive ? "active" : ""}" ${isActive ? "open" : ""} data-case-id="${reclaimCase.caseId}">
-      <summary>
-        ${chevron()}
-        <span style="flex:1;">${caseLabel(reclaimCase)}</span>
-        <button class="nav-case-delete" data-action="delete-case" data-case-id="${reclaimCase.caseId}" title="Fall löschen">✕</button>
-      </summary>
-      <div class="nav-steps">
-        ${CH_STEPS.map((s) => {
-          const isDone = completed || done.has(s.n);
+        ${stepsFor(reclaimCase).map((s) => {
+          const isDone = isStepDone(reclaimCase, s);
           const cls = s.n === currentStep ? "current" : isDone ? "done" : "";
-          return `<div class="nav-step nav-step-numbered ${cls}" data-nav="${chStepRoute(reclaimCase.caseId, s.n)}"><span class="nav-step-num">${isDone && s.n !== currentStep ? "✓" : s.n}</span>${s.title}</div>`;
-        }).join("")}
-      </div>
-    </details>`;
-}
-
-// Italien: wie Schweiz - erledigt, wenn mit "Weiter" verlassen
-// (reclaimCase.it.stepsDone) bzw. nach Italien versendet.
-function renderItalianCase(reclaimCase, activeCaseId) {
-  const isActive = reclaimCase.caseId === activeCaseId;
-  const currentStep = isActive ? Number(window.location.hash.match(/^#\/it\/[^/]+\/(\d)$/)?.[1] ?? 0) : 0;
-  const done = new Set(reclaimCase.it?.stepsDone ?? []);
-  const completed = Boolean(reclaimCase.it?.mailedAt);
-  return `
-    <details class="nav-case ${isActive ? "active" : ""}" ${isActive ? "open" : ""} data-case-id="${reclaimCase.caseId}">
-      <summary>
-        ${chevron()}
-        <span style="flex:1;">${caseLabel(reclaimCase)}</span>
-        <button class="nav-case-delete" data-action="delete-case" data-case-id="${reclaimCase.caseId}" title="Fall löschen">✕</button>
-      </summary>
-      <div class="nav-steps">
-        ${IT_STEPS.map((s) => {
-          const isDone = completed || done.has(s.n);
-          const cls = s.n === currentStep ? "current" : isDone ? "done" : "";
-          return `<div class="nav-step nav-step-numbered ${cls}" data-nav="${itStepRoute(reclaimCase.caseId, s.n)}"><span class="nav-step-num">${isDone && s.n !== currentStep ? "✓" : s.n}</span>${s.title}</div>`;
+          return `<div class="nav-step nav-step-numbered ${cls}" data-nav="${stepRoute(reclaimCase, s.n)}"><span class="nav-step-num">${cls === "done" ? "✓" : s.n}</span>${s.title}</div>`;
         }).join("")}
       </div>
     </details>`;
@@ -150,7 +89,7 @@ export function renderSidebar(container) {
       <details class="nav-country" open>
         <summary>${chevron()} Dänemark</summary>
         <div class="nav-case-group">
-          ${dkCases.map((c) => renderCase(c, activeCaseId)).join("")}
+          ${dkCases.map((c) => renderCaseNav(c, activeCaseId)).join("")}
         </div>
       </details>
 
@@ -158,13 +97,13 @@ export function renderSidebar(container) {
         <summary>${chevron()} Schweiz</summary>
         <div class="nav-case-group">
           <div class="nav-holdings" data-nav="#/ch/bestand">Wertpapierbestand</div>
-          ${chCases.map((c) => renderSwissCase(c, activeCaseId)).join("")}
+          ${chCases.map((c) => renderCaseNav(c, activeCaseId)).join("")}
         </div>
       </details>
       <details class="nav-country" open>
         <summary>${chevron()} Italien</summary>
         <div class="nav-case-group">
-          ${itCases.map((c) => renderItalianCase(c, activeCaseId)).join("")}
+          ${itCases.map((c) => renderCaseNav(c, activeCaseId)).join("")}
         </div>
       </details>
     </div>

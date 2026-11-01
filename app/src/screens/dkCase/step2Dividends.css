@@ -187,19 +187,6 @@
   width: 100%;
   text-align: right;
 }
-#divrebound-app #dist-table tbody td:nth-child(4),
-#divrebound-app #dist-table tbody td:nth-child(5),
-#divrebound-app #dist-table tbody td:nth-child(6),
-#divrebound-app #dist-table tbody td:nth-child(7) {
-  text-align: right;
-}
-#divrebound-app #dist-table thead th:nth-child(3),
-#divrebound-app #dist-table thead th:nth-child(4),
-#divrebound-app #dist-table thead th:nth-child(5),
-#divrebound-app #dist-table thead th:nth-child(6),
-#divrebound-app #dist-table thead th:nth-child(7) {
-  text-align: right;
-}
 #divrebound-app .editable:hover,
 #divrebound-app .editable:focus {
   border-color: var(--navy);

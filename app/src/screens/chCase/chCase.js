@@ -1,4 +1,4 @@
-// DivRebound Schweiz (#/ch/:caseId/:step) - lädt den jeweiligen Schritt 1-6.
+// DivRebound Schweiz (#/ch/:caseId/:step) - lädt den jeweiligen Schritt 1-7.
 // Ablauf und Inhalte: docs/konzept-schweiz.md, Mockup:
 // Mock Up Schweiz 10-2026/divrebound_ch_mockup.html.
 
@@ -10,6 +10,7 @@ import * as step3 from "./step3Dividends.js";
 import * as step4 from "./step4Portal.js";
 import * as step5 from "./step5TaxOffice.js";
 import * as step6 from "./step6Finish.js";
+import * as step7 from "./step7Refund.js";
 
 const STEP_MODULES = {
   1: (container, reclaimCase) => step1.mount(container, reclaimCase),
@@ -18,6 +19,7 @@ const STEP_MODULES = {
   4: (container, reclaimCase) => step4.mount(container, reclaimCase),
   5: (container, reclaimCase) => step5.mount(container, reclaimCase),
   6: (container, reclaimCase) => step6.mount(container, reclaimCase),
+  7: (container, reclaimCase) => step7.mount(container, reclaimCase),
 };
 
 /**

@@ -1,0 +1,82 @@
+/* Gemeinsame Seite "Dividendenabrechnungen" (Dänemark, Italien). Basis-
+   klassen (Upload-Feld, Hinweise, Zwischensummen, Erstattungsbanner,
+   bottom-bar) aus base.css und dkCase/step2Dividends.css. */
+
+#divrebound-app .du-table td.num,
+#divrebound-app .du-table th.num {
+  text-align: right;
+}
+#divrebound-app .du-group-row td {
+  background: var(--cyan-light);
+}
+#divrebound-app .du-isin {
+  font-size: 10.5px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 6px;
+}
+#divrebound-app .du-form-pill {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: #fff;
+  color: #007a9e;
+}
+#divrebound-app .du-date-cell .date-input {
+  text-align: left;
+  width: 100px;
+}
+#divrebound-app .du-date-cell:has(.du-row-note) {
+  min-width: 210px;
+}
+#divrebound-app .du-row-note {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin-top: 3px;
+  max-width: 260px;
+}
+#divrebound-app .du-row-warn td {
+  background: var(--warn-bg, #fff4d6);
+}
+#divrebound-app .du-row-excluded td,
+#divrebound-app .du-row-excluded .editable {
+  color: var(--stone);
+}
+#divrebound-app .du-rate {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+#divrebound-app .du-rate.pill-ok {
+  background: var(--success-bg);
+  color: var(--success);
+}
+#divrebound-app .du-rate.pill-warn,
+#divrebound-app .du-badge-warn {
+  background: var(--warn-bg, #fff4d6);
+  color: var(--warn, #9a6700);
+}
+#divrebound-app .du-rate.pill-bad {
+  background: var(--danger-tint);
+  color: var(--danger);
+}
+#divrebound-app .du-rate.pill-grey {
+  background: var(--bg);
+  color: var(--muted);
+}
+#divrebound-app .du-help .du-help-body {
+  border-top: 1px solid var(--divider);
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+#divrebound-app .du-help .du-help-body b {
+  color: var(--charcoal);
+}

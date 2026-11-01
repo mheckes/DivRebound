@@ -6,9 +6,8 @@ import { getState, setState } from "../../store/store.js";
 import { navigate } from "../../router/router.js";
 import * as caseRepo from "../../db/caseRepo.js";
 import { IT_STEPS, itStepRoute } from "../../config/caseSteps.js";
-import { statusTimelineHtml, bindStatusTimeline } from "../../components/statusTimeline.js";
-import { exportEncrypted, exportPlain, triggerJsonDownload } from "../../crypto/exportImport.js";
-import { openExportOptionsModal } from "../../components/modal.js";
+import { statusTimelineHtml, bindStatusTimeline, timelineTitle } from "../../components/statusTimeline.js";
+import { refundReceived } from "../../util/caseProgress.js";
 import { isEligible, formsFor, yearsOf, totalRefund } from "../../lib/italy.js";
 
 export function esc(value) {
@@ -104,13 +103,13 @@ export const IT_TIMELINE = [
 export function timelineDone(reclaimCase) {
   let derived = reclaimCase.generatedDocuments.some((d) => d.type === "it_form_a") ? 1 : 0;
   if (reclaimCase.it.mailedAt) derived = 4;
-  if (reclaimCase.it.receivedRefund?.date) derived = 5;
+  if (refundReceived(reclaimCase).received) derived = 5;
   return Math.max(reclaimCase.it.timelineStep ?? 0, derived);
 }
 
 export function timelineHtml(reclaimCase) {
   const { forms, total } = caseSummary(reclaimCase);
-  const title = `Form A Italien · ${forms.length} ${forms.length === 1 ? "Formular" : "Formulare"} · ${formatEurPlain(total)} €`;
+  const title = timelineTitle("Form A", forms.length, `${formatEurPlain(total)} €`);
   return statusTimelineHtml({ title, steps: IT_TIMELINE, doneCount: timelineDone(reclaimCase) });
 }
 
@@ -146,43 +145,4 @@ export function loadFormATemplate() {
     return r.arrayBuffer();
   });
   return templatePromise;
-}
-
-// --- "Bearbeitung pausiert" (wie Dänemark/Schweiz) ---
-
-export function pausedPanelHtml() {
-  return `
-    <div class="status-panel">
-      <div class="status-panel-title">Bearbeitung pausiert</div>
-      <div class="status-panel-text">Die weitere Bearbeitung benötigt die Bestätigung durch das Finanzamt (Wartezeit meist 2–3 Wochen). Bearbeitungsstand jetzt speichern, um später einfach fortfahren zu können.</div>
-      <div class="status-actions">
-        <button class="status-btn" data-action="save-state" type="button">💾 Bearbeitungsstand speichern</button>
-        <button class="status-btn" data-action="reminder" type="button">📅 Erinnerung herunterladen (.ics)</button>
-      </div>
-    </div>`;
-}
-
-export function bindPausedPanel(container, reclaimCase) {
-  container.querySelector('[data-action="save-state"]')?.addEventListener("click", async () => {
-    const choice = await openExportOptionsModal();
-    if (!choice) return;
-    const profile = getState().currentProfile;
-    const payload = { investorProfiles: [profile], reclaimCases: await caseRepo.getByProfileId(profile.profileId) };
-    const fileJson = choice.encrypt ? await exportEncrypted(payload, choice.passphrase) : exportPlain(payload);
-    triggerJsonDownload(fileJson, `DivRebound_Italien_${yearRangeLabel(caseSummary(reclaimCase).years)}.divrebound.json`);
-  });
-  container.querySelector('[data-action="reminder"]')?.addEventListener("click", () => {
-    const due = new Date();
-    due.setDate(due.getDate() + 21);
-    const day = (d) => d.toISOString().slice(0, 10).replace(/-/g, "");
-    const stamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-    const ics = [
-      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//DivRebound//Erinnerung//DE", "BEGIN:VEVENT",
-      `UID:${reclaimCase.caseId}-reminder@divrebound`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${day(due)}`,
-      "SUMMARY:DivRebound – Rückmeldung vom Finanzamt prüfen",
-      `DESCRIPTION:Prüfen, ob das Finanzamt die Form A für Italien bestätigt hat (${caseLabel(reclaimCase)}).`,
-      "END:VEVENT", "END:VCALENDAR", "",
-    ].join("\r\n");
-    downloadBlob(new TextEncoder().encode(ics), "Erinnerung.ics", "text/calendar");
-  });
 }

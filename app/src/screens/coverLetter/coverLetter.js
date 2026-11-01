@@ -3,7 +3,7 @@
 // Wizards, weil das Anschreiben profilweit gilt und nicht an einen einzelnen
 // Fall gebunden ist. Zeigt zur Bestätigung die Anschrift des Finanzamts und
 // erzeugt darunter per Klick das Anschreiben als PDF (analog zum Download-Button
-// für die Wohnsitzbescheinigung in summaryDownload.js).
+// für die Wohnsitzbescheinigung in dkCase/step4TaxOffice.js).
 //
 // Die Anschrift ist KEINE eigene Kopie: dieselben Felder wie in "Persönliche
 // Daten" (util/profileFields.js), automatisch ins Profil gespeichert
@@ -18,6 +18,7 @@ import { normalizeTaxOffice } from "../../util/taxOffice.js";
 import { confirmedFieldClasses } from "../../util/fieldDisplay.js";
 import { PROFILE_FIELDS } from "../../util/profileFields.js";
 import { bindProfileAutosave } from "../../util/autosave.js";
+import { openPdfPreview } from "../../util/pdfPreview.js";
 
 export function mount(container) {
   render(container);
@@ -108,34 +109,35 @@ function render(container) {
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Dokument erstellen</span></div>
-      <div class="card-body">
-        <button class="download-btn" data-action="download">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <path d="M14 2v6h6"/>
-            <path d="M12 11v6"/>
-            <path d="m9 14 3 3 3-3"/>
-          </svg>
-          Anschreiben herunterladen (PDF)
-        </button>
-        <div class="field-hint" data-incomplete-hint style="text-align:center;margin-top:8px;">Bitte zuerst die vollständige Anschrift des Finanzamts oben eintragen.</div>
-        <div class="filename-preview">${esc(fileNamePreview)}</div>
-        <div id="download-status"></div>
+      <div class="doc-item">
+        <div>
+          <div class="doc-title">Anschreiben an das Finanzamt</div>
+          <div class="doc-sub">Allgemeines Anschreiben mit der Bitte, die beigefügten Formulare zu bestätigen – unabhängig von einem DivRebound.</div>
+          <div class="doc-file">${esc(fileNamePreview)}</div>
+        </div>
+        <div class="doc-actions">
+          <button class="btn-secondary btn-small" data-action="preview" type="button">👁 Vorschau</button>
+          <button class="btn-accent btn-small" data-action="download" type="button">⬇ PDF</button>
+        </div>
       </div>
+      <div class="doc-status field-hint" data-incomplete-hint>Bitte zuerst die vollständige Anschrift des Finanzamts oben eintragen.</div>
+      <div class="doc-status" id="download-status"></div>
     </div>
     </div>
   `;
 
   const downloadBtn = container.querySelector('[data-action="download"]');
   downloadBtn.addEventListener("click", () => handleDownload(container, downloadBtn));
+  container.querySelector('[data-action="preview"]').addEventListener("click", () => openPdfPreview(() => buildTaxOfficeLetter(getState().currentProfile)));
   updateDownloadState(container, profile);
 }
 
 function updateDownloadState(container, profile) {
   const complete = isTaxOfficeComplete(profile);
-  const btn = container.querySelector('[data-action="download"]');
+  container.querySelectorAll('[data-action="download"], [data-action="preview"]').forEach((btn) => {
+    btn.disabled = !complete;
+  });
   const hint = container.querySelector("[data-incomplete-hint]");
-  if (btn) btn.disabled = !complete;
   if (hint) hint.hidden = complete;
 }
 

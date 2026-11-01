@@ -1,9 +1,11 @@
-// Status-Zeitleiste Dänemark (gleicher Baustein wie Schweiz, docs/konzept-schweiz.md
-// §1a) - auf "Formular & Finanzamt" und im letzten Schritt "SKAT-Portal ausfüllen".
+// Status-Zeitleiste Dänemark (gleicher Baustein wie Schweiz und Italien,
+// docs/konzept-schweiz.md §1a) - auf "Formular & Finanzamt" und "SKAT-Portal ausfüllen".
 
 import { getState, setState } from "../../store/store.js";
 import * as caseRepo from "../../db/caseRepo.js";
-import { statusTimelineHtml, bindStatusTimeline } from "../../components/statusTimeline.js";
+import { statusTimelineHtml, bindStatusTimeline, timelineTitle } from "../../components/statusTimeline.js";
+import { refundReceived } from "../../util/caseProgress.js";
+import { dkRefund, formatDkk } from "./dkShared.js";
 
 const STATUS_ORDER = ["draft", "residency_form_generated", "awaiting_tax_office", "ready_for_skat_submission", "skat_form_verified", "submitted"];
 
@@ -15,15 +17,17 @@ export const DK_TIMELINE = [
   { label: "Ausgezahlt", where: "Konto" },
 ];
 
-/** Gespeicherter Fortschritt, mindestens aber aus dem Status abgeleitet. */
+/** Gespeicherter Fortschritt, mindestens aber aus dem Fall abgeleitet. */
 export function dkTimelineDone(reclaimCase) {
   let derived = reclaimCase.generatedDocuments.some((d) => d.type === "residency_certificate") ? 1 : 0;
   if (reclaimCase.status === "submitted") derived = 4;
+  if (refundReceived(reclaimCase).received) derived = 5;
   return Math.max(reclaimCase.timelineStep ?? 0, derived);
 }
 
 export function dkTimelineHtml(reclaimCase) {
-  return statusTimelineHtml({ title: "Wohnsitzbescheinigung 02.050", steps: DK_TIMELINE, doneCount: dkTimelineDone(reclaimCase) });
+  const title = timelineTitle("Wohnsitzbescheinigung 02.050", 1, formatDkk(dkRefund(reclaimCase).total));
+  return statusTimelineHtml({ title, steps: DK_TIMELINE, doneCount: dkTimelineDone(reclaimCase) });
 }
 
 /** @param {() => void} rerender */

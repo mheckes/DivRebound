@@ -1,5 +1,5 @@
 // Italien, Schritt 4 "Formular & Finanzamt" - gleicher Aufbau wie Dänemark
-// (screens/summaryDownload): Zeitleiste, Formulare als kompakte Zeilen mit
+// (screens/dkCase/step4TaxOffice.js): Zeitleiste, Formulare als kompakte Zeilen mit
 // Vorschau und PDF, wer unterschreibt wo, Anschreiben, nächste Schritte,
 // "Bearbeitung pausiert". Ein Form A je Unternehmen (lib/italy.js formsFor).
 
@@ -9,10 +9,11 @@ import { buildTaxOfficeLetter } from "../../lib/buildTaxOfficeLetter.js";
 import { normalizeTaxOffice } from "../../util/taxOffice.js";
 import { openPdfPreview } from "../../util/pdfPreview.js";
 import { showToast } from "../../components/toast.js";
+import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
 import { refundFor } from "../../lib/italy.js";
 import {
   esc, saveCase, caseSummary, yearRangeLabel, formatEurPlain, stepHeader, stepNavHtml, bindStepNav, goToStep,
-  timelineHtml, bindTimeline, downloadBlob, loadFormATemplate, pausedPanelHtml, bindPausedPanel,
+  timelineHtml, bindTimeline, downloadBlob, loadFormATemplate,
 } from "./itShared.js";
 
 const STATUS_ORDER = ["draft", "residency_form_generated", "awaiting_tax_office", "ready_for_mailing", "submitted"];
@@ -81,17 +82,6 @@ function render(container, reclaimCase) {
     }
 
     <div class="card">
-      <div class="card-head"><span class="card-title">Wer unterschreibt wo?</span><span class="ch-head-sub">auf jedem Formular</span></div>
-      <div class="card-body">
-        <div class="it-sig-grid">
-          <div class="it-sig-box"><b>Seite 3 · Sie</b>„Signature“ unter dem Zahlungsweg</div>
-          <div class="it-sig-box"><b>Seite 5 oben · Sie</b>„Place and date“ ist vorausgefüllt, nur unterschreiben</div>
-          <div class="it-sig-box it-sig-office"><b>Seite 5 unten · Finanzamt</b>Ort, Steuerjahre, „Germany“ und Artikel 10 sind vorausgefüllt – das Finanzamt ergänzt Datum, Stempel und Unterschrift</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
       <div class="card-head head-navy"><span class="card-title">Anschreiben an das Finanzamt</span><span class="ch-head-sub">${esc(taxOffice.name || "Finanzamt fehlt")}</span></div>
       <div class="doc-item">
         <div>
@@ -117,14 +107,14 @@ function render(container, reclaimCase) {
       </div>
     </div>
 
-    ${pausedPanelHtml()}
+    ${pausePanelHtml(reclaimCase, "taxOffice")}
 
     ${stepNavHtml(4)}
     </div>`;
 
   bindStepNav(container, reclaimCase, 4);
   bindTimeline(container, reclaimCase, () => render(container, reclaimCase));
-  bindPausedPanel(container, reclaimCase);
+  bindPausePanel(container, reclaimCase);
   container.querySelectorAll("[data-go-step]").forEach((a) =>
     a.addEventListener("click", (e) => {
       e.preventDefault();

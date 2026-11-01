@@ -9,13 +9,12 @@ import { navigate } from "../../router/router.js";
 import { buildTaxOfficeLetter } from "../../lib/buildTaxOfficeLetter.js";
 import { normalizeTaxOffice } from "../../util/taxOffice.js";
 import { openPdfPreview } from "../../util/pdfPreview.js";
-import { exportEncrypted, exportPlain, triggerJsonDownload } from "../../crypto/exportImport.js";
-import { openExportOptionsModal } from "../../components/modal.js";
-import { statusTimelineHtml, bindStatusTimeline } from "../../components/statusTimeline.js";
-import * as caseRepo from "../../db/caseRepo.js";
+import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
+import { statusTimelineHtml, bindStatusTimeline, timelineTitle as statusTimelineTitle } from "../../components/statusTimeline.js";
+import { refundReceived } from "../../util/caseProgress.js";
 import { chStepRoute } from "../../config/caseSteps.js";
 import {
-  esc, saveCase, loadTransactions, entitlementsFor, formatChf, caseLabel,
+  esc, saveCase, loadTransactions, entitlementsFor, formatChf,
   stepHeader, stepNavHtml, bindStepNav, toastSaved,
 } from "./chShared.js";
 
@@ -27,8 +26,16 @@ export const CH_TIMELINE = [
   { label: "Ausgezahlt", where: "Konto" },
 ];
 
+/** Einheitlicher Titel wie DK/IT: "Formular · 1 Formular · Betrag" */
 export function timelineTitle(reclaimCase, total) {
-  return `${reclaimCase.ch.claimId ? `Antrag ${reclaimCase.ch.claimId}` : "Antrag"} · ${formatChf(total)}`;
+  return statusTimelineTitle(reclaimCase.ch.claimId ? `Antrag ${reclaimCase.ch.claimId}` : "Antrag DIP-0085", 1, formatChf(total));
+}
+
+/** Gespeicherter Fortschritt, mindestens aber aus dem Fall abgeleitet */
+export function chTimelineDone(reclaimCase) {
+  let derived = reclaimCase.ch.completedAt ? 4 : 0;
+  if (refundReceived(reclaimCase).received) derived = 5;
+  return Math.max(reclaimCase.ch.timelineStep ?? 0, derived);
 }
 
 const FORM_CHECKS = [
@@ -71,7 +78,7 @@ function render(container, reclaimCase, transactions) {
     ${stepHeader(reclaimCase, 5)}
     <p class="ch-lead">Ihr Antrag muss vom deutschen Finanzamt bestätigt werden. Speichern Sie ihn im ePortal als PDF, drucken Sie ihn aus, unterschreiben Sie ihn und senden Sie ihn mit dem Anschreiben an Ihr Finanzamt.</p>
 
-    ${statusTimelineHtml({ title: timelineTitle(reclaimCase, total), steps: CH_TIMELINE, doneCount: reclaimCase.ch.timelineStep })}
+    ${statusTimelineHtml({ title: timelineTitle(reclaimCase, total), steps: CH_TIMELINE, doneCount: chTimelineDone(reclaimCase) })}
 
     <div class="ch-warning">⚠️ Keine handschriftlichen Korrekturen auf dem ausgedruckten Antrag – die ESTV lehnt solche Anträge ab. Fehler im Portal korrigieren und neu ausdrucken.</div>
 
@@ -111,20 +118,13 @@ function render(container, reclaimCase, transactions) {
       </div>
     </div>
 
-    <div class="status-panel">
-      <div class="status-panel-title">Bearbeitung pausiert</div>
-      <div class="status-panel-text">Die weitere Bearbeitung benötigt die Bestätigung durch das Finanzamt (Wartezeit meist 2–3 Wochen). Bearbeitungsstand jetzt speichern, um später einfach fortfahren zu können.</div>
-      <div class="status-actions">
-        <button class="status-btn" data-action="save-state" type="button">💾 Bearbeitungsstand speichern</button>
-        <button class="status-btn" data-action="reminder" type="button">📅 Erinnerung herunterladen (.ics)</button>
-      </div>
-    </div>
+    ${pausePanelHtml(reclaimCase, "taxOffice")}
 
     ${stepNavHtml(5)}
     </div>`;
 
   bindStepNav(container, reclaimCase, 5);
-  bindStatusTimeline(container, () => reclaimCase.ch.timelineStep, async (n) => {
+  bindStatusTimeline(container, () => chTimelineDone(reclaimCase), async (n) => {
     reclaimCase.ch.timelineStep = n;
     await saveCase(reclaimCase);
     render(container, reclaimCase, transactions);
@@ -167,31 +167,5 @@ function render(container, reclaimCase, transactions) {
     })
   );
 
-  container.querySelector('[data-action="save-state"]').addEventListener("click", async () => {
-    const choice = await openExportOptionsModal();
-    if (!choice) return;
-    const current = getState().currentProfile;
-    const payload = {
-      investorProfiles: [current],
-      reclaimCases: await caseRepo.getByProfileId(current.profileId),
-      transactions: await loadTransactions(current),
-    };
-    const fileJson = choice.encrypt ? await exportEncrypted(payload, choice.passphrase) : exportPlain(payload);
-    triggerJsonDownload(fileJson, `DivRebound_Schweiz${yearsLabel ? `_${yearsLabel}` : ""}.divrebound.json`);
-  });
-
-  container.querySelector('[data-action="reminder"]').addEventListener("click", () => {
-    const due = new Date();
-    due.setDate(due.getDate() + 21);
-    const day = (d) => d.toISOString().slice(0, 10).replace(/-/g, "");
-    const stamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-    const ics = [
-      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//DivRebound//Erinnerung//DE", "BEGIN:VEVENT",
-      `UID:${reclaimCase.caseId}-reminder@divrebound`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${day(due)}`,
-      "SUMMARY:DivRebound – Rückmeldung vom Finanzamt prüfen",
-      `DESCRIPTION:Prüfen, ob der Schweizer Antrag vom Finanzamt bestätigt wurde (${caseLabel(reclaimCase)}).`,
-      "END:VEVENT", "END:VCALENDAR", "",
-    ].join("\r\n");
-    downloadBlob(new TextEncoder().encode(ics), "Erinnerung.ics", "text/calendar");
-  });
+  bindPausePanel(container, reclaimCase);
 }

@@ -8,11 +8,10 @@
 // Bestätigung durch das Finanzamt (Medienbruch).
 
 import { getState, setState } from "../../store/store.js";
-import { navigate } from "../../router/router.js";
+import { goToStep, markStepDone, stepHeader } from "./dkShared.js";
 import * as caseRepo from "../../db/caseRepo.js";
 import { fillResidencyCertificate, buildFileName } from "../../lib/fillResidencyCertificate.js";
-import { exportEncrypted, exportPlain, triggerJsonDownload } from "../../crypto/exportImport.js";
-import { openExportOptionsModal } from "../../components/modal.js";
+import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
 import { formatDateDe } from "../../util/format.js";
 import { buildTaxOfficeLetter } from "../../lib/buildTaxOfficeLetter.js";
 import { normalizeTaxOffice } from "../../util/taxOffice.js";
@@ -34,11 +33,6 @@ function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, (c) => (
     { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
   ));
-}
-
-function caseLabel(reclaimCase) {
-  const d = new Date(reclaimCase.createdAt);
-  return `DivRebound ${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
 }
 
 /** Gleiche Jahres-Ableitung wie buildFileName() in fillResidencyCertificate.js. */
@@ -144,10 +138,7 @@ function render(container) {
   const taxOfficeComplete = Boolean(taxOffice.name && taxOffice.street && taxOffice.postalCode && taxOffice.city);
 
   container.innerHTML = `
-    <div class="content-header">
-      <h1 class="content-title">Formular &amp; Finanzamt</h1>
-      <div class="content-breadcrumb">Dänemark <b>›</b> ${esc(caseLabel(reclaimCase))} <b>›</b> 4 von 5</div>
-    </div>
+    ${stepHeader(reclaimCase, 4)}
 
     <p class="ch-lead">Die Wohnsitzbescheinigung (Formular 02.050) muss vom deutschen Finanzamt bestätigt werden. DivRebound füllt sie für Sie aus. Drucken Sie sie aus, unterschreiben Sie sie und senden Sie sie mit dem Anschreiben an Ihr Finanzamt.</p>
 
@@ -188,7 +179,7 @@ function render(container) {
           <button class="btn-accent btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ PDF</button>
         </div>
       </div>
-      ${taxOfficeComplete ? "" : `<div class="doc-status field-hint">Bitte zuerst die Anschrift des Finanzamts in <a href="#/dk/${reclaimCase.caseId}/checklist">Schritt 1</a> ergänzen.</div>`}
+      ${taxOfficeComplete ? "" : `<div class="doc-status field-hint">Bitte zuerst die Anschrift des Finanzamts in <a href="#" data-go-step="1">Schritt 1</a> ergänzen.</div>`}
     </div>
 
     <div class="card">
@@ -198,20 +189,11 @@ function render(container) {
       <div class="card-body">
         <div class="step-row"><span class="step-num">1</span><span>Wohnsitzbescheinigung ausdrucken, unterschreiben und mit dem Anschreiben per Post an das Finanzamt senden.</span></div>
         <div class="step-row"><span class="step-num">2</span><span>Das Finanzamt bestätigt (Stempel und Unterschrift) und schickt die Bescheinigung zurück.</span></div>
-        <div class="step-row"><span class="step-num">3</span><span>Danach geht es weiter mit <a href="#/dk/${reclaimCase.caseId}/step2/verify">Schritt 5: SKAT-Portal ausfüllen</a> – dort laden Sie die bestätigte Bescheinigung hoch.</span></div>
+        <div class="step-row"><span class="step-num">3</span><span>Danach geht es weiter mit <a href="#" data-go-step="5">Schritt 5: SKAT-Portal ausfüllen</a> – dort laden Sie die bestätigte Bescheinigung hoch.</span></div>
       </div>
     </div>
 
-    <div class="status-panel">
-      <div class="status-panel-title">Bearbeitung pausiert</div>
-      <div class="status-panel-text">
-        Die weitere Bearbeitung benötigt die Bestätigung durch das Finanzamt (Wartezeit meist 2–3 Wochen). Bearbeitungsstand jetzt speichern, um später einfach fortfahren zu können.
-      </div>
-      <div class="status-actions">
-        <button class="status-btn" data-action="save-state">💾 Bearbeitungsstand speichern</button>
-        <button class="status-btn" data-action="reminder">📅 Erinnerung herunterladen (.ics)</button>
-      </div>
-    </div>
+    ${pausePanelHtml(reclaimCase, "taxOffice")}
 
     <div class="ch-step-nav">
       <button class="btn-secondary" data-action="back" type="button">← Zurück</button>
@@ -223,12 +205,17 @@ function render(container) {
 }
 
 function attachListeners(container, reclaimCase) {
-  container.querySelector('[data-action="back"]').addEventListener("click", () => {
-    navigate(`#/dk/${reclaimCase.caseId}/step1/missing-data`);
+  container.querySelector('[data-action="back"]').addEventListener("click", () => goToStep(reclaimCase, 3));
+  container.querySelector('[data-action="next"]').addEventListener("click", async () => {
+    await markStepDone(reclaimCase, 4);
+    goToStep(reclaimCase, 5);
   });
-  container.querySelector('[data-action="next"]').addEventListener("click", () => {
-    navigate(`#/dk/${reclaimCase.caseId}/step2/verify`);
-  });
+  container.querySelectorAll("[data-go-step]").forEach((a) =>
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      goToStep(reclaimCase, Number(a.dataset.goStep));
+    })
+  );
 
   bindDkTimeline(container, reclaimCase, () => render(container));
 
@@ -251,13 +238,7 @@ function attachListeners(container, reclaimCase) {
     openPdfPreview(() => buildLetter(getState().currentProfile));
   });
 
-  container.querySelector('[data-action="save-state"]').addEventListener("click", () => {
-    handleSaveState();
-  });
-
-  container.querySelector('[data-action="reminder"]').addEventListener("click", () => {
-    handleDownloadReminder();
-  });
+  bindPausePanel(container, reclaimCase);
 }
 
 async function handleDownload(container, btn) {
@@ -291,58 +272,12 @@ async function handleDownload(container, btn) {
     render(container);
     container.querySelector("#download-status").innerHTML = renderDownloadStatusHtml("success", { fileName, generatedAt });
   } catch (err) {
-    console.error("[summaryDownload] Formularerstellung fehlgeschlagen:", err);
+    console.error("[dkCase] Formularerstellung fehlgeschlagen:", err);
     statusEl.innerHTML = renderDownloadStatusHtml("error", { message: err.message });
   } finally {
     btn.disabled = false;
     btn.textContent = originalLabel;
   }
-}
-
-async function handleSaveState() {
-  const { currentProfile: profile, currentCase: reclaimCase } = getState();
-  if (!profile || !reclaimCase) return;
-
-  const choice = await openExportOptionsModal();
-  if (!choice) return;
-
-  const payload = { investorProfiles: [profile], reclaimCases: [reclaimCase] };
-  const fileJson = choice.encrypt ? await exportEncrypted(payload, choice.passphrase) : exportPlain(payload);
-  const fileName = `DivRebound_Daenemark_${yearLabel(reclaimCase)}.divrebound.json`;
-  triggerJsonDownload(fileJson, fileName);
-}
-
-function toIcsDateOnly(d) {
-  return d.toISOString().slice(0, 10).replace(/-/g, "");
-}
-
-function toIcsTimestamp(d) {
-  return d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-}
-
-function handleDownloadReminder() {
-  const { currentCase: reclaimCase } = getState();
-  if (!reclaimCase) return;
-
-  const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + 21); // Übliche Wartezeit lt. status-panel: 2-3 Wochen
-
-  const ics = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//DivRebound//Erinnerung//DE",
-    "BEGIN:VEVENT",
-    `UID:${reclaimCase.caseId}-reminder@divrebound`,
-    `DTSTAMP:${toIcsTimestamp(new Date())}`,
-    `DTSTART;VALUE=DATE:${toIcsDateOnly(dueDate)}`,
-    "SUMMARY:DivRebound – Rückmeldung vom Finanzamt prüfen",
-    `DESCRIPTION:Prüfen, ob die Wohnsitzbescheinigung vom Finanzamt bestätigt wurde (Fall ${caseLabel(reclaimCase)}).`,
-    "END:VEVENT",
-    "END:VCALENDAR",
-    "",
-  ].join("\r\n");
-
-  downloadBlob(new TextEncoder().encode(ics), "Erinnerung.ics", "text/calendar");
 }
 
 /** @param {HTMLElement} container @param {{ caseId: string }} params */

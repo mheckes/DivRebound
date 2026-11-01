@@ -6,6 +6,14 @@
    style/base.css enthalten - dieser Screen ist komplex genug, um eigene
    Bausteine (Zeilen, Pläsibilitäts-Check, Seiten-Tabs, Chunk-Auswahl) zu brauchen. */
 
+#divrebound-app .cheat-progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 6px 0 10px;
+}
 #divrebound-app .progress-wrap {
   display: flex;
   align-items: center;

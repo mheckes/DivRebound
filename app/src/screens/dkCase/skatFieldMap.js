@@ -21,6 +21,8 @@
 //   in die Zwischenablage kopiert wird (i.d.R. identisch, außer z.B. bei der
 //   Telefonnummer, siehe m36)
 
+import { refundFor } from "../../lib/withholding.js";
+
 const RESIDENCE_COUNTRY_NAMES = {
   DE: "Germany",
   AT: "Austria",
@@ -362,12 +364,10 @@ const REFUND_REASON_TEXT =
  * @returns {Array<{ distributionId: string, shareIndex: number, shareCount: number, headLabel: string, rows: Array, plausibilityEstimate: number }>}
  */
 export function buildSharePages(distributions, corridor, residenceCountryCode) {
-  const treatyRate = corridor.treatyRateByResidence[residenceCountryCode] ?? 0;
-  const gapRate = corridor.standardWithholdingRate - treatyRate;
-
   return distributions.map((d, i) => {
     const n = i + 1;
-    const plausibilityEstimate = Math.round(d.grossDividend * gapRate * 100) / 100;
+    // gezahlte Steuer − DBA-Satz × Brutto, wie in Schritt 2 (lib/withholding.js)
+    const plausibilityEstimate = refundFor(d, corridor, residenceCountryCode).refund;
     const grossWhole = Math.round(d.grossDividend);
 
     const rows = [

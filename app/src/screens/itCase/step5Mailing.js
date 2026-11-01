@@ -1,7 +1,7 @@
 // Italien, Schritt 5 "Versand nach Italien" (docs/konzept-italien.md §1, §6):
 // Begleitschreiben (Englisch), Checkliste für den Umschlag, Adresse in
 // Pescara. "Als versendet markieren" schließt den DivRebound ab (zählt für die
-// Statistik); danach optional die erhaltene Erstattung.
+// Statistik); die erhaltene Erstattung folgt optional in Schritt 6.
 
 import { getState } from "../../store/store.js";
 import { corridors } from "../../config/corridors.js";
@@ -9,6 +9,7 @@ import { buildItalyCoverLetter, italyCoverLetterFileName } from "../../lib/build
 import { openPdfPreview } from "../../util/pdfPreview.js";
 import { formatDateDe } from "../../util/format.js";
 import { showToast } from "../../components/toast.js";
+import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
 import { groupByIssuer } from "../../lib/italy.js";
 import {
   esc, saveCase, caseSummary, formatEurPlain, stepHeader, stepNavHtml, bindStepNav, timelineHtml, bindTimeline, downloadBlob,
@@ -38,7 +39,6 @@ function render(container, reclaimCase) {
   const items = envelopeChecks(forms.length, eligible.length);
   const allChecked = items.every(([id]) => checks.has(id));
   const mailed = Boolean(reclaimCase.it.mailedAt);
-  const received = reclaimCase.it.receivedRefund ?? { date: "", amountEur: "" };
 
   container.innerHTML = `
     <div class="ch-page">
@@ -89,12 +89,8 @@ function render(container, reclaimCase) {
                   <div class="done-sub">Am ${esc(formatDateDe(reclaimCase.it.mailedAt.slice(0, 10)))} nach Italien versendet · erwartete Erstattung ${formatEurPlain(total)} €</div>
                 </div>
               </div>
-              <p class="ch-text"><b>Optional:</b> Wenn das Geld da ist, hier eintragen – so sehen Sie später, was DivRebound Ihnen insgesamt gebracht hat.</p>
-              <div class="ch-received">
-                <div class="field-row"><label class="field-label">Erhalten am</label><input class="field-input" type="date" data-received="date" value="${esc(received.date)}"></div>
-                <div class="field-row"><label class="field-label">Betrag (EUR)</label><input class="field-input mono" inputmode="decimal" data-received="amountEur" placeholder="z.B. ${formatEurPlain(total)}" value="${esc(received.amountEur)}"></div>
-              </div>`
-            : `<p class="ch-text">Wenn der Umschlag unterwegs ist, ist Ihr DivRebound abgeschlossen. Die Erstattung können Sie später hier eintragen.</p>
+              <p class="ch-text">Wenn die Erstattung da ist, können Sie sie in Schritt 6 festhalten (optional).</p>`
+            : `<p class="ch-text">Wenn der Umschlag unterwegs ist, ist Ihr DivRebound abgeschlossen. Die Erstattung können Sie später in Schritt 6 eintragen.</p>
               <button class="btn-primary" data-action="mark-mailed" ${allChecked ? "" : "disabled"} type="button">✓ Als versendet markieren</button>
               ${allChecked ? "" : `<div class="field-hint" style="margin-top:6px;">Bitte zuerst die Punkte oben abhaken.</div>`}`
         }
@@ -103,10 +99,13 @@ function render(container, reclaimCase) {
 
     <div class="info-banner"><span class="icon">⏳</span><div><b>Geduld nötig:</b> Die Bearbeitung in Pescara dauert erfahrungsgemäß viele Monate. Die Frist von 48 Monaten ist mit dem Versand gewahrt.</div></div>
 
+    ${mailed ? pausePanelHtml(reclaimCase, "payout") : ""}
+
     ${stepNavHtml(5)}
     </div>`;
 
   bindStepNav(container, reclaimCase, 5);
+  bindPausePanel(container, reclaimCase);
   bindTimeline(container, reclaimCase, () => render(container, reclaimCase));
 
   container.querySelector('[data-action="letter"]').addEventListener("click", async () => {
@@ -133,21 +132,13 @@ function render(container, reclaimCase) {
 
   container.querySelector('[data-action="mark-mailed"]')?.addEventListener("click", async () => {
     reclaimCase.it.mailedAt = new Date().toISOString();
+    reclaimCase.submittedAt = reclaimCase.it.mailedAt;
     reclaimCase.it.timelineStep = Math.max(reclaimCase.it.timelineStep ?? 0, 4);
     reclaimCase.it.stepsDone = [1, 2, 3, 4, 5];
     reclaimCase.status = "submitted";
     await saveCase(reclaimCase);
     render(container, reclaimCase);
   });
-
-  container.querySelectorAll("[data-received]").forEach((input) =>
-    input.addEventListener("change", async () => {
-      reclaimCase.it.receivedRefund = { ...received, ...reclaimCase.it.receivedRefund, [input.dataset.received]: input.value.trim() };
-      await saveCase(reclaimCase);
-      showToast(`✓ ${input.dataset.received === "date" ? "Datum" : "Betrag"} gespeichert`);
-      if (input.dataset.received === "date") render(container, reclaimCase);
-    })
-  );
 }
 
 export function mount(container, reclaimCase) {

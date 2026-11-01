@@ -1,67 +1,22 @@
 // Fachlogik Italien (docs/konzept-italien.md §2, §5) ohne DOM und ohne PDF:
-// Einstufung des Quellensteuersatzes, Erstattung je Ausschüttung, Aufteilung
-// in Form A (eines pro Unternehmen, höchstens 4 Zeilen), Jahresangaben.
+// Aufteilung in Form A (eines pro Unternehmen, höchstens 4 Zeilen),
+// Jahresangaben, Angaben zum Zahler. Einstufung des Steuersatzes und
+// Erstattung kommen aus lib/withholding.js (gemeinsam mit Dänemark), hier mit
+// dem Corridor Italien vorbelegt.
 
 import { corridors } from "../config/corridors.js";
 import { ITALIAN_SHARES } from "../config/italianShares.js";
+import * as withholding from "./withholding.js";
 
 const corridor = corridors.IT;
-const TOLERANCE = 0.005; // 0,5 Prozentpunkte
 
-const round2 = (v) => Math.round(v * 100) / 100;
-
-/**
- * Einstufung nach dem tatsächlich einbehaltenen Satz (Steuer ÷ Brutto). Der
- * auf der Abrechnung ausgewiesene Satz dient nur zur Kontrolle.
- *  - "invalid": Brutto oder Steuer fehlt - Werte ergänzen
- *  - "expired": Zahltag älter als 48 Monate
- *  - "none":    höchstens 15 % einbehalten - nichts zu erstatten
- *  - "partial": zwischen 15 % und 26 % - nur der tatsächliche Abzug zählt, Nutzer bestätigt
- *  - "high":    über 26 % - unplausibel, prüfen
- *  - "ok":      26 % (Regelfall)
- * @returns {{ kind: string, effectiveRate: number|null, rateMismatch: boolean }}
- */
-export function classifyWithholding(distribution, today = new Date()) {
-  const { grossDividend: gross, withheldTax: tax, withholdingRatePercent: printed, paymentDate } = distribution;
-  if (!gross || tax === null || tax === undefined) return { kind: "invalid", effectiveRate: null, rateMismatch: false };
-  const effectiveRate = tax / gross;
-  const rateMismatch = printed !== null && printed !== undefined && Math.abs(printed / 100 - effectiveRate) > TOLERANCE;
-  const base = { effectiveRate, rateMismatch };
-  if (paymentDate && isTimeBarred(paymentDate, today)) return { kind: "expired", ...base };
-  const treaty = corridor.treatyRateByResidence.DE;
-  const standard = corridor.standardWithholdingRate;
-  if (effectiveRate <= treaty + 0.0001) return { kind: "none", ...base };
-  if (Math.abs(effectiveRate - standard) <= TOLERANCE) return { kind: "ok", ...base };
-  if (effectiveRate > standard) return { kind: "high", ...base };
-  return { kind: "partial", ...base };
-}
-
-/** 48 Monate ab dem Steuerabzug (= Zahltag) */
-export function isTimeBarred(paymentDate, today = new Date()) {
-  const cutoff = new Date(today);
-  cutoff.setMonth(cutoff.getMonth() - corridor.limitationPeriodYears * 12);
-  return new Date(paymentDate) < cutoff;
-}
-
-/** Erstattung = tatsächlich gezahlte Steuer − 15 % vom Brutto (nie pauschal 11 %) */
-export function refundFor(distribution) {
-  const taxDue = round2(distribution.grossDividend * corridor.treatyRateByResidence.DE);
-  return { taxDue, refund: Math.max(0, round2(distribution.withheldTax - taxDue)) };
-}
-
-/** Kann überhaupt erstattet werden (unabhängig von der Bestätigung)? */
-export function isRefundable(distribution, today) {
-  return ["ok", "partial", "high"].includes(classifyWithholding(distribution, today).kind);
-}
-
+/** 26 % Regelfall, 15 % DBA, 48 Monate - siehe lib/withholding.js */
+export const classifyWithholding = (distribution, today) => withholding.classifyWithholding(distribution, corridor, { today });
+export const refundFor = (distribution) => withholding.refundFor(distribution, corridor);
+export const isRefundable = (distribution, today) => withholding.isRefundable(distribution, corridor, { today });
 /** Bestätigt (Häkchen oder korrigiert) und erstattungsfähig -> kommt ins Formular */
-export function isEligible(distribution, today) {
-  return distribution.extractionConfidence !== "extracted" && isRefundable(distribution, today);
-}
-
-export function totalRefund(distributions) {
-  return round2(distributions.reduce((s, d) => s + refundFor(d).refund, 0));
-}
+export const isEligible = (distribution, today) => withholding.isEligible(distribution, corridor, { today });
+export const totalRefund = (distributions) => withholding.totalRefund(distributions, corridor);
 
 /** Ausschüttungen je Unternehmen (ISIN), in Reihenfolge des ersten Zahltags */
 export function groupByIssuer(distributions) {

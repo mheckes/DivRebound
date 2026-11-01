@@ -1,4 +1,4 @@
-// DivRebound Italien (#/it/:caseId/:step) - lädt den jeweiligen Schritt 1-5.
+// DivRebound Italien (#/it/:caseId/:step) - lädt den jeweiligen Schritt 1-6.
 // Ablauf und Inhalte: docs/konzept-italien.md, Mockup:
 // Mock Up Italien 10-2026/divrebound_it_mockup.html.
 
@@ -9,8 +9,9 @@ import * as step2 from "./step2Dividends.js";
 import * as step3 from "./step3MissingData.js";
 import * as step4 from "./step4TaxOffice.js";
 import * as step5 from "./step5Mailing.js";
+import * as step6 from "./step6Refund.js";
 
-const STEP_MODULES = { 1: step1, 2: step2, 3: step3, 4: step4, 5: step5 };
+const STEP_MODULES = { 1: step1, 2: step2, 3: step3, 4: step4, 5: step5, 6: step6 };
 
 /**
  * @param {HTMLElement} container

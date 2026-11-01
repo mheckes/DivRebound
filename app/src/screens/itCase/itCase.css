@@ -1,96 +1,7 @@
-/* DivRebound Italien, Schritte 1-5. Basisklassen kommen aus base.css,
-   shell.css (Upload-Tabelle, Erstattungsbanner), chCase.css (Checkliste,
-   Schritt-Navigation), summaryDownload.css (.doc-item, .status-panel) und
-   cheatSheet.css (.help-disclosure). Hier nur, was Italien zusätzlich braucht. */
-
-/* --- Schritt 2: Tabelle je Unternehmen --- */
-#divrebound-app #it-dist-table tbody td:nth-child(3),
-#divrebound-app #it-dist-table tbody td:nth-child(4),
-#divrebound-app #it-dist-table tbody td:nth-child(5),
-#divrebound-app #it-dist-table tbody td:nth-child(7),
-#divrebound-app #it-dist-table thead th:nth-child(3),
-#divrebound-app #it-dist-table thead th:nth-child(4),
-#divrebound-app #it-dist-table thead th:nth-child(5),
-#divrebound-app #it-dist-table thead th:nth-child(7) {
-  text-align: right;
-}
-#divrebound-app .it-company-row td {
-  background: var(--cyan-light);
-}
-#divrebound-app .it-isin {
-  font-size: 10.5px;
-  font-weight: 400;
-  color: var(--muted);
-  margin-left: 6px;
-}
-#divrebound-app .it-form-pill {
-  display: inline-block;
-  margin-left: 8px;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 99px;
-  background: #fff;
-  color: #007a9e;
-}
-#divrebound-app .it-date-cell:has(.it-row-note) {
-  min-width: 210px;
-}
-#divrebound-app .it-date-cell .date-input {
-  text-align: left;
-  width: 100px;
-}
-#divrebound-app .it-row-note {
-  font-size: 11px;
-  color: var(--muted);
-  line-height: 1.4;
-  margin-top: 3px;
-  max-width: 260px;
-}
-#divrebound-app .it-row-warn td {
-  background: var(--warn-bg, #fff4d6);
-}
-#divrebound-app .it-row-excluded td,
-#divrebound-app .it-row-excluded .editable {
-  color: var(--stone);
-}
-#divrebound-app .it-rate {
-  font-size: 10.5px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 99px;
-  white-space: nowrap;
-}
-#divrebound-app .it-rate.pill-ok {
-  background: var(--success-bg);
-  color: var(--success);
-}
-#divrebound-app .it-rate.pill-warn {
-  background: var(--warn-bg, #fff4d6);
-  color: var(--warn, #9a6700);
-}
-#divrebound-app .it-rate.pill-bad {
-  background: var(--danger-tint);
-  color: var(--danger);
-}
-#divrebound-app .it-rate.pill-grey {
-  background: var(--bg);
-  color: var(--muted);
-}
-#divrebound-app .it-badge-warn {
-  background: var(--warn-bg, #fff4d6);
-  color: var(--warn, #9a6700);
-}
-#divrebound-app .it-help .it-help-body {
-  border-top: 1px solid var(--divider);
-  padding: 12px 14px;
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.6;
-}
-#divrebound-app .it-help .it-help-body b {
-  color: var(--charcoal);
-}
+/* DivRebound Italien. Basisklassen kommen aus base.css, shared/dividendUpload.css
+   (Schritt 2), chCase.css (Checkliste, Schritt-Navigation), dkCase/step4TaxOffice.css
+   (.doc-item, .pause-note) und dkCase/step5Skat.css (.help-disclosure).
+   Hier nur, was Italien zusätzlich braucht. */
 
 /* --- Schritt 3: optionale Angaben zu Unternehmen --- */
 #divrebound-app .it-optional {
@@ -104,33 +15,9 @@
   margin-bottom: 6px;
 }
 
-/* --- Schritt 4: Formulare, Unterschriften --- */
+/* --- Schritt 4: Formulare --- */
 #divrebound-app .it-doc-all {
   background: #fafbfc;
-}
-#divrebound-app .it-sig-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-#divrebound-app .it-sig-box {
-  border: 1.5px dashed var(--navy);
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 12px;
-  line-height: 1.45;
-}
-#divrebound-app .it-sig-box b {
-  display: block;
-  color: var(--navy);
-  margin-bottom: 2px;
-}
-#divrebound-app .it-sig-office {
-  border-color: var(--stone);
-  color: var(--muted);
-}
-#divrebound-app .it-sig-office b {
-  color: var(--muted);
 }
 
 /* --- Schritt 5: Adresse --- */
@@ -144,8 +31,3 @@
   margin-bottom: 4px;
 }
 
-@media (max-width: 760px) {
-  #divrebound-app .it-sig-grid {
-    grid-template-columns: 1fr;
-  }
-}

@@ -4,15 +4,16 @@ import "./components/sidebar.css";
 import "./components/modal.css";
 import "./components/toast.css";
 import "./screens/home/home.css";
-import "./screens/shell/shell.css";
-import "./screens/missingData/missingData.css";
-import "./screens/summaryDownload/summaryDownload.css";
-import "./screens/formVerification/formVerification.css";
-import "./screens/cheatSheet/cheatSheet.css";
+import "./screens/dkCase/step2Dividends.css";
+import "./screens/dkCase/step3MissingData.css";
+import "./screens/dkCase/step4TaxOffice.css";
+import "./screens/dkCase/step5Skat.css";
 import "./screens/profile/profile.css";
 import "./screens/holdings/holdings.css";
 import "./screens/chCase/chCase.css";
 import "./screens/itCase/itCase.css";
+import "./screens/shared/dividendUpload.css";
+import "./screens/shared/refundReceived.css";
 import "./components/statusTimeline.css";
 
 import * as pdfjsLib from "pdfjs-dist";
@@ -33,16 +34,11 @@ import { mountSidebar } from "./components/sidebar.js";
 import { hasInvalidInput, invalidFieldLabels, clearInvalidInput } from "./util/autosave.js";
 
 import * as home from "./screens/home/home.js";
-import * as shell from "./screens/shell/shell.js";
-import * as missingData from "./screens/missingData/missingData.js";
-import * as summaryDownload from "./screens/summaryDownload/summaryDownload.js";
-import * as formVerification from "./screens/formVerification/formVerification.js";
-import * as cheatSheet from "./screens/cheatSheet/cheatSheet.js";
 import * as profileScreen from "./screens/profile/profile.js";
 import * as coverLetter from "./screens/coverLetter/coverLetter.js";
 import * as holdingsScreen from "./screens/holdings/holdings.js";
 import * as chCase from "./screens/chCase/chCase.js";
-import * as dkChecklist from "./screens/dkChecklist/dkChecklist.js";
+import * as dkCase from "./screens/dkCase/dkCase.js";
 import * as itCase from "./screens/itCase/itCase.js";
 
 import { websiteHome } from "./config/siteLinks.js";
@@ -97,29 +93,9 @@ route("#/it/:caseId/:step", async (p) => {
   await ensureCaseSelected(p.caseId);
   mountScreen(itCase, p);
 });
-route("#/dk/:caseId/checklist", async (p) => {
+route("#/dk/:caseId/:step", async (p) => {
   await ensureCaseSelected(p.caseId);
-  mountScreen(dkChecklist, p);
-});
-route("#/dk/:caseId/step1", async (p) => {
-  await ensureCaseSelected(p.caseId);
-  mountScreen(shell, p);
-});
-route("#/dk/:caseId/step1/missing-data", async (p) => {
-  await ensureCaseSelected(p.caseId);
-  mountScreen(missingData, p);
-});
-route("#/dk/:caseId/step1/summary", async (p) => {
-  await ensureCaseSelected(p.caseId);
-  mountScreen(summaryDownload, p);
-});
-route("#/dk/:caseId/step2/verify", async (p) => {
-  await ensureCaseSelected(p.caseId);
-  mountScreen(formVerification, p);
-});
-route("#/dk/:caseId/step2/cheatsheet", async (p) => {
-  await ensureCaseSelected(p.caseId);
-  mountScreen(cheatSheet, p);
+  mountScreen(dkCase, p);
 });
 
 async function bootstrap() {

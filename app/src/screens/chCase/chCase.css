@@ -1,6 +1,6 @@
 /* DivRebound Schweiz, Schritte 1-6. Basisklassen (.card, .badge*, table,
-   .field-*, .row/.pane/.page-tab aus cheatSheet.css, .status-panel/.download-btn
-   aus summaryDownload.css) werden wiederverwendet. */
+   .field-*, .row/.pane/.page-tab aus dkCase/step5Skat.css, .pause-note/.download-btn
+   aus dkCase/step4TaxOffice.css) werden wiederverwendet. */
 
 #divrebound-app .ch-page {
   max-width: 900px;

@@ -11,66 +11,49 @@ import { navigate } from "../../router/router.js";
 import { corridors } from "../../config/corridors.js";
 import { formatNumberDe } from "../../util/format.js";
 import { openNewCaseWizard } from "../../components/newCaseWizard.js";
-import { CH_STEPS, chStepRoute, IT_STEPS, itStepRoute } from "../../config/caseSteps.js";
-
-const STATUS_LABELS = {
-  draft: "In Bearbeitung — Ausschüttungen erfassen",
-  residency_form_generated: "Formular erzeugt — wartet auf Finanzamt",
-  awaiting_tax_office: "Wartet auf Bestätigung durch Finanzamt",
-  ready_for_skat_submission: "Bereit für das SKAT-Portal",
-  skat_form_verified: "SKAT-Formular verifiziert — Cheat Sheet offen",
-  submitted: "Eingereicht",
-};
-
-// Schweiz: erster noch nicht erledigter Schritt (bzw. der letzte, wenn abgeschlossen).
-function nextSwissStep(reclaimCase) {
-  if (reclaimCase.ch?.completedAt) return CH_STEPS[CH_STEPS.length - 1];
-  const done = new Set(reclaimCase.ch?.stepsDone ?? []);
-  return CH_STEPS.find((s) => !done.has(s.n)) ?? CH_STEPS[CH_STEPS.length - 1];
-}
-
-// Italien: wie Schweiz, abgeschlossen = nach Italien versendet.
-function nextItalianStep(reclaimCase) {
-  if (reclaimCase.it?.mailedAt) return IT_STEPS[IT_STEPS.length - 1];
-  const done = new Set(reclaimCase.it?.stepsDone ?? []);
-  return IT_STEPS.find((s) => !done.has(s.n)) ?? IT_STEPS[IT_STEPS.length - 1];
-}
-
-function statusLabel(reclaimCase) {
-  if (reclaimCase.targetCountry === "CH") {
-    return reclaimCase.ch?.completedAt ? "Abgeschlossen" : `Schritt ${nextSwissStep(reclaimCase).n}: ${nextSwissStep(reclaimCase).title}`;
-  }
-  if (reclaimCase.targetCountry === "IT") {
-    return reclaimCase.it?.mailedAt ? "Abgeschlossen" : `Schritt ${nextItalianStep(reclaimCase).n}: ${nextItalianStep(reclaimCase).title}`;
-  }
-  return STATUS_LABELS[reclaimCase.status] ?? reclaimCase.status;
-}
+import { nextStep, stepRoute } from "../../util/caseNav.js";
+import { isSubmitted, submittedAt, refundReceived, parseAmount, monthsBetween } from "../../util/caseProgress.js";
+import { isEligible, totalRefund } from "../../lib/withholding.js";
 
 const COUNTRY_LABELS = { DK: "Dänemark", CH: "Schweiz", IT: "Italien" };
 
-function continueRoute(reclaimCase) {
-  if (reclaimCase.targetCountry === "CH") return chStepRoute(reclaimCase.caseId, nextSwissStep(reclaimCase).n);
-  if (reclaimCase.targetCountry === "IT") return itStepRoute(reclaimCase.caseId, nextItalianStep(reclaimCase).n);
-  switch (reclaimCase.status) {
-    case "residency_form_generated":
-    case "awaiting_tax_office":
-      return `#/dk/${reclaimCase.caseId}/step1/summary`;
-    case "ready_for_skat_submission":
-      return `#/dk/${reclaimCase.caseId}/step2/verify`;
-    case "skat_form_verified":
-    case "submitted":
-      return `#/dk/${reclaimCase.caseId}/step2/cheatsheet`;
-    default:
-      // Noch nichts erfasst und Schritt 1 nicht abgeschlossen: bei "Unterlagen prüfen" beginnen.
-      return !reclaimCase.dkStepsDone?.includes(1) && reclaimCase.distributions.length === 0
-        ? `#/dk/${reclaimCase.caseId}/checklist`
-        : `#/dk/${reclaimCase.caseId}/step1`;
-  }
+function statusLabel(reclaimCase) {
+  if (isSubmitted(reclaimCase)) return refundReceived(reclaimCase).received ? "Abgeschlossen, Erstattung erhalten" : "Abgeschlossen";
+  const step = nextStep(reclaimCase);
+  return `Schritt ${step.n}: ${step.title}`;
 }
 
-function refundAmount(distribution, corridor, residenceCountry) {
-  const treatyRate = corridor.treatyRateByResidence[residenceCountry] ?? 0.15;
-  return distribution.grossDividend * (corridor.standardWithholdingRate - treatyRate);
+/** Erwartete Erstattung aus den bestätigten Ausschüttungen (DK in DKK, IT in EUR) */
+function expectedRefund(reclaimCase, residenceCountry) {
+  const corridor = corridors[reclaimCase.targetCountry];
+  const eligible = reclaimCase.distributions.filter((d) => isEligible(d, corridor, { residenceCountry }));
+  return totalRefund(eligible, corridor, residenceCountry);
+}
+
+/**
+ * Statistik über alle Fälle: erhaltene Erstattungen (optionaler letzter
+ * Schritt), durchschnittliche Wartezeit ab Einreichung und Mehrbetrag
+ * gegenüber der Erwartung (nur wo in EUR erstattet wird, z.B. durch Zinsen).
+ */
+function statistics(cases, residenceCountry) {
+  let receivedEur = 0;
+  let receivedCount = 0;
+  let extraEur = 0;
+  const waits = [];
+  for (const c of cases) {
+    const r = refundReceived(c);
+    if (!r.received) continue;
+    const amount = parseAmount(r.amountEur);
+    if (amount !== null) {
+      receivedEur += amount;
+      receivedCount += 1;
+      if (corridors[c.targetCountry].nativeCurrency === "EUR") extraEur += Math.max(0, amount - expectedRefund(c, residenceCountry));
+    }
+    const months = monthsBetween(submittedAt(c)?.slice(0, 10), r.date);
+    if (months !== null) waits.push(months);
+  }
+  const avgWait = waits.length ? Math.round(waits.reduce((s, m) => s + m, 0) / waits.length) : null;
+  return { receivedEur, receivedCount, extraEur: Math.round(extraEur * 100) / 100, avgWait };
 }
 
 function caseLabel(reclaimCase) {
@@ -86,27 +69,11 @@ function render(container) {
   const state = getState();
   const profile = state.currentProfile;
   const allCases = state.cases;
-  const cases = allCases.filter((c) => c.targetCountry === "DK");
-  const swissCases = allCases.filter((c) => c.targetCountry === "CH");
-  const italianCases = allCases.filter((c) => c.targetCountry === "IT");
-  const completedCount =
-    cases.filter((c) => c.status === "submitted").length + swissCases.filter((c) => c.ch?.completedAt).length + italianCases.filter((c) => c.it?.mailedAt).length;
-  // Tatsächlich erhaltene Erstattungen (optional im letzten Schritt eingetragen)
-  const amount = (refund) => Number(String(refund?.amountEur ?? "").replace(/\./g, "").replace(",", ".")) || 0;
-  const receivedEur =
-    swissCases.reduce((sum, c) => sum + amount(c.ch?.receivedRefund), 0) + italianCases.reduce((sum, c) => sum + amount(c.it?.receivedRefund), 0);
-  const corridor = corridors.DK;
-
-  const totalRefund = profile
-    ? cases.reduce(
-        (sum, c) =>
-          sum +
-          c.distributions
-            .filter((d) => d.extractionConfidence !== "extracted")
-            .reduce((s, d) => s + refundAmount(d, corridor, profile.residence.country), 0),
-        0
-      )
-    : 0;
+  const residence = profile?.residence?.country;
+  const completedCount = allCases.filter(isSubmitted).length;
+  const stats = statistics(allCases, residence);
+  const openDkk = allCases.filter((c) => c.targetCountry === "DK" && !refundReceived(c).received).reduce((sum, c) => sum + expectedRefund(c, residence), 0);
+  const openEur = allCases.filter((c) => c.targetCountry === "IT" && !refundReceived(c).received).reduce((sum, c) => sum + expectedRefund(c, residence), 0);
   const mostRecent = [...allCases].sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""))[0] ?? null;
   const greetingName = profile?.residence?.firstName ? `, ${escapeHtml(profile.residence.firstName)}` : "";
 
@@ -129,7 +96,7 @@ function render(container) {
         <div class="home-tile-desc">Persönliche Daten, Bankverbindung und Finanzamt verwalten.</div>
       </div>
 
-      <div class="home-tile ${mostRecent ? "" : "home-tile-disabled"}" ${mostRecent ? `data-nav="${continueRoute(mostRecent)}"` : ""}>
+      <div class="home-tile ${mostRecent ? "" : "home-tile-disabled"}" ${mostRecent ? `data-nav="${stepRoute(mostRecent, nextStep(mostRecent).n)}"` : ""}>
         <div class="home-tile-icon">↻</div>
         <div class="home-tile-title">Letzte Bearbeitung fortsetzen</div>
         <div class="home-tile-desc">
@@ -146,8 +113,11 @@ function render(container) {
         <div class="home-tile-title">Statistik</div>
         <div class="home-tile-desc">
           ${allCases.length} DivRebound${allCases.length === 1 ? "" : "s"} angelegt, davon ${completedCount} abgeschlossen<br>
-          ${cases.length ? `${formatNumberDe(totalRefund)} DKK bestätigte Erstattung Dänemark<br>` : ""}
-          ${receivedEur ? `${formatNumberDe(receivedEur)} EUR erhalten (Schweiz, Italien)` : ""}
+          ${openDkk ? `${formatNumberDe(openDkk)} DKK Erstattung ausstehend (Dänemark)<br>` : ""}
+          ${openEur ? `${formatNumberDe(openEur)} EUR Erstattung ausstehend (Italien)<br>` : ""}
+          ${stats.receivedCount ? `${formatNumberDe(stats.receivedEur)} EUR erhalten (${stats.receivedCount} ${stats.receivedCount === 1 ? "Erstattung" : "Erstattungen"})<br>` : ""}
+          ${stats.extraEur ? `davon ${formatNumberDe(stats.extraEur)} EUR mehr als erwartet (z. B. Zinsen)<br>` : ""}
+          ${stats.avgWait !== null ? `Ø Wartezeit bis zur Auszahlung: ${stats.avgWait} ${stats.avgWait === 1 ? "Monat" : "Monate"}` : ""}
         </div>
       </div>
     </div>

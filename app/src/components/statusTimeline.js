@@ -8,6 +8,16 @@ function esc(value) {
 }
 
 /**
+ * Einheitlicher Titel in allen Ländern: "Formular · n Formular(e) · Betrag"
+ * @param {string} formLabel - z.B. "Wohnsitzbescheinigung 02.050", "Antrag DE-1407-5964-00", "Form A"
+ * @param {number} count
+ * @param {string} amountText - bereits formatiert, in der Währung des Landes
+ */
+export function timelineTitle(formLabel, count, amountText) {
+  return `${formLabel} · ${count} ${count === 1 ? "Formular" : "Formulare"} · ${amountText}`;
+}
+
+/**
  * @param {{ title: string, steps: { label: string, where: string }[], doneCount: number }} options
  */
 export function statusTimelineHtml({ title, steps, doneCount }) {

@@ -1,0 +1,46 @@
+/* Optionaler letzter Schritt "Erstattung erhalten" (alle Länder) */
+
+#divrebound-app .refund-choice {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+#divrebound-app .refund-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid var(--divider);
+  border-radius: 9px;
+  padding: 9px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+#divrebound-app .refund-option.selected {
+  border-color: var(--navy);
+  background: var(--navy-light);
+  font-weight: 600;
+}
+#divrebound-app .refund-option input {
+  accent-color: var(--navy);
+}
+#divrebound-app .refund-facts {
+  margin-top: 14px;
+}
+#divrebound-app .refund-facts:empty {
+  display: none;
+}
+#divrebound-app .refund-fact {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--divider);
+  font-size: 12.5px;
+}
+#divrebound-app .refund-fact span {
+  color: var(--muted);
+}
+#divrebound-app .refund-fact b {
+  font-family: var(--font-mono);
+}
