@@ -202,8 +202,8 @@ function render(container, profile) {
         <ul class="help-list">
           <li>Alles hier bleibt lokal auf diesem Gerät, es werden keine Daten an einen Server übertragen.</li>
           <li>Für die Bearbeitung an einem anderen Gerät: verschlüsselte <span class="mono">.divrebound.json</span>-Datei exportieren und dort wieder importieren.</li>
-          <li>Andere Nutzer dieser App sehen ausschließlich ihre eigenen Daten.</li>
-          <li>Löschen des Browser-/App-Speichers löscht auch diese Daten unwiderruflich, sofern kein Export vorher gespeichert wurde.</li>
+          <li>Andere Nutzer dieses Assistenten sehen ausschließlich ihre eigenen Daten.</li>
+          <li>Löschen des Browser-Speichers löscht auch diese Daten unwiderruflich, sofern kein Export vorher gespeichert wurde.</li>
         </ul>
       </div>
     </details>

@@ -10,15 +10,15 @@ permalink: /datenschutz/
 
 <div class="placeholder"><strong>Platzhalter:</strong> Wie im Impressum.</div>
 
-## Verarbeitung in der DivRebound App
+## Verarbeitung im DivRebound-Assistenten
 
 DivRebound läuft vollständig in deinem Browser. Hochgeladene Dividendenabrechnungen, persönliche Angaben und erzeugte Formulare werden ausschließlich lokal verarbeitet und in der Browser-Datenbank (IndexedDB) deines Geräts gespeichert. Es gibt keinen Server, an den diese Daten übertragen werden.
 
-Die Daten bleiben gespeichert, bis du sie in der App löschst oder die Website-Daten in deinem Browser entfernst. Über „Bearbeitung speichern" kannst du eine Sicherungsdatei erzeugen, auf Wunsch verschlüsselt. Diese Datei verbleibt bei dir.
+Die Daten bleiben gespeichert, bis du sie im Assistenten löschst oder die Website-Daten in deinem Browser entfernst. Über „Bearbeitung speichern" kannst du eine Sicherungsdatei erzeugen, auf Wunsch verschlüsselt. Diese Datei verbleibt bei dir.
 
 ## Feedback in der Beta-Phase
 
-In der App kannst du über „Feedback geben“ oder „Feedback zu diesem Schritt“ freiwillig eine Rückmeldung senden. Übertragen werden nur die Angaben, die du im Feedback-Fenster siehst und einträgst (Art der Rückmeldung, dein Text, eine ggf. markierte Textstelle und, falls angegeben, deine E-Mail-Adresse), sowie automatisch der Name des aktuellen Bildschirms, die App-Version, Browserinformationen (User-Agent) und der Zeitpunkt. Persönliche Daten aus deinem Profil sowie Finanz- und Steuerdaten aus deinen Fällen werden nicht übertragen.
+Im Assistenten kannst du über „Feedback geben“ oder „Feedback zu diesem Schritt“ freiwillig eine Rückmeldung senden. Übertragen werden nur die Angaben, die du im Feedback-Fenster siehst und einträgst (Art der Rückmeldung, dein Text, eine ggf. markierte Textstelle und, falls angegeben, deine E-Mail-Adresse), sowie automatisch der Name des aktuellen Bildschirms, die Version des Assistenten, Browserinformationen (User-Agent) und der Zeitpunkt. Persönliche Daten aus deinem Profil sowie Finanz- und Steuerdaten aus deinen Fällen werden nicht übertragen.
 
 Für den Versand wird der Dienst Formspree (USA) genutzt. Formspree empfängt die Rückmeldung, verarbeitet dabei technisch bedingt deine IP-Adresse, speichert die Meldung bis zu 30 Tage und leitet sie per E-Mail an den Betreiber weiter. Die Rückmeldungen werden ausschließlich zur Verbesserung von DivRebound genutzt, die E-Mail-Adresse nur für Rückfragen zu deinem Feedback.
 
@@ -26,7 +26,7 @@ Für den Versand wird der Dienst Formspree (USA) genutzt. Formspree empfängt di
 
 ## Hosting
 
-Website und App werden über GitHub Pages ausgeliefert (GitHub Inc.). Beim Aufruf verarbeitet GitHub technisch notwendige Verbindungsdaten wie die IP-Adresse.
+Website und Assistent werden über GitHub Pages ausgeliefert (GitHub Inc.). Beim Aufruf verarbeitet GitHub technisch notwendige Verbindungsdaten wie die IP-Adresse.
 
 <div class="placeholder"><strong>Platzhalter:</strong> Angaben zu GitHub Pages (Anbieter, Rechtsgrundlage, Drittlandübermittlung) rechtlich prüfen lassen.</div>
 

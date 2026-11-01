@@ -63,7 +63,7 @@ export function openFeedbackModal({ quote = "" } = {}) {
   overlay.innerHTML = `
     <form class="dr-modal feedback-modal" novalidate>
       <h2 class="dr-modal-title">Feedback zur Beta</h2>
-      <p class="dr-modal-hint">Danke fürs Testen! Bildschirm, App-Version und Browserinformation werden automatisch mitgeschickt. Nicht gesendet werden deine persönlichen Daten, Finanz- und Steuerdaten.</p>
+      <p class="dr-modal-hint">Danke fürs Testen! Bildschirm, Version des Assistenten und Browserinformation werden automatisch mitgeschickt. Nicht gesendet werden deine persönlichen Daten, Finanz- und Steuerdaten.</p>
       <details class="feedback-privacy">
         <summary>Datenschutzhinweis</summary>
         <p>Dein Feedback wird über den Dienst Formspree (USA) übermittelt und per E-Mail an den Betreiber von DivRebound weitergeleitet. Formspree speichert die Meldung bis zu 30 Tage.</p>

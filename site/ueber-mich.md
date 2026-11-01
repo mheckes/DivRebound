@@ -19,7 +19,7 @@ Meine Anlagestrategie hat sich in dieser Zeit verändert. Zu Beginn lag der Foku
 
 ## Warum auch Einzelaktien
 
-Mich reizt es, Unternehmen unternehmerisch zu begleiten und die Perspektive eines Mitunternehmers einzunehmen. Außerdem kann ich so auf Geschäftsmodelle setzen, die in einem breiten ETF-Portfolio unterrepräsentiert sind, zum Beispiel europäische Mittelständler mit einem soliden, wenig zyklischen Geschäftsmodell oder besonderen Wachstumschancen in ihrer Nische.
+Mich reizt es, Unternehmen zu begleiten und die Perspektive eines Miteigentümers einzunehmen. Außerdem kann ich so auf Geschäftsmodelle setzen, die in einem breiten ETF-Portfolio unterrepräsentiert sind, zum Beispiel europäische Mittelständler mit einem soliden, wenig zyklischen Geschäftsmodell oder besonderen Wachstumschancen in ihrer Nische.
 
 ## Die Überraschung bei der Quellensteuer
 
