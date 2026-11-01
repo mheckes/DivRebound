@@ -11,15 +11,15 @@ layout: layouts/default.html
   </div>
   <div class="stat-row">
     <div class="stat-card">
-      <div class="stat-value">bis zu <span class="accent">30</span> %</div>
+      <div class="stat-value">bis zu <span class="nowrap"><span class="accent">30</span>&nbsp;%</span></div>
       <div class="stat-desc">Quellensteuer rückforderbar — abhängig vom Land</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value"><span class="accent">3</span> Schritte</div>
+      <div class="stat-value"><span class="nowrap"><span class="accent">3</span>&nbsp;Schritte</span></div>
       <div class="stat-desc">Rückerstattung in wenigen Klicks — intuitive Anleitung, kein Vorwissen nötig</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value">bis zu <span class="accent">4</span> J.</div>
+      <div class="stat-value">bis zu <span class="nowrap"><span class="accent">4</span>&nbsp;J.</span></div>
       <div class="stat-desc">Rückwirkende Erstattung möglich — abhängig vom Land</div>
     </div>
   </div>
@@ -49,7 +49,9 @@ layout: layouts/default.html
 
 <section class="section">
   <h2 class="section-heading">Ein Blick in die App</h2>
-  <div class="preview-note">Beispielansicht · Layout aus der aktuellen App, Namen und Beträge verallgemeinert</div>
+  <div class="preview-note"><span class="only-wide">Beispielansicht · Layout aus der aktuellen App, Namen und Beträge verallgemeinert</span><span class="only-narrow">So sieht DivRebound am Computer aus · Namen und Beträge verallgemeinert</span></div>
+  <div class="mock-frame">
+  <div class="mock-screen">
   <div class="app-mock" aria-hidden="true">
     <div class="app-mock-sidebar">
       <div class="mock-brand">Div<span>Rebound</span></div>
@@ -96,29 +98,8 @@ layout: layouts/default.html
       <div class="btn-primary">Weiter →</div>
     </div>
   </div>
-</section>
-
-<section class="section">
-  <h2 class="section-heading">In diesen Ländern zurückholen</h2>
-  <p class="section-intro">Erstattungspotenzial auf Dividenden nach Sitzland der Aktiengesellschaft, jeweils beim Regelsatz. Länder ohne Erstattungsanspruch (z. B. Großbritannien, Australien, Niederlande, Japan) sind nicht aufgeführt. Die letzte Spalte zeigt, wo DivRebound dich unterstützt.</p>
-  <div class="country-table" role="table" aria-label="Erstattungspotenzial nach Land">
-    <div class="country-row head" role="row"><div role="columnheader">Land</div><div role="columnheader">Quellensteuersatz</div><div role="columnheader">In DE anrechenbar</div><div role="columnheader">Erstattungspotenzial</div><div role="columnheader">DivRebound</div></div>
-    {%- assign sortedCountries = countries | sortByPotential %}
-    {%- for c in sortedCountries %}
-    <div class="country-row" role="row">
-      <div role="cell">{{ c.name }}</div>
-      <div role="cell">{{ c.rate | pct }}</div>
-      <div role="cell">{{ c.creditable | pct }}</div>
-      <div role="cell" class="accent-cell">bis zu {{ c.potential | pct }}</div>
-      <div role="cell">
-        {%- if c.status == "live" %}<span class="status status-live">verfügbar</span>
-        {%- elsif c.status == "planned" %}<span class="status status-planned">in Planung</span>
-        {%- else %}<span class="status status-no">nicht geplant</span>{% endif -%}
-      </div>
-    </div>
-    {%- endfor %}
   </div>
-  <p class="source-note">Quelle: Stiftung Warentest Finanztest 10/2026 (S. 83), Datenbasis Bundeszentralamt für Steuern, Stand {{ site.countriesAsOf }}. Angaben in Prozentpunkten, bezogen auf die Dividende, jeweils Regelsatz. Richtwerte, die sich ändern können. Österreich und Frankreich unterstützt DivRebound nicht, weil das Verfahren dort aufwendig, bürokratisch und teuer ist und sich die Rückforderung meist nicht lohnt.</p>
+  </div>
 </section>
 
 <section class="section">
@@ -143,6 +124,29 @@ layout: layouts/default.html
       {%- endfor %}
     </div>
   </div>
+</section>
+
+<section class="section">
+  <h2 class="section-heading">In diesen Ländern zurückholen</h2>
+  <p class="section-intro">Erstattungspotenzial auf Dividenden nach Sitzland der Aktiengesellschaft, jeweils beim Regelsatz. Länder ohne Erstattungsanspruch (z. B. Großbritannien, Australien, Niederlande, Japan) sind nicht aufgeführt. Der Status zeigt, wo DivRebound dich unterstützt.</p>
+  <div class="country-table" role="table" data-collapse-mobile="6" aria-label="Erstattungspotenzial nach Land">
+    <div class="country-row head" role="row"><div role="columnheader">Land</div><div role="columnheader">Quellensteuersatz</div><div role="columnheader">In DE anrechenbar</div><div role="columnheader">Erstattungspotenzial</div><div role="columnheader">DivRebound</div></div>
+    {%- assign sortedCountries = countries | sortLiveFirst %}
+    {%- for c in sortedCountries %}
+    <div class="country-row" role="row">
+      <div role="cell">{{ c.name }}</div>
+      <div role="cell">{{ c.rate | pct }}</div>
+      <div role="cell">{{ c.creditable | pct }}</div>
+      <div role="cell" class="accent-cell">bis zu {{ c.potential | pct }}</div>
+      <div role="cell">
+        {%- if c.status == "live" %}<span class="status status-live">verfügbar</span>
+        {%- elsif c.status == "planned" %}<span class="status status-planned">in Planung</span>
+        {%- else %}<span class="status status-no">nicht geplant</span>{% endif -%}
+      </div>
+    </div>
+    {%- endfor %}
+  </div>
+  <p class="source-note">Quelle: Stiftung Warentest Finanztest 10/2026 (S. 83), Datenbasis Bundeszentralamt für Steuern, Stand {{ site.countriesAsOf }}. Angaben in Prozentpunkten, bezogen auf die Dividende, jeweils Regelsatz. Richtwerte, die sich ändern können. Österreich und Frankreich unterstützt DivRebound nicht, weil das Verfahren dort aufwendig, bürokratisch und teuer ist und sich die Rückforderung meist nicht lohnt.</p>
 </section>
 
 <section class="cta-band">

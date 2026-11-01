@@ -15,6 +15,7 @@ import "./screens/itCase/itCase.css";
 import "./screens/shared/dividendUpload.css";
 import "./screens/shared/refundReceived.css";
 import "./components/statusTimeline.css";
+import "./components/smallScreenNotice.css";
 
 import * as pdfjsLib from "pdfjs-dist";
 // Muss vor dem ersten parseDividendCertificate()-Aufruf gesetzt sein, sonst
@@ -32,6 +33,7 @@ import * as profileRepo from "./db/profileRepo.js";
 import * as caseRepo from "./db/caseRepo.js";
 import { mountSidebar } from "./components/sidebar.js";
 import { installFeedbackTriggers } from "./components/feedbackModal.js";
+import { mountSmallScreenNotice } from "./components/smallScreenNotice.js";
 import { hasInvalidInput, invalidFieldLabels, clearInvalidInput } from "./util/autosave.js";
 
 import * as home from "./screens/home/home.js";
@@ -102,6 +104,7 @@ route("#/dk/:caseId/:step", async (p) => {
 async function bootstrap() {
   mountSidebar(sidebarRoot);
   installFeedbackTriggers();
+  mountSmallScreenNotice(app);
 
   // Gespeichert wird automatisch beim Verlassen eines Felds (util/autosave.js) -
   // gewarnt wird nur noch, wenn eine ungültige Eingabe nicht gespeichert werden konnte.

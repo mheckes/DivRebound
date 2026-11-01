@@ -22,8 +22,11 @@ export default function (eleventyConfig) {
 
   // 27.5 -> "27,5 %"
   eleventyConfig.addFilter("pct", (value) => `${String(value).replace(".", ",")} %`);
-  eleventyConfig.addFilter("sortByPotential", (countries) =>
-    [...countries].sort((a, b) => b.potential - a.potential)
+  // Bereits unterstützte Länder zuerst, innerhalb der Gruppen nach Erstattungspotenzial
+  eleventyConfig.addFilter("sortLiveFirst", (countries) =>
+    [...countries].sort(
+      (a, b) => (b.status === "live") - (a.status === "live") || b.potential - a.potential
+    )
   );
   eleventyConfig.addFilter("withCompanies", (countries) => countries.filter((c) => c.companies));
   eleventyConfig.addFilter("potentialFor", (countries, code) => {
