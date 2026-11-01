@@ -1,7 +1,8 @@
 // Schritt 4 "ePortal ausfüllen" (docs/konzept-schweiz.md §1, §5): Spickzettel
 // in der Reihenfolge des ESTV-Portals, mit Kopier-Buttons und Haken (wie das
-// SKAT-Cheat-Sheet für Dänemark). EIN Antrag für alle offenen Jahre - im
-// Portal unter "Allgemeine Angaben" per Mehrfachauswahl.
+// SKAT-Cheat-Sheet für Dänemark, gleiches Layout: links die Reiter, rechts das
+// ePortal angedeutet). EIN Antrag für alle offenen Jahre - im Portal unter
+// "Allgemeine Angaben" per Mehrfachauswahl.
 
 import { getState } from "../../store/store.js";
 import { navigate } from "../../router/router.js";
@@ -9,10 +10,18 @@ import { PROFILE_FIELDS } from "../../util/profileFields.js";
 import { chStepRoute } from "../../config/caseSteps.js";
 import { computeLots } from "../../lib/holdings.js";
 import { shareNames } from "../../util/shareNames.js";
+import { portalSideHtml, portalInlineHtml } from "../../components/portalSide.js";
 import {
   esc, corridor, saveCase, loadTransactions, entitlementsFor, completeDistributions, isTimeBarred,
   formatChf, formatDatePortal, stepHeader, stepNavHtml, bindStepNav, copyToClipboard,
 } from "./chShared.js";
+
+const PORTAL = {
+  url: corridor.onlinePortalUrl,
+  host: "eportal.admin.ch",
+  caption: "Öffnen Sie das ePortal in einem zweiten Fenster und ordnen Sie es hier daneben an. Dort anmelden und die Kachel <b>„Verrechnungssteuer“</b> → <b>Neuen Antrag anlegen</b> wählen. Die Reiter folgen der Reihenfolge im Portal.",
+  buttonLabel: "ePortal öffnen ↗",
+};
 
 const PAGES = [
   ["general", "Allgemeine Angaben"],
@@ -209,23 +218,28 @@ function render(container, reclaimCase) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 4)}
-    <div class="info-banner"><span class="icon">🔗</span><div>
-      Öffnen Sie das ePortal, melden Sie sich an und wählen Sie die Kachel <b>„Verrechnungssteuer“</b> → <b>Neuen Antrag anlegen</b>. Die Reiter unten folgen der Reihenfolge im Portal.
-      <div style="margin-top:8px;"><a class="btn-accent btn-small" href="${corridor.onlinePortalUrl}" target="_blank" rel="noopener">ePortal öffnen ↗</a></div>
-    </div></div>
 
-    <div class="page-tabs">
-      ${PAGES.map(([id, label], i) => `<div class="page-tab ${id === currentPage ? "active" : ""}" data-page="${id}">${i < pageIdx ? '<span class="done-mark">✓</span>' : `${i + 1}.`} ${label}</div>`).join("")}
-    </div>
+    <div class="cheat-layout-row">
+      <div class="cheat-main">
+        ${portalInlineHtml(PORTAL)}
+        <div class="cheat-progress-row"><span class="card-title">Spickzettel</span></div>
 
-    <div class="pane">
-      <div class="pane-head"><span class="pane-title">${PAGES[pageIdx][1]}</span></div>
-      ${body}
-    </div>
+        <div class="page-tabs">
+          ${PAGES.map(([id, label], i) => `<div class="page-tab ${id === currentPage ? "active" : ""}" data-page="${id}">${i < pageIdx ? '<span class="done-mark">✓</span>' : `${i + 1}.`} ${label}</div>`).join("")}
+        </div>
 
-    <div class="ch-pane-nav">
-      ${pageIdx > 0 ? `<button class="btn-secondary" data-page="${PAGES[pageIdx - 1][0]}" type="button">← ${PAGES[pageIdx - 1][1]}</button>` : "<span></span>"}
-      ${pageIdx < PAGES.length - 1 ? `<button class="btn-secondary" data-page="${PAGES[pageIdx + 1][0]}" type="button">${PAGES[pageIdx + 1][1]} →</button>` : ""}
+        <div class="pane">
+          <div class="pane-head"><span class="pane-title">${PAGES[pageIdx][1]}</span></div>
+          ${body}
+        </div>
+
+        <div class="ch-pane-nav">
+          ${pageIdx > 0 ? `<button class="btn-secondary" data-page="${PAGES[pageIdx - 1][0]}" type="button">← ${PAGES[pageIdx - 1][1]}</button>` : "<span></span>"}
+          ${pageIdx < PAGES.length - 1 ? `<button class="btn-secondary" data-page="${PAGES[pageIdx + 1][0]}" type="button">${PAGES[pageIdx + 1][1]} →</button>` : ""}
+        </div>
+      </div>
+
+      ${portalSideHtml(PORTAL)}
     </div>
 
     ${stepNavHtml(4)}

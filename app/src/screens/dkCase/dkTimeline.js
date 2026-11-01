@@ -1,5 +1,5 @@
 // Status-Zeitleiste Dänemark (gleicher Baustein wie Schweiz und Italien,
-// docs/konzept-schweiz.md §1a) - auf "Formular & Finanzamt" und "SKAT-Portal ausfüllen".
+// docs/konzept-schweiz.md §1a) - auf "Formular & Finanzamt" und "Einreichen & abschließen".
 
 import { getState, setState } from "../../store/store.js";
 import * as caseRepo from "../../db/caseRepo.js";

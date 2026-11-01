@@ -396,19 +396,6 @@
   accent-color: var(--success);
   flex-shrink: 0;
 }
-#divrebound-app .ch-claim-id {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 10px;
-  font-size: 11.5px;
-  color: var(--muted);
-}
-#divrebound-app .ch-claim-id input {
-  width: 220px;
-  height: 36px;
-}
 #divrebound-app .ch-next {
   display: flex;
   gap: 12px;

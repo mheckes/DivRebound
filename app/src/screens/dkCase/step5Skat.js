@@ -1,6 +1,7 @@
-// Dänemark, Schritt 5 "SKAT-Portal ausfüllen" - eine Seite wie das ePortal bei
-// der Schweiz: Zeitleiste, SKAT-Formular öffnen, Spickzettel mit Reitern je
-// Formularseite, "DivRebound abschließen". Der Spickzettel ist eine
+// Dänemark, Schritt 5 "SKAT-Portal ausfüllen" - nur der Spickzettel mit Reitern
+// je Formularseite, rechts daneben das SKAT-Formular angedeutet (gleiches
+// Layout wie das ePortal der Schweiz). Zeitleiste und "DivRebound
+// abschließen" folgen in Schritt 6 (step6Finish.js). Der Spickzettel ist eine
 // seitengetreue Übertragungshilfe für die 6 echten SKAT-Formularseiten
 // (siehe Mock Up Status 08-2026/divrebound_cheatsheet_v3_mockup.html).
 // Der Nutzer hat das echte SKAT-Formular in einem zweiten Browser-Tab offen
@@ -14,19 +15,12 @@
 // sichtbares Kurz-Feedback vorsieht (Kopier-Häkchen-Flash, Zeilen-Highlight) -
 // das würde ein voller Re-Render mitten in der Animation zerstören.
 
+import * as caseRepo from "../../db/caseRepo.js";
 import { corridors } from "../../config/corridors.js";
 import { buildSubmissionChunks } from "../../util/chunking.js";
-import { formatDateDe } from "../../util/format.js";
+import { portalSideHtml, portalInlineHtml } from "../../components/portalSide.js";
 import { skatTabs, buildSharePages, shareHelpNote } from "./skatFieldMap.js";
-import { dkTimelineHtml, bindDkTimeline } from "./dkTimeline.js";
-import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
 import { stepHeader, stepNavHtml, bindStepNav, saveCase, dkRefund } from "./dkShared.js";
-
-const SUBMIT_CHECKS = [
-  ["attached", "Die vom Finanzamt bestätigte Wohnsitzbescheinigung ist im SKAT-Formular hochgeladen."],
-  ["sent", "Der Antrag ist bei SKAT mit <b>„Send“</b> abgeschickt."],
-  ["receipt", "Die Bestätigungsseite nach dem Absenden ist gespeichert oder ausgedruckt."],
-];
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (ch) => {
@@ -53,84 +47,14 @@ function infoSvg() {
   return `<svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`;
 }
 
-// Rein dekorative, abstrahierte Skizze eines Browserfensters für den frei
-// bleibenden Bereich rechts neben der (bewusst auf 600px begrenzten, siehe
-// step5Skat.css) Tabelle - visualisiert nur die Idee "hier daneben öffnest
-// du das echte SKAT-Formular", ohne das tatsächliche SKAT-Layout/-Branding
-// nachzubilden (fremde Behördenseite, kein Grund, deren Design zu kopieren).
-// Wird auf schmalen Bildschirmen per CSS ausgeblendet (siehe .cheat-illustration).
-function browserMockHtml() {
-  return `
-    <div class="cheat-illustration" aria-hidden="true">
-      <div class="browser-mock">
-        <div class="browser-mock-bar">
-          <span class="browser-mock-dot"></span>
-          <span class="browser-mock-dot"></span>
-          <span class="browser-mock-dot"></span>
-          <div class="browser-mock-url"></div>
-        </div>
-        <div class="browser-mock-body">
-          <div class="browser-mock-line browser-mock-title"></div>
-          <div class="browser-mock-field-row"><div class="browser-mock-line browser-mock-label"></div><div class="browser-mock-box"></div></div>
-          <div class="browser-mock-field-row"><div class="browser-mock-line browser-mock-label"></div><div class="browser-mock-box"></div></div>
-          <div class="browser-mock-field-row"><div class="browser-mock-line browser-mock-label"></div><div class="browser-mock-box"></div></div>
-          <div class="browser-mock-btn"></div>
-        </div>
-      </div>
-      <div class="cheat-illustration-caption">Das echte SKAT-Formular öffnen Sie am besten hier daneben in einem zweiten Fenster.</div>
-    </div>`;
-}
-
-/** Zeitleiste, Hinweis und "SKAT-Formular öffnen" über dem Spickzettel */
-function introHtml(reclaimCase, corridor) {
-  return `
-    ${dkTimelineHtml(reclaimCase)}
-    <div class="info-banner">
-      <span class="icon">⚠</span>
-      <div><b>Voraussetzung:</b> Die vom Finanzamt bestätigte Wohnsitzbescheinigung aus Schritt 4 muss vorliegen – Sie laden sie im SKAT-Formular hoch.</div>
-    </div>
-    <div class="card">
-      <div class="card-head head-navy"><span class="card-title">SKAT-Formular</span><span class="ch-head-sub">kein Login und keine MitID nötig</span></div>
-      <div class="doc-item">
-        <div>
-          <div class="doc-title">„Refusion af udbytteskat / Claim for refund of Danish dividend tax“</div>
-          <div class="doc-sub">Öffnen Sie das Formular in einem neuen Tab und ordnen Sie beide Fenster nebeneinander an – dann übertragen Sie die Werte unten Seite für Seite.</div>
-        </div>
-        <div class="doc-actions"><a class="btn-accent btn-small" href="${corridor.onlinePortalUrl}" target="_blank" rel="noopener">SKAT-Formular öffnen ↗</a></div>
-      </div>
-    </div>`;
-}
-
-/** "DivRebound abschließen" - gleicher Ablauf wie Schweiz (Schritt 6) und Italien (Schritt 5) */
-function finishHtml(reclaimCase) {
-  const checks = new Set(reclaimCase.dkSubmitChecks ?? []);
-  const allChecked = SUBMIT_CHECKS.every(([id]) => checks.has(id));
-  const done = reclaimCase.status === "submitted";
-  const doneAt = reclaimCase.submittedAt ? ` am ${formatDateDe(reclaimCase.submittedAt.slice(0, 10))}` : "";
-  return `
-    <div class="card">
-      <div class="card-head head-navy"><span class="card-title">DivRebound abschließen</span></div>
-      <div class="card-body">
-        ${SUBMIT_CHECKS.map(([id, text]) => `<label class="ch-step-row"><input type="checkbox" data-submit-check="${id}" ${checks.has(id) || done ? "checked" : ""} ${done ? "disabled" : ""}><span>${text}</span></label>`).join("")}
-        ${
-          done
-            ? `<div class="done-banner ch-done-banner">
-                <div class="done-icon">✓</div>
-                <div>
-                  <div class="done-title">DivRebound abgeschlossen</div>
-                  <div class="done-sub">Bei SKAT eingereicht${doneAt}. Wenn die Erstattung da ist, können Sie sie in Schritt 6 festhalten (optional).</div>
-                </div>
-              </div>`
-            : `<p class="ch-text">Sobald der Antrag bei SKAT abgeschickt ist, schließen Sie den DivRebound ab. Erst dann zählt er als erledigt.</p>
-              <button class="btn-primary" data-action="finish" ${allChecked ? "" : "disabled"} type="button">✓ Eingereicht – DivRebound abschließen</button>
-              ${allChecked ? "" : `<div class="field-hint" style="margin-top:6px;">Bitte zuerst die drei Punkte oben abhaken.</div>`}`
-        }
-      </div>
-    </div>`;
-}
-
 export function mount(container, reclaimCase, profile) {
   const corridor = corridors.DK;
+  const portal = {
+    url: corridor.onlinePortalUrl,
+    host: "udbytterefusion.skat.dk",
+    caption: "Öffnen Sie das SKAT-Formular „Claim for refund of Danish dividend tax“ in einem zweiten Fenster und ordnen Sie es hier daneben an. Kein Login und keine MitID nötig.",
+    buttonLabel: "SKAT-Formular öffnen ↗",
+  };
   // Nur bestätigte, erstattungsfähige Ausschüttungen kommen ins SKAT-Formular
   const eligible = dkRefund(reclaimCase, profile).eligible;
 
@@ -261,7 +185,7 @@ export function mount(container, reclaimCase, profile) {
         <div class="done-icon">✓</div>
         <div>
           <div class="done-title">Geschafft!</div>
-          <div class="done-sub">Ihr Antrag ist vollständig ausgefüllt. Jetzt bei SKAT ausdrucken oder als PDF speichern, auf „Send“ klicken und den DivRebound unten abschließen.</div>
+          <div class="done-sub">Ihr Antrag ist vollständig ausgefüllt. Jetzt bei SKAT ausdrucken oder als PDF speichern, auf „Send“ klicken und den DivRebound in Schritt 6 abschließen.</div>
         </div>
       </div>`;
   }
@@ -363,16 +287,6 @@ export function mount(container, reclaimCase, profile) {
     }
   }
 
-  async function onFinish() {
-    if (reclaimCase.status === "submitted") return;
-    reclaimCase.status = "submitted";
-    reclaimCase.submittedAt = new Date().toISOString();
-    reclaimCase.timelineStep = Math.max(reclaimCase.timelineStep ?? 0, 4);
-    reclaimCase.dkStepsDone = [...new Set([...(reclaimCase.dkStepsDone ?? []), 1, 2, 3, 4, 5])].sort();
-    await saveCase(reclaimCase);
-    render();
-  }
-
   function render() {
     const tabs = resolvedTabs();
     const chunk = activeChunk();
@@ -407,21 +321,22 @@ export function mount(container, reclaimCase, profile) {
 
     container.innerHTML = `
       ${stepHeader(reclaimCase, 5)}
-      ${introHtml(reclaimCase, corridor)}
-
-      <div class="cheat-progress-row">
-        <span class="card-title">Spickzettel</span>
-        <div class="progress-wrap">
-          <span>${done} von ${total} übertragen</span>
-          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-        </div>
-      </div>
 
       <div class="cheat-layout-row">
         <div class="cheat-main">
+          ${portalInlineHtml(portal)}
+          <div class="cheat-progress-row">
+            <span class="card-title">Spickzettel</span>
+            <div class="progress-wrap">
+              <span>${done} von ${total} übertragen</span>
+              <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+            </div>
+          </div>
+
           <details class="help-disclosure cheat-help-disclosure">
             <summary>${chevronSvg()} ${infoSvg()} Wie diese Seite funktioniert</summary>
             <div class="help-disclosure-body">
+              <p><b>Voraussetzung:</b> die vom Finanzamt bestätigte Wohnsitzbescheinigung aus Schritt 4. Sie laden sie auf Seite 4 des SKAT-Formulars hoch.</p>
               <p>Das Cheat Sheet ist eine Hilfestellung zum Ausfüllen des offiziellen SKAT-Formulars. Übertragen Sie die Einträge in den Tab mit dem geöffneten SKAT-Formular. Die Reihenfolge der Felder entspricht 1:1 dem SKAT-Formular. <a href="${
                 corridor.onlinePortalUrl
               }" target="_blank" rel="noopener">Formular nicht mehr offen? Erneut öffnen ↗</a></p>
@@ -449,27 +364,13 @@ export function mount(container, reclaimCase, profile) {
           </div>
         </div>
 
-        ${browserMockHtml()}
+        ${portalSideHtml(portal)}
       </div>
 
-      ${finishHtml(reclaimCase)}
-      ${reclaimCase.status === "submitted" ? pausePanelHtml(reclaimCase, "payout") : ""}
       ${stepNavHtml(5)}
     `;
 
     bindStepNav(container, reclaimCase, 5);
-    bindPausePanel(container, reclaimCase);
-    bindDkTimeline(container, reclaimCase, render);
-    container.querySelectorAll("[data-submit-check]").forEach((box) =>
-      box.addEventListener("change", async () => {
-        const set = new Set(reclaimCase.dkSubmitChecks ?? []);
-        box.checked ? set.add(box.dataset.submitCheck) : set.delete(box.dataset.submitCheck);
-        reclaimCase.dkSubmitChecks = [...set];
-        await saveCase(reclaimCase);
-        render();
-      })
-    );
-    container.querySelector('[data-action="finish"]')?.addEventListener("click", onFinish);
 
     container.querySelectorAll('input[type="checkbox"][data-row-id]').forEach((cb) => {
       cb.addEventListener("change", () => {

@@ -3,7 +3,7 @@
 //  - "taxOffice": Warten auf die Bestätigung durch das Finanzamt
 //    (DK Schritt 4, CH Schritt 5, IT Schritt 4)
 //  - "payout": Warten auf die Auszahlung nach dem Einreichen
-//    (DK Schritt 5/6, CH Schritt 6/7, IT Schritt 5/6)
+//    (DK Schritt 6/7, CH Schritt 6/7, IT Schritt 5/6)
 //  - "done": letzter Schritt, Erstattung eingetragen (Endstand sichern)
 // Gespeichert wird wie mit dem Button in der Seitenleiste: Profil, alle Fälle
 // und der Wertpapierbestand (Schweiz).

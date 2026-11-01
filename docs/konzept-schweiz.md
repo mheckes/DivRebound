@@ -19,7 +19,7 @@
 | Stichtag | Bestand am Ende des Handelstags **vor dem Ex-Tag**. Kauf am Ex-Tag gibt keinen Anspruch, Verkauf am Ex-Tag behält ihn. Im Portal steht nur das Fälligkeitsdatum – der Ex-Tag wird dort nicht abgefragt. DivRebound übernimmt ihn aus der Dividendenabrechnung oder schätzt ihn (2 Bankarbeitstage vor Fälligkeit, ohne Feiertage) und zeigt ihn nur zur Prüfung an, wenn kurz vor der Fälligkeit (≤ 10 Tage) gekauft oder verkauft wurde |
 | Erwerbsdatum | **Handelstag** der Abrechnung, nicht Auftragsdatum, nicht Valuta (Referenz: Kauf 27.04.2026 hatte Auftragsdatum 17.04. und Valuta 29.04.) |
 | Mehrere Ausschüttungen pro Jahr | Selten, aber möglich (Halbjahres- oder Sonderdividenden). Jeder Termin ist ein eigener Block im Portal |
-| Zeitraum | Ein DivRebound-Fall deckt **alle nicht verjährten Jahre ab (bis zu 3)**. Im Portal ist das **ein Antrag mit Mehrfachauswahl der Jahre** (Allgemeine Angaben). Also ein Spickzettel, eine Antrags-ID, ein Status pro Fall; die Vermögenswerte sind nach Jahr gruppiert |
+| Zeitraum | Ein DivRebound-Fall deckt **alle nicht verjährten Jahre ab (bis zu 3)**. Im Portal ist das **ein Antrag mit Mehrfachauswahl der Jahre** (Allgemeine Angaben). Also ein Spickzettel und ein Status pro Fall; die Vermögenswerte sind nach Jahr gruppiert |
 | Bestandsquelle | **PDF-Import aller Kauf- und Verkaufsabrechnungen** als Standardweg. DivRebound pflegt daraus den Bestand. **Manuelle Erfassung** (Art, ISIN, Handelstag, Stück) gleichwertig daneben, z. B. wenn alte Abrechnungen nicht mehr abrufbar sind; manuelle Einträge sind bearbeit- und löschbar |
 | Menü | Wertpapierbestand vorerst unter **Quellensteuer › Schweiz** (über den Fällen), nicht unter „Nutzer“. Ein länderübergreifender Bestand (auch aus DK-Dividendenabrechnungen ableitbar) ist später denkbar |
 | Abschluss | Ein DivRebound ist erst **abgeschlossen**, wenn der bestätigte Antrag hochgeladen ist (CH: ePortal, DK: SKAT-Formular eingereicht). Dieser Status zählt für die Statistik. Optional danach: erhaltener Betrag und Datum |
@@ -35,7 +35,7 @@ Portal: `https://eportal.admin.ch` → Kachel „Verrechnungssteuer“ → Anwen
 | # | Portal-Schritt | DivRebound |
 |---|---|---|
 | 0 | — | **Checkliste der Unterlagen** (Abschnitt 2), abgeglichen mit Profil und Depot-Journal |
-| 1–3 | ePortal öffnen, einloggen bzw. registrieren, Kachel „Verrechnungssteuer“ | In der Checkliste: Button „ePortal öffnen“ und **Anleitung „Zugang einrichten“** (vorerst Platzhalter: Schritt-für-Schritt-Gerüst mit Screenshot-Flächen, Inhalte folgen) |
+| 1–3 | ePortal öffnen, einloggen bzw. registrieren, Kachel „Verrechnungssteuer“ | In der Checkliste: Button „ePortal öffnen“. Eine Anleitung „Zugang einrichten“ folgt später (Gerüst liegt in `components/guideModal.js`, derzeit nicht eingebunden) |
 | 4 | Neuen Antrag anlegen | Ein Antrag für alle offenen Jahre |
 | 5 | Allgemeine Angaben | **Auswahl der Jahre (Mehrfachauswahl):** DivRebound markiert die Jahre mit erstattungsfähigen Dividenden. Dazu Kopierwerte aus dem Profil: Name, Adresse, Geburtsdatum, Steuer-IdNr, Steuernummer |
 | 6–7 | Vermögenswerte hinzufügen | **Kern:** FIFO-Liste pro Dividendentermin, eine Zeile pro Tranche mit Kopier-Buttons und „erledigt“-Haken. Aufklappbare Herleitung (welche Tranche durch welchen Verkauf reduziert wurde) |
@@ -44,7 +44,7 @@ Portal: `https://eportal.admin.ch` → Kachel „Verrechnungssteuer“ → Anwen
 | 10 | Zusätzliche Angaben | Telefon (Format `0049…`), E-Mail, IBAN, Kontoinhaber aus dem Profil |
 | 11 | Angaben prüfen | Soll-Ist: erwartete Rückerstattung gegen Summe im Portal (sofern Bruttodividende bekannt) |
 | 12 | Ausdrucken, Finanzamt beglaubigen lassen, unterschreiben | Seite „Formular & Finanzamt“ (Abschnitt 1a), Anschreiben ans Finanzamt (Wiederverwendung `buildTaxOfficeLetter.js`, `taxOffice.js`) |
-| 13 | Beglaubigten Antrag hochladen | Eigener Schritt „Hochladen & abschließen“: Checkliste (Stempel prüfen, alle Seiten als ein PDF scannen, hochladen), Anleitung (Platzhalter), Button „DivRebound abschließen“ |
+| 13 | Beglaubigten Antrag hochladen | Eigener Schritt „Hochladen & abschließen“: Checkliste (Stempel prüfen, alle Seiten als ein PDF scannen, hochladen), Button „DivRebound abschließen“. Anleitung folgt später |
 
 ### 1a. Schritte in DivRebound und Angleichung an Dänemark
 
@@ -61,7 +61,7 @@ Beide Länder bekommen nummerierte Schritte in der Sidebar (Ziffer im Kreis, erl
 
 **Gemeinsame Seite „Formular & Finanzamt“** (gleicher Aufbau in beiden Ländern, ein gemeinsamer Baustein):
 1. **Status-Zeitleiste** mit 5 Punkten: Formular erstellt → Unterschrieben & versendet → Vom Finanzamt bestätigt → Eingereicht (CH: im ePortal hochgeladen / DK: bei SKAT eingereicht) → Ausgezahlt. Zum Anklicken, erscheint auch auf dem letzten Schritt.
-2. **① Formular:** DK: Wohnsitzbescheinigung herunterladen (erzeugt DivRebound). CH: Antrag im ePortal erstellen und speichern (erzeugt das Portal), Antrags-ID eintragen.
+2. **① Formular:** DK: Wohnsitzbescheinigung herunterladen (erzeugt DivRebound). CH: Antrag im ePortal erstellen und als PDF speichern (erzeugt das Portal).
 3. **② Anschreiben an das Finanzamt:** PDF herunterladen.
 4. **③ Nächste Schritte:** nummeriert, mit Link zum folgenden Schritt.
 5. **Bearbeitung pausiert:** Bearbeitungsstand speichern, Erinnerung (.ics) – wie bisher bei DK.
@@ -84,7 +84,7 @@ Jeder Eintrag hat einen von drei Zuständen:
 
 | Gruppe | Eintrag | Quelle |
 |---|---|---|
-| Zugang | Konto für das ePortal | Abhaken, mit „ePortal öffnen“ und „Anleitung“ |
+| Zugang | Konto für das ePortal | Abhaken, mit „ePortal öffnen“ |
 | Profil | Name, Adresse, Geburtsdatum | Profil |
 | Profil | Steuer-IdNr | Profil (`residence.tin`) |
 | Profil | **Steuernummer** | Profil, **neues Feld** |
@@ -104,12 +104,12 @@ Jeder Eintrag hat einen von drei Zuständen:
 |---|---|---|
 | Persönliche Daten (Name, Adresse, IdNr, Steuernummer, Bank, Finanzamt …) | **Profil** | alle Fälle aller Länder |
 | Käufe und Verkäufe CH | **Depot-Journal** (Abschnitt 3.1) | alle CH-Fälle |
-| Ausschüttungen, Voucher, Ansässigkeitszeitraum, Jahre, Antrags-ID | **Fall** | nur diesen Fall |
+| Ausschüttungen, Voucher, Ansässigkeitszeitraum, Jahre | **Fall** | nur diesen Fall |
 
 Regeln:
 1. **Bearbeiten direkt in der Checkliste, genau wie in „Persönliche Daten“.** Gefüllte Felder wirken wie Text (`.confirmed-input`) und werden per Klick ins Feld bearbeitet, leere Felder erscheinen als Eingabefeld (`.field-input`, bei fehlenden Pflichtangaben rot umrandet). Gespeichert wird **automatisch** ins Profil (gleiche Felder, gleiche Validierung, gemeinsamer Feld-Baustein), siehe 2c. Kein „ändern“- und kein „Speichern“-Button.
 2. **Offene Fälle lesen immer das aktuelle Profil.** Eine Änderung wirkt sofort in allen Fällen, deren Formular noch nicht erzeugt ist.
-3. **Einfrieren beim Erzeugen des Formulars.** Sobald ein offizielles Dokument entsteht (DK: Wohnsitzbescheinigung heruntergeladen, CH: Antrags-ID eingetragen), speichert der Fall einen Schnappschuss der verwendeten Werte. Das ersetzt den bisherigen `applicantSnapshot`, der beim Anlegen des Falls gezogen wird und dann oft noch leer ist.
+3. **Einfrieren beim Erzeugen des Formulars.** Sobald ein offizielles Dokument entsteht (DK: Wohnsitzbescheinigung heruntergeladen, CH: Antrag im ePortal erstellt), speichert der Fall einen Schnappschuss der verwendeten Werte. Das ersetzt den bisherigen `applicantSnapshot`, der beim Anlegen des Falls gezogen wird und dann oft noch leer ist.
 4. **Hinweis bei Abweichung.** Wird danach ein im Formular enthaltener, vorher gefüllter Wert im Profil geändert, zeigt der Fall auf „Formular & Finanzamt“: welche Angabe sich geändert hat, und bietet „Neu herunterladen“ (DK) bzw. „Im ePortal korrigieren“ (CH) oder „Bereits verschickt – ignorieren“. Erstmaliges Ausfüllen eines leeren Felds löst keinen Hinweis aus.
 5. **Abgeschlossene Fälle** behalten ihren Schnappschuss als Nachweis; Profiländerungen betreffen sie nicht mehr.
 
@@ -123,7 +123,7 @@ Regeln:
 
 ### 2c. Automatisches Speichern (app-weit)
 
-Gilt für **alle** Eingabefelder mit Nutzerdaten: Persönliche Daten, Anschreiben Finanzamt, Unterlagen prüfen, Fehlende Angaben, manuelle Transaktionen, Antrags-ID, Status.
+Gilt für **alle** Eingabefelder mit Nutzerdaten: Persönliche Daten, Anschreiben Finanzamt, Unterlagen prüfen, Fehlende Angaben, manuelle Transaktionen, Status.
 
 1. **Speichern beim Verlassen des Felds** (`change`-Event). Zusätzlich während des Tippens mit kurzer Verzögerung (ca. 1 s), damit beim Schließen des Tabs nichts verloren geht.
 2. **Rückmeldung:** kurze Meldung unten „✓ Steuernummer gespeichert · Rückgängig“ (4 s). „Rückgängig“ stellt den vorherigen Wert wieder her – Schutz gegen versehentliche Änderungen.
@@ -163,7 +163,7 @@ Transaction {
 
 ```
 distributions[]   { isin, depotId, exDate, paymentDate, grossPerShare?, voucherRefs[] }
-claim             { status, claimId?,        // z. B. "DE-1407-5964-00"
+claim             { status,
                     years[],                   // Mehrfachauswahl im Portal
                     entries[] { year, isin, acquisitionDate, quantity, paymentDate }  // berechnet
                   }

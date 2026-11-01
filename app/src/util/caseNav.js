@@ -13,7 +13,7 @@ const NAV = {
   DK: {
     steps: DK_STEPS,
     route: dkStepRoute,
-    isDone: (c, n) => (c.dkStepsDone ?? []).includes(n) || (DK_STATUS_ORDER.indexOf(c.status) >= 2 && n <= 4) || (isSubmitted(c) && n <= 5),
+    isDone: (c, n) => (c.dkStepsDone ?? []).includes(n) || (DK_STATUS_ORDER.indexOf(c.status) >= 2 && n <= 4) || (isSubmitted(c) && n <= 6),
   },
   CH: { steps: CH_STEPS, route: chStepRoute, isDone: (c, n) => (c.ch?.stepsDone ?? []).includes(n) || (isSubmitted(c) && n <= 6) },
   IT: { steps: IT_STEPS, route: itStepRoute, isDone: (c, n) => (c.it?.stepsDone ?? []).includes(n) || (isSubmitted(c) && n <= 5) },

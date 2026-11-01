@@ -8,7 +8,6 @@ import { getState, setState } from "../../store/store.js";
 import * as profileRepo from "../../db/profileRepo.js";
 import { navigate } from "../../router/router.js";
 import { formatDateDe } from "../../util/format.js";
-import { openGuideModal } from "../../components/guideModal.js";
 import {
   PROFILE_ITEM, profileRow, textRow, setRowState, updateChecklistSummary, bindChecklistAutosave, AUTOSAVE_ROW,
 } from "../../components/checklist.js";
@@ -49,7 +48,6 @@ function render(container, reclaimCase, profile, transactions) {
         "ePortal-Zugang",
         "Eigenes Konto bei eportal.admin.ch.",
         `<a class="btn-secondary btn-small" href="${corridor.onlinePortalUrl}" target="_blank" rel="noopener">ePortal öffnen ↗</a>
-         <button class="btn-secondary btn-small" data-guide="account" type="button" ${portalAccess ? "disabled" : ""} title="${portalAccess ? "Zugang vorhanden – Anleitung nicht nötig" : ""}">Anleitung</button>
          <label class="ch-check-toggle"><input type="checkbox" data-portal-access ${portalAccess ? "checked" : ""}> vorhanden</label>`,
         "data-access-item"
       )}
@@ -92,17 +90,12 @@ function render(container, reclaimCase, profile, transactions) {
 
   updateChecklistSummary(container);
   bindStepNav(container, reclaimCase, 1);
-  container.querySelector('[data-guide="account"]').addEventListener("click", () => openGuideModal("account"));
   container.querySelectorAll("[data-go-step]").forEach((btn) => btn.addEventListener("click", () => navigate(chStepRoute(reclaimCase.caseId, Number(btn.dataset.goStep)))));
   container.querySelector("[data-portal-access]").addEventListener("change", async (e) => {
     const updated = { ...getState().currentProfile, chPortalAccess: e.target.checked };
     await profileRepo.put(updated);
     setState({ currentProfile: updated });
     setRowState(container.querySelector("[data-access-item]"), e.target.checked ? "ok" : "check");
-    // Mit vorhandenem Zugang wird die Anleitung nicht mehr gebraucht.
-    const guideBtn = container.querySelector('[data-guide="account"]');
-    guideBtn.disabled = e.target.checked;
-    guideBtn.title = e.target.checked ? "Zugang vorhanden – Anleitung nicht nötig" : "";
     updateChecklistSummary(container);
   });
 }

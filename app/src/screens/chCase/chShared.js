@@ -7,7 +7,6 @@ import * as transactionRepo from "../../db/transactionRepo.js";
 import { computeEntitlements } from "../../lib/holdings.js";
 import { corridors } from "../../config/corridors.js";
 import { CH_STEPS, chStepRoute } from "../../config/caseSteps.js";
-import { showToast } from "../../components/toast.js";
 
 export const corridor = corridors.CH;
 
@@ -124,8 +123,4 @@ export function copyToClipboard(btn, value) {
     btn.textContent = original;
     btn.classList.remove("copied");
   }, 1200);
-}
-
-export function toastSaved(label) {
-  showToast(`✓ ${label} gespeichert`);
 }

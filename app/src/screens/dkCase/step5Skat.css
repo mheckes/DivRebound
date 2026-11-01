@@ -196,8 +196,9 @@
 /* Zweispaltiges Layout: links die feste 600px-Übertragungshilfe (Tabelle etc.
    - deshalb bewusst nicht auf 100% gestreckt, siehe .cheat-main), rechts
    bleibt bewusst Platz frei für ein zweites Browserfenster mit dem echten
-   SKAT-Formular. Die Skizze darin (.cheat-illustration) visualisiert nur
-   diese Idee, siehe browserMockHtml() in cheatSheet.js. */
+   Portal (DK: SKAT-Formular, CH: ePortal). Die Skizze darin
+   (.cheat-illustration) visualisiert nur diese Idee, siehe
+   components/portalSide.js. Bleibt beim Scrollen langer Reiter sichtbar. */
 #divrebound-app .cheat-layout-row {
   display: flex;
   align-items: flex-start;
@@ -213,14 +214,21 @@
   flex: 1;
   min-width: 240px;
   padding-top: 12px;
-  opacity: 0.6;
+  position: sticky;
+  top: 16px;
 }
 /* Auf schmalen Bildschirmen (z.B. neben der Sidebar wenig Platz) gibt es
    ohnehin keinen freien Raum neben der 600px-Spalte - dann lieber ganz
    ausblenden statt hässlich darunter umzubrechen. */
+#divrebound-app .cheat-portal-inline {
+  display: none;
+}
 @media (max-width: 1080px) {
   #divrebound-app .cheat-illustration {
     display: none;
+  }
+  #divrebound-app .cheat-portal-inline {
+    display: flex;
   }
 }
 #divrebound-app .browser-mock {
@@ -229,6 +237,7 @@
   border-radius: 12px;
   overflow: hidden;
   max-width: 320px;
+  opacity: 0.6;
 }
 #divrebound-app .browser-mock-bar {
   display: flex;
@@ -247,10 +256,17 @@
 }
 #divrebound-app .browser-mock-url {
   flex: 1;
-  height: 12px;
+  height: 16px;
   margin-left: 10px;
+  padding: 0 8px;
   border-radius: 6px;
   background: var(--bg);
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--muted);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 #divrebound-app .browser-mock-body {
   padding: 18px 16px;
@@ -292,6 +308,10 @@
   font-size: 11px;
   color: var(--muted);
   line-height: 1.5;
+}
+#divrebound-app .cheat-illustration-btn {
+  display: inline-block;
+  margin-top: 10px;
 }
 
 #divrebound-app .pane {

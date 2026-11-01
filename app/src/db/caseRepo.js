@@ -56,7 +56,6 @@ export function createSwissCaseData() {
     dismissedHints: [],
     /** im ePortal-Spickzettel abgehakte Zeilen */
     checkedRows: [],
-    claimId: "",
     /** Anzahl erledigter Punkte der Status-Zeitleiste (0-5) */
     timelineStep: 0,
     uploadChecks: [],

@@ -30,15 +30,16 @@ export const IT_STEPS = [
 
 export const itStepRoute = (caseId, n) => `#/it/${caseId}/${n}`;
 
-// Dänemark: Schritt 5 umfasst "SKAT-Formular öffnen", den Spickzettel und den
-// Abschluss auf einer Seite.
+// Dänemark: Schritt 5 ist der Spickzettel fürs SKAT-Formular, Schritt 6 der
+// Abschluss (wie "Hochladen & abschließen" bei der Schweiz).
 export const DK_STEPS = [
   { n: 1, title: "Unterlagen prüfen" },
   { n: 2, title: "Dividendenabrechnungen" },
   { n: 3, title: "Fehlende Angaben" },
   { n: 4, title: "Formular & Finanzamt" },
   { n: 5, title: "SKAT-Portal ausfüllen" },
-  { n: 6, title: REFUND_STEP_TITLE, optional: true },
+  { n: 6, title: "Einreichen & abschließen" },
+  { n: 7, title: REFUND_STEP_TITLE, optional: true },
 ];
 
 export const dkStepRoute = (caseId, n) => `#/dk/${caseId}/${n}`;

@@ -2,7 +2,7 @@
 // Aufbau wie bei Dänemark: Status-Zeitleiste, Formular, Anschreiben,
 // nächste Schritte, "Bearbeitung pausiert". Bei der Schweiz
 // erzeugt das ePortal das Formular (Antrag DIP-0085) - DivRebound liefert das
-// Anschreiben und merkt sich Antrags-ID und Status.
+// Anschreiben und merkt sich den Status.
 
 import { getState } from "../../store/store.js";
 import { navigate } from "../../router/router.js";
@@ -15,7 +15,7 @@ import { refundReceived } from "../../util/caseProgress.js";
 import { chStepRoute } from "../../config/caseSteps.js";
 import {
   esc, saveCase, loadTransactions, entitlementsFor, formatChf,
-  stepHeader, stepNavHtml, bindStepNav, toastSaved,
+  stepHeader, stepNavHtml, bindStepNav,
 } from "./chShared.js";
 
 export const CH_TIMELINE = [
@@ -28,7 +28,7 @@ export const CH_TIMELINE = [
 
 /** Einheitlicher Titel wie DK/IT: "Formular · 1 Formular · Betrag" */
 export function timelineTitle(reclaimCase, total) {
-  return statusTimelineTitle(reclaimCase.ch.claimId ? `Antrag ${reclaimCase.ch.claimId}` : "Antrag DIP-0085", 1, formatChf(total));
+  return statusTimelineTitle("Antrag DIP-0085", 1, formatChf(total));
 }
 
 /** Gespeicherter Fortschritt, mindestens aber aus dem Fall abgeleitet */
@@ -39,8 +39,7 @@ export function chTimelineDone(reclaimCase) {
 }
 
 const FORM_CHECKS = [
-  ["created", "Im ePortal auf <b>„Erstellen“</b> klicken und den Antrag als PDF speichern bzw. ausdrucken."],
-  ["signed", "Auf Seite 1 unter „Rechtsgültige Unterschrift“ Ort und Datum eintragen und unterschreiben."],
+  ["created", "Im ePortal auf <b>„Erstellen“</b> klicken und den Antrag als PDF speichern."],
 ];
 
 export async function mount(container, reclaimCase) {
@@ -84,10 +83,6 @@ function render(container, reclaimCase, transactions) {
       <div class="card-head head-navy"><span class="card-title">Formular</span><span class="ch-head-sub">wird im ePortal erzeugt</span></div>
       <div class="card-body">
         ${FORM_CHECKS.map(([id, text]) => `<label class="ch-step-row"><input type="checkbox" data-form-check="${id}" ${formChecks.has(id) ? "checked" : ""}><span>${text}</span></label>`).join("")}
-        <div class="ch-claim-id">
-          <label for="claim-id">Antrags-ID <span class="field-optional">· oben rechts auf dem Antrag</span></label>
-          <input id="claim-id" class="${reclaimCase.ch.claimId ? "confirmed-input" : "field-input"} mono" placeholder="z.B. DE-1407-5964-00" value="${esc(reclaimCase.ch.claimId)}">
-        </div>
       </div>
     </div>
 
@@ -96,7 +91,7 @@ function render(container, reclaimCase, transactions) {
       <div class="doc-item">
         <div>
           <div class="doc-title">Anschreiben an das Finanzamt</div>
-          <div class="doc-sub">Bitte um Bestätigung der Ansässigkeit auf dem beigefügten Antrag${reclaimCase.ch.claimId ? ` <span class="mono">${esc(reclaimCase.ch.claimId)}</span>` : ""}${yearsLabel ? ` (Jahre ${esc(yearsLabel)})` : ""}, mit Steuer-ID und Steuernummer.</div>
+          <div class="doc-sub">Bitte um Bestätigung der Ansässigkeit auf dem beigefügten Antrag${yearsLabel ? ` (Jahre ${esc(yearsLabel)})` : ""}, mit Steuer-ID und Steuernummer.</div>
           <div class="doc-file">${esc(letterFileName(profile, yearsLabel))}</div>
         </div>
         <div class="doc-actions">
@@ -110,9 +105,10 @@ function render(container, reclaimCase, transactions) {
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Nächste Schritte</span></div>
       <div class="card-body">
-        <div class="ch-next"><span class="ch-next-num">1</span><span>Antrag und Anschreiben per Post an das Finanzamt senden.</span></div>
-        <div class="ch-next"><span class="ch-next-num">2</span><span>Das Finanzamt bestätigt auf Seite 1 (Stempel und Unterschrift) und schickt den Antrag zurück.</span></div>
-        <div class="ch-next"><span class="ch-next-num">3</span><span>Danach geht es weiter mit <a href="#" data-go-step="6">Schritt 6: Hochladen &amp; abschließen</a>.</span></div>
+        <div class="ch-next"><span class="ch-next-num">1</span><span>Antrag ausdrucken, auf Seite 1 unter „Rechtsgültige Unterschrift“ Ort und Datum eintragen und unterschreiben.</span></div>
+        <div class="ch-next"><span class="ch-next-num">2</span><span>Antrag und Anschreiben per Post an das Finanzamt senden.</span></div>
+        <div class="ch-next"><span class="ch-next-num">3</span><span>Das Finanzamt bestätigt auf Seite 1 (Stempel und Unterschrift) und schickt den Antrag zurück.</span></div>
+        <div class="ch-next"><span class="ch-next-num">4</span><span>Danach geht es weiter mit <a href="#" data-go-step="6">Schritt 6: Hochladen &amp; abschließen</a>.</span></div>
       </div>
     </div>
 
@@ -133,26 +129,19 @@ function render(container, reclaimCase, transactions) {
       const set = new Set(reclaimCase.ch.formChecks ?? []);
       box.checked ? set.add(box.dataset.formCheck) : set.delete(box.dataset.formCheck);
       reclaimCase.ch.formChecks = [...set];
+      // Mit dem erstellten Antrag ist der erste Schritt der Zeitleiste erledigt.
+      if (box.dataset.formCheck === "created" && box.checked && (reclaimCase.ch.timelineStep ?? 0) < 1) {
+        reclaimCase.ch.timelineStep = 1;
+        await saveCase(reclaimCase);
+        render(container, reclaimCase, transactions);
+        return;
+      }
       await saveCase(reclaimCase);
     })
   );
 
-  const claimInput = container.querySelector("#claim-id");
-  claimInput.addEventListener("change", async () => {
-    reclaimCase.ch.claimId = claimInput.value.trim().toUpperCase();
-    // Mit der Antrags-ID ist das Formular erstellt.
-    if (reclaimCase.ch.claimId && reclaimCase.ch.timelineStep < 1) reclaimCase.ch.timelineStep = 1;
-    await saveCase(reclaimCase);
-    render(container, reclaimCase, transactions);
-    toastSaved("Antrags-ID");
-  });
-
-  const buildLetter = () => {
-    const reference = reclaimCase.ch.claimId
-      ? `Antrag ${reclaimCase.ch.claimId} auf Rückerstattung der schweizerischen Verrechnungssteuer`
-      : "Antrag auf Rückerstattung der schweizerischen Verrechnungssteuer";
-    return buildTaxOfficeLetter(getState().currentProfile, { reference });
-  };
+  const buildLetter = () =>
+    buildTaxOfficeLetter(getState().currentProfile, { reference: "Antrag auf Rückerstattung der schweizerischen Verrechnungssteuer" });
   container.querySelector('[data-action="letter"]').addEventListener("click", async () => {
     downloadBlob(await buildLetter(), letterFileName(profile, yearsLabel), "application/pdf");
   });

@@ -4,7 +4,6 @@
 
 import { getState } from "../../store/store.js";
 import { statusTimelineHtml, bindStatusTimeline } from "../../components/statusTimeline.js";
-import { openGuideModal } from "../../components/guideModal.js";
 import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
 import { formatDateDe } from "../../util/format.js";
 import { CH_TIMELINE, timelineTitle, chTimelineDone } from "./step5TaxOffice.js";
@@ -36,12 +35,11 @@ function render(container, reclaimCase, transactions) {
     ${statusTimelineHtml({ title: timelineTitle(reclaimCase, total), steps: CH_TIMELINE, doneCount: chTimelineDone(reclaimCase) })}
 
     <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Bestätigten Antrag hochladen</span>${reclaimCase.ch.claimId ? `<span class="ch-head-sub">Antrag ${esc(reclaimCase.ch.claimId)}</span>` : ""}</div>
+      <div class="card-head head-navy"><span class="card-title">Bestätigten Antrag hochladen</span></div>
       <div class="card-body">
         ${UPLOAD_CHECKS.map(([id, text]) => `<label class="ch-step-row"><input type="checkbox" data-upload-check="${id}" ${checks.has(id) ? "checked" : ""} ${completed ? "disabled" : ""}><span>${text}</span></label>`).join("")}
         <div class="ch-inline-actions">
           <a class="btn-accent btn-small" href="${corridor.onlinePortalUrl}" target="_blank" rel="noopener">ePortal öffnen ↗</a>
-          <button class="btn-secondary btn-small" data-guide="upload" type="button">Anleitung: Hochladen im ePortal</button>
         </div>
       </div>
     </div>
@@ -78,7 +76,6 @@ function render(container, reclaimCase, transactions) {
     await saveCase(reclaimCase);
     render(container, reclaimCase, transactions);
   });
-  container.querySelector('[data-guide="upload"]').addEventListener("click", () => openGuideModal("upload"));
 
   container.querySelectorAll("[data-upload-check]").forEach((box) =>
     box.addEventListener("change", async () => {

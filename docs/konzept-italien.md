@@ -36,7 +36,7 @@
 | 3 | Fehlende Angaben | Nur was fehlt (Abschnitt 3). Eingaben landen in den Persönlichen Daten bzw. im Unternehmens-Verzeichnis, damit man sie nur einmal eingibt | `missingData.js`, `PROFILE_FIELDS` |
 | 4 | Formular & Finanzamt | Zeitleiste; Form A als Liste kompakter Zeilen (je Unternehmen/Teil: Vorschau + PDF, darunter „alle als ein PDF“); Anschreiben an das Finanzamt; Nächste Schritte; Bearbeitung pausiert. **Keine Zusammenfassung** (gilt jetzt auch für DK) | `summaryDownload.js`-Aufbau (Formular-Zeile `.doc-item` wie DK), `buildTaxOfficeLetter.js` unverändert |
 | 5 | Versand nach Italien | Erst sinnvoll, wenn das Finanzamt bestätigt hat. Begleitschreiben (Englisch) herunterladen; Checkliste fürs Kuvert (bestätigte Form A im Original, Kopien der Abrechnungen, Begleitschreiben, Unterschriften auf S. 3 und S. 5 vorhanden, Stempel auf S. 5 vorhanden); Adresse Pescara zum Kopieren; Button **„Als versendet markieren“** = abgeschlossen | neu, Aufbau wie Schritt 4 |
-| 6 | Erstattung erhalten (optional) | Erhalten ja/nein, Datum, Betrag in EUR; zeigt Wartezeit ab Versand und Mehrbetrag gegenüber der Erwartung (z. B. Zinsen). Fließt in die Statistik der Startseite | gemeinsamer Baustein für alle Länder (`screens/shared/refundReceived.js`; DK Schritt 6, CH Schritt 7) |
+| 6 | Erstattung erhalten (optional) | Erhalten ja/nein, Datum, Betrag in EUR; zeigt Wartezeit ab Versand und Mehrbetrag gegenüber der Erwartung (z. B. Zinsen). Fließt in die Statistik der Startseite | gemeinsamer Baustein für alle Länder (`screens/shared/refundReceived.js`; DK Schritt 7, CH Schritt 7) |
 
 **Status-Zeitleiste Italien:** Formular erstellt → Unterschrieben & ans Finanzamt → Vom Finanzamt bestätigt → Nach Italien versendet → Ausgezahlt.
 
