@@ -22,21 +22,15 @@
     el.addEventListener("mouseleave", function () { set(false); });
   });
 
-  // App-Vorschau: unter 820px bleibt die Desktop-Ansicht erhalten und wird
-  // als Ganzes auf die Breite des Laptop-Rahmens verkleinert.
+  // App-Vorschau: die Desktop-Ansicht wird als Ganzes auf die Breite des
+  // Laptop-Rahmens skaliert (Breite der Ansicht steht in site.css).
   var screen = document.querySelector(".mock-screen");
   var mock = screen && screen.querySelector(".app-mock");
   if (mock) {
-    var narrow = window.matchMedia("(max-width: 820px)");
     function fitMock() {
-      if (!narrow.matches) {
-        mock.style.transform = "";
-        screen.style.height = "";
-        return;
-      }
       var scale = screen.clientWidth / mock.offsetWidth;
       mock.style.transform = "scale(" + scale + ")";
-      screen.style.height = mock.offsetHeight * scale + 16 + "px"; // + Rahmen oben/unten
+      screen.style.height = mock.offsetHeight * scale + screen.offsetHeight - screen.clientHeight + "px"; // + Rahmen
     }
     window.addEventListener("resize", fitMock);
     fitMock();
@@ -45,8 +39,16 @@
   // Lange Listen: auf dem Handy nur die ersten Einträge, Rest per Schalter.
   // Das Kürzen selbst macht site.css (nur unter 720px), ohne JS bleibt alles sichtbar.
   document.querySelectorAll("[data-collapse-mobile]").forEach(function (list) {
-    var total = list.querySelectorAll('[role="row"]:not(.head)').length;
-    if (total <= Number(list.getAttribute("data-collapse-mobile"))) return;
+    var limit = Number(list.getAttribute("data-collapse-mobile"));
+    var rows = list.querySelectorAll(".country-row:not(.head)");
+    var total = rows.length;
+    if (total <= limit) return;
+    // Zeilen ab dem Limit ausblenden, Gruppenüberschriften ohne sichtbare Zeile ebenso
+    for (var i = limit; i < total; i++) rows[i].classList.add("is-extra");
+    list.querySelectorAll(".country-group-head").forEach(function (head) {
+      var first = head.nextElementSibling;
+      if (first && first.classList.contains("is-extra")) head.classList.add("is-extra");
+    });
     var btn = document.createElement("button");
     btn.type = "button";
     btn.className = "collapse-toggle";

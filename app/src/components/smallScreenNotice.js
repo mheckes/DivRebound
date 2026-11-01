@@ -1,35 +1,15 @@
 // Hinweis für Handys: DivRebound ist für Computer und Tablet gebaut (PDFs,
 // Ausdrucke, ausländische Portale) und speichert nur im Browser des Geräts.
-// Unter 760px Breite liegt beim Start diese Seite über der App. "Trotzdem
-// öffnen" blendet sie aus und merkt sich die Wahl auf diesem Gerät.
+// Unter 760px Breite liegt bei jedem Start diese Seite über der App.
+// "Trotzdem öffnen" blendet sie nur für diesen Aufruf aus.
 
 import { websiteHome } from "../config/siteLinks.js";
 
 const NARROW_QUERY = "(max-width: 760px)";
-const STORAGE_KEY = "divrebound.smallScreenAccepted";
 
-function accepted() {
-  try {
-    return localStorage.getItem(STORAGE_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function remember() {
-  try {
-    localStorage.setItem(STORAGE_KEY, "1");
-  } catch {
-    // Ohne Speicher erscheint der Hinweis beim nächsten Start eben wieder.
-  }
-}
-
-/** Zeigt den Hinweis, falls der Bildschirm schmal ist und noch nicht bestätigt wurde. */
+/** Zeigt den Hinweis, falls der Bildschirm schmal ist. */
 export function mountSmallScreenNotice(root) {
-  if (!window.matchMedia(NARROW_QUERY).matches || accepted()) return;
-
-  // Link auf die App ohne #/... - am Computer startet sie ohnehin auf der Startseite.
-  const appUrl = location.origin + location.pathname;
+  if (!window.matchMedia(NARROW_QUERY).matches) return;
 
   const el = document.createElement("div");
   el.className = "small-screen-notice";
@@ -53,28 +33,12 @@ export function mountSmallScreenNotice(root) {
       <div class="ssn-info">
         <strong>Gut zu wissen:</strong> Deine Daten bleiben nur auf dem Gerät, auf dem du startest. Öffne DivRebound deshalb am besten gleich am Computer.
       </div>
-      <button type="button" class="ssn-btn ssn-btn-primary" data-ssn="copy">🔗 Link kopieren</button>
-      <div class="ssn-link" hidden>${appUrl}</div>
-      <p class="ssn-hint">Schick dir den Link per Mail oder Messenger und öffne ihn am Computer.</p>
-      <button type="button" class="ssn-btn ssn-btn-secondary" data-ssn="open">Trotzdem öffnen</button>
+      <button type="button" class="ssn-btn" data-ssn="open">Trotzdem öffnen</button>
       <a class="ssn-back" href="${websiteHome}">← Zur Website</a>
     </div>
   `;
 
-  const copyBtn = el.querySelector('[data-ssn="copy"]');
-  copyBtn.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(appUrl);
-      copyBtn.textContent = "✓ Link kopiert";
-    } catch {
-      // Kein Zugriff auf die Zwischenablage: Link zum Markieren anzeigen.
-      el.querySelector(".ssn-link").hidden = false;
-      copyBtn.textContent = "Link unten markieren und kopieren";
-    }
-  });
-
   el.querySelector('[data-ssn="open"]').addEventListener("click", () => {
-    remember();
     el.remove();
     document.documentElement.classList.remove("ssn-open");
   });

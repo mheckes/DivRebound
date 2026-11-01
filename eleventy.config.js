@@ -22,11 +22,22 @@ export default function (eleventyConfig) {
 
   // 27.5 -> "27,5 %"
   eleventyConfig.addFilter("pct", (value) => `${String(value).replace(".", ",")} %`);
-  // Bereits unterstützte Länder zuerst, innerhalb der Gruppen nach Erstattungspotenzial
-  eleventyConfig.addFilter("sortLiveFirst", (countries) =>
-    [...countries].sort(
-      (a, b) => (b.status === "live") - (a.status === "live") || b.potential - a.potential
-    )
+  // Länder-Tabelle: Gruppen nach Status (verfügbar, in Planung, nicht geplant),
+  // innerhalb jeder Gruppe nach Erstattungspotenzial
+  const statusGroups = [
+    { status: "live", label: "Mit DivRebound verfügbar" },
+    { status: "planned", label: "In Planung" },
+    { status: "no", label: "Nicht geplant" },
+  ];
+  eleventyConfig.addFilter("groupByStatus", (countries) =>
+    statusGroups
+      .map((g) => ({
+        ...g,
+        countries: countries
+          .filter((c) => c.status === g.status)
+          .sort((a, b) => b.potential - a.potential),
+      }))
+      .filter((g) => g.countries.length > 0)
   );
   eleventyConfig.addFilter("withCompanies", (countries) => countries.filter((c) => c.companies));
   eleventyConfig.addFilter("potentialFor", (countries, code) => {

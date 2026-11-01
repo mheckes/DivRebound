@@ -129,47 +129,60 @@ main { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
 .estimate-box { background: var(--navy); color: #fff; border-radius: 10px; padding: 16px 18px; margin-bottom: 18px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
 .estimate-box strong { font-family: var(--font-mono); font-size: 20px; color: var(--cyan); }
 .estimate-formula { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.5); }
-/* Unter 820px: Desktop-Ansicht verkleinert in einem Laptop-Rahmen.
-   site.js skaliert .app-mock auf die Breite von .mock-screen. */
+/* App-Ansicht in einem Laptop-Rahmen. site.js skaliert .app-mock auf die
+   Breite von .mock-screen (am Desktop knapp 1:1, auf dem Handy verkleinert). */
 .only-narrow { display: none; }
+.mock-frame { max-width: 860px; margin: 0 auto; padding: 0 22px; }
+.mock-screen { background: #0A1A33; border: 10px solid #0A1A33; border-bottom-width: 14px; border-radius: 16px 16px 0 0; overflow: hidden; }
+.mock-frame::after { content: ""; display: block; height: 16px; margin: 0 -22px; background: #C9D2DE; border-radius: 0 0 16px 16px; box-shadow: inset 0 4px 4px -3px rgba(0,0,0,0.25); }
+.app-mock { width: 900px; border: none; border-radius: 4px; transform-origin: top left; }
 @media (max-width: 820px) {
   .only-wide { display: none; }
   .only-narrow { display: inline; }
-  .mock-frame { max-width: 460px; margin: 0 auto; }
-  .mock-screen { background: #0A1A33; border: 7px solid #0A1A33; border-bottom-width: 9px; border-radius: 12px 12px 0 0; overflow: hidden; }
-  .mock-frame::after { content: ""; display: block; height: 10px; margin: 0 -16px; background: #C9D2DE; border-radius: 0 0 12px 12px; box-shadow: inset 0 3px 3px -2px rgba(0,0,0,0.25); }
-  .app-mock { width: 760px; border: none; border-radius: 4px; transform-origin: top left; }
+  .mock-frame { max-width: 460px; padding: 0 10px; }
+  .mock-screen { border-width: 7px 7px 9px; border-radius: 12px 12px 0 0; }
+  .mock-frame::after { height: 10px; margin: 0 -10px; border-radius: 0 0 12px 12px; }
+  .app-mock { width: 760px; }
 }
 
-/* ─── Länder-Tabelle ─── */
+/* ─── Länder-Tabelle (gruppiert nach Status) ─── */
 .country-table { border: 1px solid var(--divider); border-radius: 12px; overflow: hidden; background: var(--surface); }
-.country-row { display: grid; grid-template-columns: 1.1fr 1fr 1.1fr 1.1fr 1.3fr; gap: 10px; padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--divider); align-items: center; }
+.country-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 10px; padding: 11px 18px; font-size: 14px; border-bottom: 1px solid var(--divider); align-items: center; }
+.country-row > div:nth-child(n + 2) { text-align: right; font-variant-numeric: tabular-nums; }
 .country-row:last-child { border-bottom: none; }
 .country-row.head { background: var(--bg); font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; }
+.country-row.group-live { background: #F3FBFD; }
+.country-row.group-live > div:first-child { font-weight: 600; }
+.country-row.group-no { color: var(--muted); }
+.country-row.group-no .accent-cell { color: var(--muted); }
+.country-group-head { padding: 9px 18px; border-bottom: 1px solid var(--divider); font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--navy); background: var(--navy-light); }
+.country-group-head.group-live { background: var(--success-bg); color: var(--success); }
+.country-group-head.group-no { background: var(--bg); color: var(--muted); }
+.group-count { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 4px; background: rgba(255,255,255,0.7); font-weight: 500; }
 .accent-cell { font-family: var(--font-mono); color: var(--cyan-dark); font-weight: 600; }
 .source-note { font-size: 11px; color: var(--muted); margin-top: 10px; }
-/* Handy: jede Zeile als zweizeiliger Eintrag, alle Angaben bleiben sichtbar.
-   Oben Land, Status und Erstattungspotenzial, darunter die beiden Sätze. */
+/* Handy: oben Land und Erstattungspotenzial, darunter klein die beiden Sätze. */
 @media (max-width: 720px) {
   .country-row.head { display: none; }
+  .country-group-head { padding: 8px 14px; }
   .country-row {
-    grid-template-columns: auto 1fr auto; grid-template-areas: "name status pot" "rate cred cred";
-    gap: 4px 10px; padding: 12px 14px; font-size: 14px;
+    grid-template-columns: auto 1fr auto; grid-template-areas: "name name pot" "rate cred cred";
+    gap: 2px 8px; padding: 11px 14px; font-size: 15px;
   }
+  .country-row > div:nth-child(n + 2) { text-align: left; }
   .country-row > div:nth-child(1) { grid-area: name; font-weight: 600; }
   .country-row > div:nth-child(2) { grid-area: rate; }
   .country-row > div:nth-child(3) { grid-area: cred; }
   .country-row > div:nth-child(4) { grid-area: pot; justify-self: end; white-space: nowrap; }
-  .country-row > div:nth-child(5) { grid-area: status; justify-self: start; }
   .country-row > div:nth-child(2), .country-row > div:nth-child(3) { font-size: 12px; color: var(--muted); white-space: nowrap; }
   .country-row > div:nth-child(2)::before { content: "Quellensteuer "; }
-  .country-row > div:nth-child(3)::before { content: "· anrechenbar "; }
-  .status { font-size: 10.5px; padding: 2px 7px; }
+  .country-row > div:nth-child(3)::before { content: "· in DE anrechenbar "; }
 }
-/* Lange Listen auf dem Handy zunächst gekürzt (Schalter kommt aus site.js) */
+/* Lange Listen auf dem Handy zunächst gekürzt (site.js markiert die Zeilen
+   ab dem n-ten Eintrag mit .is-extra und fügt den Schalter ein) */
 .collapse-toggle { display: none; }
 @media (max-width: 720px) {
-  .is-collapsed > .country-row:not(.head):nth-child(n + 8) { display: none; }
+  .is-collapsed .is-extra { display: none; }
   .collapse-toggle {
     display: block; width: 100%; margin-top: 10px; padding: 12px; border-radius: 10px;
     border: 1px solid var(--divider); background: var(--surface); color: var(--navy);
@@ -178,8 +191,6 @@ main { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
 }
 .status { display: inline-block; font-family: var(--font-mono); font-size: 11px; padding: 3px 9px; border-radius: 5px; white-space: nowrap; }
 .status-live { background: var(--success-bg); color: var(--success); font-weight: 600; }
-.status-planned { background: var(--navy-light); color: var(--navy); }
-.status-no { background: var(--bg); color: var(--muted); border: 1px solid var(--divider); }
 
 /* ─── Europakarte + Unternehmensbeispiele ─── */
 .map-panel { background: var(--navy); border-radius: 20px; padding: 28px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 28px; align-items: center; position: relative; overflow: hidden; }

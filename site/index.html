@@ -128,22 +128,20 @@ layout: layouts/default.html
 
 <section class="section">
   <h2 class="section-heading">In diesen Ländern zurückholen</h2>
-  <p class="section-intro">Erstattungspotenzial auf Dividenden nach Sitzland der Aktiengesellschaft, jeweils beim Regelsatz. Länder ohne Erstattungsanspruch (z. B. Großbritannien, Australien, Niederlande, Japan) sind nicht aufgeführt. Der Status zeigt, wo DivRebound dich unterstützt.</p>
+  <p class="section-intro">Erstattungspotenzial auf Dividenden nach Sitzland der Aktiengesellschaft, jeweils beim Regelsatz. Länder ohne Erstattungsanspruch (z. B. Großbritannien, Australien, Niederlande, Japan) sind nicht aufgeführt. Oben stehen die Länder, für die DivRebound den Antrag schon heute vorbereitet.</p>
   <div class="country-table" role="table" data-collapse-mobile="6" aria-label="Erstattungspotenzial nach Land">
-    <div class="country-row head" role="row"><div role="columnheader">Land</div><div role="columnheader">Quellensteuersatz</div><div role="columnheader">In DE anrechenbar</div><div role="columnheader">Erstattungspotenzial</div><div role="columnheader">DivRebound</div></div>
-    {%- assign sortedCountries = countries | sortLiveFirst %}
-    {%- for c in sortedCountries %}
-    <div class="country-row" role="row">
+    <div class="country-row head" role="row"><div role="columnheader">Land</div><div role="columnheader">Quellensteuersatz</div><div role="columnheader">In DE anrechenbar</div><div role="columnheader">Erstattungspotenzial</div></div>
+    {%- assign groups = countries | groupByStatus %}
+    {%- for g in groups %}
+    <div class="country-group-head group-{{ g.status }}" role="row"><div role="cell">{{ g.label }} <span class="group-count">{{ g.countries.size }}</span></div></div>
+    {%- for c in g.countries %}
+    <div class="country-row group-{{ g.status }}" role="row">
       <div role="cell">{{ c.name }}</div>
       <div role="cell">{{ c.rate | pct }}</div>
       <div role="cell">{{ c.creditable | pct }}</div>
       <div role="cell" class="accent-cell">bis zu {{ c.potential | pct }}</div>
-      <div role="cell">
-        {%- if c.status == "live" %}<span class="status status-live">verfügbar</span>
-        {%- elsif c.status == "planned" %}<span class="status status-planned">in Planung</span>
-        {%- else %}<span class="status status-no">nicht geplant</span>{% endif -%}
-      </div>
     </div>
+    {%- endfor %}
     {%- endfor %}
   </div>
   <p class="source-note">Quelle: Stiftung Warentest Finanztest 10/2026 (S. 83), Datenbasis Bundeszentralamt für Steuern, Stand {{ site.countriesAsOf }}. Angaben in Prozentpunkten, bezogen auf die Dividende, jeweils Regelsatz. Richtwerte, die sich ändern können. Österreich und Frankreich unterstützt DivRebound nicht, weil das Verfahren dort aufwendig, bürokratisch und teuer ist und sich die Rückforderung meist nicht lohnt.</p>
