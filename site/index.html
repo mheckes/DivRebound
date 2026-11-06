@@ -127,15 +127,15 @@ layout: layouts/default.html
 
 <section class="section">
   <h2 class="section-heading">In diesen Ländern zurückholen</h2>
-  <p class="section-intro section-intro-wide">Erstattungspotenzial auf Dividenden nach Sitzland der Aktiengesellschaft, jeweils beim Regelsatz. Länder ohne Erstattungsanspruch (z. B. Großbritannien, Australien, Niederlande, Japan) sind nicht aufgeführt. Oben stehen die Länder, für die DivRebound den Antrag schon heute vorbereitet.</p>
-  <div class="country-table" role="table" data-collapse-mobile="6" aria-label="Erstattungspotenzial nach Land">
+  <p class="section-intro section-intro-wide">Erstattungspotenzial auf Dividenden nach Sitzland der Aktiengesellschaft, jeweils beim Regelsatz. Länder ohne Erstattungsanspruch (z. B. Großbritannien, Australien, Niederlande, Japan) sind nicht aufgeführt. Oben stehen die Länder, für die DivRebound den Antrag schon heute vorbereitet. Fehlt dir eines der geplanten Länder? Klick auf „Will ich haben“, dann wissen wir, welches zuerst kommen soll.</p>
+  <div class="country-table" role="table" data-collapse-mobile="6" data-wish-endpoint="{{ site.wishEndpoint }}" aria-label="Erstattungspotenzial nach Land">
     <div class="country-row head" role="row"><div role="columnheader">Land</div><div role="columnheader">Quellensteuersatz</div><div role="columnheader">In DE anrechenbar</div><div role="columnheader">Erstattungspotenzial</div></div>
     {%- assign groups = countries | groupByStatus %}
     {%- for g in groups %}
     <div class="country-group-head group-{{ g.status }}" role="row"><div role="cell">{{ g.label }} <span class="group-count">{{ g.countries.size }}</span></div></div>
     {%- for c in g.countries %}
     <div class="country-row group-{{ g.status }}" role="row">
-      <div role="cell">{{ c.name }}</div>
+      <div role="cell" class="name-cell"><span>{{ c.name }}</span>{% if g.status == "planned" %}<button type="button" class="wish-btn" data-wish="{{ c.name }}" hidden>Will ich haben</button>{% endif %}</div>
       <div role="cell">{{ c.rate | pct }}</div>
       <div role="cell">{{ c.creditable | pct }}</div>
       <div role="cell" class="accent-cell">bis zu {{ c.potential | pct }}</div>

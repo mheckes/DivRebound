@@ -67,3 +67,44 @@
     list.after(btn);
   });
 })();
+
+// „Will ich haben“ bei geplanten Ländern: anonyme Stimme über Formspree.
+// Der Browser merkt sich lokal, wofür schon abgestimmt wurde (nur Komfort,
+// ohne Speicher funktioniert der Knopf trotzdem). Ohne JS bleibt er versteckt.
+(function () {
+  var table = document.querySelector("[data-wish-endpoint]");
+  var endpoint = table && table.getAttribute("data-wish-endpoint");
+  if (!endpoint || !window.fetch) return;
+  var KEY = "divrebound-country-wishes";
+  var done = [];
+  try { done = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (e) { done = []; }
+
+  function markDone(btn) {
+    btn.disabled = true;
+    btn.classList.add("is-done");
+    btn.textContent = "✓ Vorgemerkt";
+  }
+
+  table.querySelectorAll("[data-wish]").forEach(function (btn) {
+    var country = btn.getAttribute("data-wish");
+    btn.hidden = false;
+    if (done.indexOf(country) !== -1) { markDone(btn); return; }
+    btn.addEventListener("click", function () {
+      btn.disabled = true;
+      btn.textContent = "Wird gesendet …";
+      fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ _subject: "Länderwunsch: " + country, art: "Länderwunsch", land: country, quelle: "Website" }),
+      }).then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        markDone(btn);
+        done.push(country);
+        try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {}
+      }).catch(function () {
+        btn.disabled = false;
+        btn.textContent = "Nicht gesendet – nochmal versuchen";
+      });
+    });
+  });
+})();

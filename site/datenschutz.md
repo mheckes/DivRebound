@@ -24,6 +24,10 @@ Für den Versand wird der Dienst Formspree (USA) genutzt. Formspree empfängt di
 
 <div class="placeholder"><strong>Platzhalter:</strong> Angaben zu Formspree (Anbieter, Rechtsgrundlage, Auftragsverarbeitung, Drittlandübermittlung) und zur Speicherdauer im Postfach des Betreibers rechtlich prüfen lassen.</div>
 
+## Länderwünsche auf der Startseite
+
+In der Ländertabelle kannst du bei geplanten Ländern auf „Will ich haben“ klicken. Dabei wird nur der Name des Landes über Formspree (siehe oben) an den Betreiber übermittelt, ohne Namen oder E-Mail-Adresse. Formspree verarbeitet dabei technisch bedingt deine IP-Adresse. Damit du nicht mehrfach für dasselbe Land abstimmst, merkt sich dein Browser lokal (im Local Storage), für welche Länder du schon geklickt hast. Diese Angabe verlässt dein Gerät nicht.
+
 ## Hosting
 
 Website und Assistent werden über GitHub Pages ausgeliefert (GitHub Inc.). Beim Aufruf verarbeitet GitHub technisch notwendige Verbindungsdaten wie die IP-Adresse.
