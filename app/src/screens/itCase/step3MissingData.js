@@ -28,7 +28,7 @@ function issuerRow(group, profile) {
   return checklistRow(
     details.source === "user" ? "ok" : "later",
     details.name || group.isin,
-    `<span class="ch-check-text">${details.source === "user" ? "Ihre Angaben werden ins Formular übernommen." : "Nicht in der DivRebound-Liste. Ins Formular kommt nur der Name."}</span>
+    `<span class="ch-check-text">${details.source === "user" ? "Deine Angaben werden ins Formular übernommen." : "Nicht in der DivRebound-Liste. Ins Formular kommt nur der Name."}</span>
      <details class="it-optional" ${details.source === "user" ? "open" : ""}>
        <summary>Sitz und Steuernummer ergänzen (optional)</summary>
        <div class="ch-inline-fields">
@@ -48,14 +48,14 @@ function render(container, reclaimCase, profile) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 3)}
-    <p class="ch-lead">Hier steht nur noch, was nach dem Einlesen Ihrer Dividendenabrechnungen offen ist.</p>
+    <p class="ch-lead">Hier steht nur noch, was nach dem Einlesen deiner Dividendenabrechnungen offen ist.</p>
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Bitte noch ergänzen</span><span class="count-pill">${missing.length ? `${missing.length} offen` : "nichts offen"}</span></div>
       ${
         missing.length
           ? missing.map((k) => profileRow(profile, PROFILE_ITEM[k])).join("") + AUTOSAVE_ROW
-          : `<div class="card-body"><div class="md-all-done">✓ Alle Pflichtangaben für Form A sind vollständig. Sie stammen aus Ihren persönlichen Daten – <a href="#" data-go-checklist>ansehen oder ändern</a>.</div></div>`
+          : `<div class="card-body"><div class="md-all-done">✓ Alle Pflichtangaben für Form A sind vollständig. Sie stammen aus deinen persönlichen Daten – <a href="#" data-go-checklist>ansehen oder ändern</a>.</div></div>`
       }
     </div>
 

@@ -25,7 +25,7 @@ export const PROFILE_ITEM = {
   name: { label: "Name", fields: [["firstName", "Vorname"], ["lastName", "Nachname"]] },
   address: { label: "Adresse", fields: [["address", "Straße und Hausnummer", "wide"], ["postalCode", "PLZ"], ["city", "Ort"]] },
   birthDate: { label: "Geburtsdatum", fields: [["birthDate", "", "date"]] },
-  birthPlace: { label: "Geburtsort", fields: [["birthPlace", "wie im Reisepass"]] },
+  birthPlace: { label: "Geburtsort", fields: [["birthPlace", ""]] },
   tin: { label: "Steuer-ID", fields: [["tin", "z.B. 86095742719", "mono"]] },
   taxNumber: { label: "Steuernummer", fields: [["taxNumber", "z.B. 143/123/45678", "mono"]] },
   taxOffice: { label: "Finanzamt", fields: [["taxOfficeName", "Name des Finanzamts", "wide"], ["taxOfficeStreet", "Straße", "wide"], ["taxOfficePostalCode", "PLZ"], ["taxOfficeCity", "Ort"]] },
@@ -82,7 +82,7 @@ export function optionalProfileRow(profile, item) {
   return checklistRow(isItemFilled(profile, item) ? "ok" : "later", item.label, profileInputsHtml(profile, item), "", `data-optional-item="${Object.keys(PROFILE_ITEM).find((k) => PROFILE_ITEM[k] === item) ?? ""}"`);
 }
 
-export const AUTOSAVE_ROW = `<div class="ch-autosave-row autosave-note">✓ Zum Ändern ins Feld klicken. Änderungen werden automatisch in Ihren persönlichen Daten gespeichert.</div>`;
+export const AUTOSAVE_ROW = `<div class="ch-autosave-row autosave-note">✓ Zum Ändern ins Feld klicken. Änderungen werden automatisch in deinen persönlichen Daten gespeichert.</div>`;
 
 export function setRowState(row, state) {
   row.classList.remove("ok", "missing", "check", "later");

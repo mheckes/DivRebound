@@ -31,7 +31,7 @@ export function mountSmallScreenNotice(root) {
       <h1 class="ssn-title" id="ssn-title">DivRebound ist für Computer und Tablet gemacht</h1>
       <p class="ssn-text">Für die Rückforderung lädst du PDFs hoch, druckst Formulare aus und überträgst Werte in die Portale ausländischer Steuerbehörden. Das geht am großen Bildschirm deutlich leichter.</p>
       <div class="ssn-info">
-        <strong>Gut zu wissen:</strong> Deine Daten bleiben nur auf dem Gerät, auf dem du startest. Öffne DivRebound deshalb am besten gleich am Computer.
+        <strong>Empfehlung:</strong> Öffne DivRebound am besten gleich am Computer.
       </div>
       <button type="button" class="ssn-btn" data-ssn="open">Trotzdem öffnen</button>
       <a class="ssn-back" href="${websiteHome}">← Zur Website</a>

@@ -13,7 +13,7 @@ facts:
 
 ## Mein Weg an den Kapitalmarkt
 
-Der Kapitalmarkt begleitet mich seit der Schulzeit. Angefangen hat es mit dem Planspiel Börse der Sparkasse und dem Besuch einer Hauptversammlung gemeinsam mit meinem Vater. Seit rund 20 Jahren bin ich investiert, und seit etwa zehn Jahren ist meine Begeisterung noch einmal deutlich gewachsen.
+Der Kapitalmarkt begleitet mich seit der Schulzeit. Angefangen hat es mit dem Planspiel Börse der Sparkasse und dem Besuch einer Hauptversammlung gemeinsam mit meinem Vater. Seit rund 20 Jahren bin ich investiert.
 
 Meine Anlagestrategie hat sich in dieser Zeit verändert. Zu Beginn lag der Fokus auf aktiv gemanagten Fonds, später habe ich auf ETFs umgestellt. Heute verfolge ich eine Core-Satellite-Strategie: Das Fundament bilden ETFs, ergänzt um ausgewählte Einzelaktien.
 

@@ -53,7 +53,7 @@ export function mount(container, reclaimCase, profile) {
     title: "SKAT-Formular",
     sub: "kein Login und keine MitID nötig",
     docTitle: "„Refusion af udbytteskat / Claim for refund of Danish dividend tax“",
-    text: "Öffnen Sie das Formular in einem zweiten Fenster und ordnen Sie es neben dieser Seite an. Halten Sie die vom Finanzamt bestätigte Wohnsitzbescheinigung bereit, Sie laden sie auf Seite 4 hoch.",
+    text: "Öffne das Formular in einem zweiten Fenster und ordne es neben dieser Seite an. Halte die vom Finanzamt bestätigte Wohnsitzbescheinigung bereit, du lädst sie auf Seite 4 hoch.",
     url: corridor.onlinePortalUrl,
     buttonLabel: "SKAT-Formular öffnen ↗",
   };
@@ -188,7 +188,7 @@ export function mount(container, reclaimCase, profile) {
         <div class="done-icon">✓</div>
         <div>
           <div class="done-title">Geschafft!</div>
-          <div class="done-sub">Ihr Antrag ist vollständig ausgefüllt. Jetzt bei SKAT ausdrucken oder als PDF speichern, auf „Send“ klicken und den DivRebound in Schritt 6 abschließen.</div>
+          <div class="done-sub">Dein Antrag ist vollständig ausgefüllt. Jetzt bei SKAT ausdrucken oder als PDF speichern, auf „Send“ klicken und den DivRebound in Schritt 6 abschließen.</div>
         </div>
       </div>`;
   }

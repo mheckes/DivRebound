@@ -82,7 +82,7 @@ function render(container, reclaimCase, profile) {
       <div class="card-head head-navy"><span class="card-title">Aus den Abrechnungen abgeleitet – bitte bestätigen</span></div>
       <div class="card-body">
         <div class="md-period-title">Zeitraum der Ansässigkeit</div>
-        <div class="field-hint" style="margin-bottom:12px;">„Von“ ist der früheste Zahltag Ihrer Ausschüttungen. Die Wohnsitzbescheinigung muss alle Zahltage abdecken.</div>
+        <div class="field-hint" style="margin-bottom:12px;">„Von“ ist der früheste Zahltag deiner Ausschüttungen. Die Wohnsitzbescheinigung muss alle Zahltage abdecken.</div>
         <div class="md-period">
           <div class="field-row">
             <label class="field-label" for="res-from">Von</label>
@@ -103,7 +103,7 @@ function render(container, reclaimCase, profile) {
       ${
         missing.length
           ? missing.map((k) => profileRow(profile, PROFILE_ITEM[k])).join("") + AUTOSAVE_ROW
-          : `<div class="card-body"><div class="md-all-done">✓ Alle übrigen Angaben sind vollständig. Sie stammen aus Ihren persönlichen Daten – <a href="#" data-go-checklist>ansehen oder ändern</a>.</div></div>`
+          : `<div class="card-body"><div class="md-all-done">✓ Alle übrigen Angaben sind vollständig. Sie stammen aus deinen persönlichen Daten – <a href="#" data-go-checklist>ansehen oder ändern</a>.</div></div>`
       }
     </div>
 

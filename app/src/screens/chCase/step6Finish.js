@@ -30,7 +30,7 @@ function render(container, reclaimCase, transactions) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 6)}
-    <p class="ch-lead">Der vom deutschen Finanzamt bestätigte Antrag wird im ePortal hochgeladen. Erst danach prüft die Eidgenössische Steuerverwaltung Ihren Antrag und überweist die Erstattung.</p>
+    <p class="ch-lead">Der vom deutschen Finanzamt bestätigte Antrag wird im ePortal hochgeladen. Erst danach prüft die Eidgenössische Steuerverwaltung deinen Antrag und überweist die Erstattung.</p>
 
     ${statusTimelineHtml({ title: timelineTitle(reclaimCase, total), steps: CH_TIMELINE, doneCount: chTimelineDone(reclaimCase) })}
 
@@ -53,10 +53,10 @@ function render(container, reclaimCase, transactions) {
                 <div class="done-icon">✓</div>
                 <div>
                   <div class="done-title">DivRebound abgeschlossen</div>
-                  <div class="done-sub">Hochgeladen am ${esc(formatDateDe(reclaimCase.ch.completedAt.slice(0, 10)))}. Die Eidgenössische Steuerverwaltung prüft jetzt Ihren Antrag. Die Auszahlung dauert erfahrungsgemäß einige Wochen.</div>
+                  <div class="done-sub">Hochgeladen am ${esc(formatDateDe(reclaimCase.ch.completedAt.slice(0, 10)))}. Die Eidgenössische Steuerverwaltung prüft jetzt deinen Antrag. Die Auszahlung dauert erfahrungsgemäß einige Wochen.</div>
                 </div>
               </div>
-              <p class="ch-text">Wenn die Erstattung da ist, können Sie sie in Schritt 7 festhalten (optional).</p>`
+              <p class="ch-text">Wenn die Erstattung da ist, kannst du sie in Schritt 7 festhalten (optional).</p>`
             : `<button class="btn-primary" data-action="finish" ${allChecked ? "" : "disabled"} type="button">✓ Hochgeladen – DivRebound abschließen</button>
               ${allChecked ? "" : `<div class="field-hint" style="margin-top:6px;">Bitte zuerst die drei Punkte oben abhaken.</div>`}`
         }

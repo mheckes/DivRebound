@@ -122,7 +122,7 @@ function render(container, profile) {
         </div>
         <div class="field-grid">
           ${field(profile, "birthDate", "Geburtsdatum", { type: "date" })}
-          ${field(profile, "birthPlace", "Geburtsort", { hint: "wie im Reisepass" })}
+          ${field(profile, "birthPlace", "Geburtsort")}
         </div>
         <div class="field-grid">
           <div class="field-row">
@@ -188,7 +188,7 @@ function render(container, profile) {
         <div class="field-grid">
           ${field(profile, "bankAddress", "Adresse der Bank", { hint: "optional, für Italien", wide: true, placeholder: "z.B. Kaiserplatz, 60311 Frankfurt am Main" })}
         </div>
-        <div class="field-hint">Geben Sie hier ein Konto an, das SEPA-Überweisungen empfangen kann und auf dem Sie Ihre Quellensteuer-Erstattung erhalten wollen.</div>
+        <div class="field-hint">Gib hier ein Konto an, das SEPA-Überweisungen empfangen kann und auf dem du deine Quellensteuer-Erstattung erhalten willst.</div>
       </div>
     </div>
 

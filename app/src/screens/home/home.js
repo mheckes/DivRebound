@@ -92,7 +92,7 @@ function render(container) {
 
       <div class="home-tile" data-nav="#/profile">
         <div class="home-tile-icon">👤</div>
-        <div class="home-tile-title">Nutzerprofil bearbeiten</div>
+        <div class="home-tile-title">Persönliche Daten bearbeiten</div>
         <div class="home-tile-desc">Persönliche Daten, Bankverbindung und Finanzamt verwalten.</div>
       </div>
 

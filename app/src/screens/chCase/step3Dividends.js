@@ -222,7 +222,7 @@ function render(container, reclaimCase) {
   container.innerHTML = `
     <div class="ch-page ch-page-wide">
     ${stepHeader(reclaimCase, 3)}
-    <p class="ch-lead">Für jede Dividende braucht das ePortal einen Tax Voucher Ihrer Bank. Laden Sie die Voucher und – falls vorhanden – die Dividendenabrechnungen hoch. DivRebound ordnet sie zu und prüft, ob die Stückzahlen zu Ihrem Bestand am Stichtag passen.</p>
+    <p class="ch-lead">Für jede Dividende braucht das ePortal einen Tax Voucher deiner Bank. Lade die Voucher und – falls vorhanden – die Dividendenabrechnungen hoch. DivRebound ordnet sie zu und prüft, ob die Stückzahlen zu deinem Bestand am Stichtag passen.</p>
 
     <div class="dropzone" id="dropzone">
       <input type="file" id="file-input" multiple accept="application/pdf" hidden />
@@ -248,7 +248,7 @@ function render(container, reclaimCase) {
               <tbody>${dists.map((d) => distributionRow(d, byId[d.distributionId], isinNames)).join("")}</tbody>
               <tfoot><tr><td colspan="6"><b>Voraussichtliche Erstattung (20 % der Bruttodividende)</b></td><td class="num"><b>${formatChf(total)}</b></td><td></td></tr></tfoot>
             </table></div>`
-          : `<div class="card-body"><p class="ch-empty">Noch keine Dividenden erfasst. Laden Sie oben Ihre Tax Voucher hoch.</p></div>`
+          : `<div class="card-body"><p class="ch-empty">Noch keine Dividenden erfasst. Lade oben deine Tax Voucher hoch.</p></div>`
       }
       <div class="ch-card-foot"><button class="btn-secondary btn-small" data-add-dist type="button">＋ Dividende manuell hinzufügen</button></div>
     </div>
@@ -260,7 +260,7 @@ function render(container, reclaimCase) {
         <span class="ch-hint-icon">💡</span>
         <div>
           <b>Möglicherweise noch offen: ${esc(h.issuerName || h.isin)} ${h.years.join(", ")}.</b><br>
-          Laut Ihrem Bestand hielten Sie die Aktie in ${h.years.length === 1 ? "diesem Jahr" : "diesen Jahren"}, es ist aber keine Dividende erfasst. Falls eine gezahlt wurde, ist sie noch nicht verjährt.
+          Laut deinem Bestand hieltest du die Aktie in ${h.years.length === 1 ? "diesem Jahr" : "diesen Jahren"}, es ist aber keine Dividende erfasst. Falls eine gezahlt wurde, ist sie noch nicht verjährt.
           <div class="ch-hint-actions">
             <button class="btn-secondary btn-small" data-upload-hint type="button">Unterlagen hochladen</button>
             <button class="btn-secondary btn-small" data-dismiss-hint="${esc(h.isin)}|${h.years.join(",")}" type="button">Bereits erstattet / keine Dividende</button>
@@ -274,7 +274,7 @@ function render(container, reclaimCase) {
       <summary>Warum mehrere Tax Voucher für eine Dividende? Was ist der Stichtag?</summary>
       <div class="help-disclosure-body">
         <p>Manche Banken stellen für eine Dividende mehrere Voucher aus (z.B. 20 und 5 Stück). Entscheidend ist, dass die <b>Summe</b> dem Bestand am Stichtag entspricht. Weicht sie ab, fehlt entweder ein Voucher oder eine Kauf-/Verkaufsabrechnung in Schritt 2.</p>
-        <p><b>Stichtag:</b> Anspruch hat, wer die Aktie am Ende des Handelstags vor dem Ex-Tag hält. DivRebound benötigt den Stichtag nur, um den Bestand an diesem Tag zu berechnen. Er wird aus der Dividendenabrechnung übernommen oder geschätzt und nur dann zur Prüfung angezeigt, wenn Sie kurz vor der Fälligkeit gekauft oder verkauft haben.</p>
+        <p><b>Stichtag:</b> Anspruch hat, wer die Aktie am Ende des Handelstags vor dem Ex-Tag hält. DivRebound benötigt den Stichtag nur, um den Bestand an diesem Tag zu berechnen. Er wird aus der Dividendenabrechnung übernommen oder geschätzt und nur dann zur Prüfung angezeigt, wenn du kurz vor der Fälligkeit gekauft oder verkauft hast.</p>
       </div>
     </details>
 

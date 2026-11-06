@@ -329,3 +329,11 @@
 #divrebound-app .mono {
   font-family: var(--font-mono);
 }
+
+/* Datumsfelder: Platzhalter einheitlich als TT.MM.JJJJ (Chrome zeigt sonst je
+   nach Version gemischte Groß-/Kleinschreibung). Ziffern sind davon unberührt. */
+#divrebound-app input[type="date"]::-webkit-datetime-edit-day-field,
+#divrebound-app input[type="date"]::-webkit-datetime-edit-month-field,
+#divrebound-app input[type="date"]::-webkit-datetime-edit-year-field {
+  text-transform: uppercase;
+}

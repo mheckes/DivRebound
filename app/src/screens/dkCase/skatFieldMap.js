@@ -66,7 +66,7 @@ const page1Rows = [
   {
     id: "m1",
     labelEn: "I claim refund of Danish dividend tax as",
-    hint: "Ihre Rolle beim Antrag",
+    hint: "Deine Rolle beim Antrag",
     resolve: () => val("Shareholder"),
   },
 ];
@@ -78,7 +78,7 @@ const page2Rows = [
   {
     id: "m2",
     labelEn: "The shareholder is",
-    hint: 'Sind Sie Privatperson oder ein Unternehmen? Als Privatanleger: "a person" wählen.',
+    hint: 'Bist du Privatperson oder ein Unternehmen? Als Privatanleger: "a person" wählen.',
     reveals: true,
     resolve: () => val("a person"),
   },
@@ -86,7 +86,7 @@ const page2Rows = [
     id: "m3",
     labelEn: "Select the relevant identification and complete the field",
     hint:
-      'Womit weisen Sie sich aus? Als deutscher Steuerzahler ohne dänische CPR-Nr.: "Tax identification number (TIN)" wählen.',
+      'Womit weist du dich aus? Als deutscher Steuerzahler ohne dänische CPR-Nr.: "Tax identification number (TIN)" wählen.',
     group: "m2",
     reveals: true,
     resolve: () => val("Tax identification number (TIN)"),
@@ -329,7 +329,7 @@ export const skatTabs = [
     rows: page5Rows,
     helpNote: {
       title: "Warum diese Werte so gewählt sind",
-      items: ['"Name of bank" ist Ihr persönliches Verrechnungskonto, nicht zwingend das Broker-Konto.'],
+      items: ['"Name of bank" ist dein persönliches Verrechnungskonto, nicht zwingend das Broker-Konto.'],
     },
   },
   {

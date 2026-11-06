@@ -37,7 +37,7 @@ function render(container, reclaimCase, profile, transactions) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 1)}
-    <p class="ch-lead">Die Rückerstattung der Schweizer Verrechnungssteuer läuft vollständig über das ePortal der Eidgenössischen Steuerverwaltung. DivRebound bereitet alle Angaben so vor, dass Sie sie dort nur noch übertragen müssen.</p>
+    <p class="ch-lead">Die Rückerstattung der Schweizer Verrechnungssteuer läuft vollständig über das ePortal der Eidgenössischen Steuerverwaltung. DivRebound bereitet alle Angaben so vor, dass du sie dort nur noch übertragen musst.</p>
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Checkliste</span><span class="count-pill" data-summary></span></div>
@@ -60,23 +60,23 @@ function render(container, reclaimCase, profile, transactions) {
       ${
         transactions.length
           ? textRow("check", "Käufe und Verkäufe", `${transactions.length} Transaktionen erfasst${lastTx ? ` · letzte am ${formatDateDe(lastTx.tradeDate)}` : ""} · seitdem etwas gekauft oder verkauft?`, `<button class="btn-secondary btn-small" data-go-step="2" type="button">Bestand prüfen</button>`)
-          : textRow("missing", "Käufe und Verkäufe", "Noch keine erfasst. Das ePortal verlangt das Erwerbsdatum Ihrer Aktien, deshalb werden alle Käufe und Verkäufe Ihrer Schweizer Aktien ab dem ersten Kauf benötigt, per Abrechnung oder manuell.", `<button class="btn-primary btn-small" data-go-step="2" type="button">Erfassen</button>`)
+          : textRow("missing", "Käufe und Verkäufe", "Noch keine erfasst. Das ePortal verlangt das Erwerbsdatum deiner Aktien, deshalb werden alle Käufe und Verkäufe deiner Schweizer Aktien ab dem ersten Kauf benötigt, per Abrechnung oder manuell.", `<button class="btn-primary btn-small" data-go-step="2" type="button">Erfassen</button>`)
       }
 
       <div class="ch-check-group">Dividenden</div>
-      ${textRow("later", "Tax Voucher", "Pro Dividende einer, von Ihrer Bank. Kommen teils erst Wochen nach der Zahlung.", `<span class="badge badge-extracted">Schritt 3</span>`)}
+      ${textRow("later", "Tax Voucher", "Pro Dividende einer, von deiner Bank. Kommen teils erst Wochen nach der Zahlung.", `<span class="badge badge-extracted">Schritt 3</span>`)}
       ${textRow("later", "Dividendenabrechnungen", "Optional. Liefern Dividendentermin und Bruttobetrag.", `<span class="badge badge-extracted">Schritt 3</span>`)}
     </div>
 
     <div class="ch-two-col">
       <div class="card"><div class="card-head"><span class="card-title">Das übernimmt DivRebound</span></div><div class="card-body"><ul class="ch-list">
-        <li>Bestand aus Ihren Abrechnungen berechnen (FIFO)</li>
+        <li>Bestand aus deinen Abrechnungen berechnen (FIFO)</li>
         <li>Liste der Vermögenswerte fürs ePortal</li>
         <li>Abgleich mit den Tax Vouchern</li>
         <li>Antworten auf die Fragen im Portal</li>
         <li>Anschreiben ans Finanzamt</li>
       </ul></div></div>
-      <div class="card"><div class="card-head"><span class="card-title">Das machen Sie selbst</span></div><div class="card-body"><ul class="ch-list">
+      <div class="card"><div class="card-head"><span class="card-title">Das machst du selbst</span></div><div class="card-body"><ul class="ch-list">
         <li>Im ePortal anmelden (eigener Zugang)</li>
         <li>Angaben ins Portal übertragen</li>
         <li>Antrag ausdrucken und unterschreiben</li>

@@ -20,7 +20,7 @@ const ADDRESS = corridors.IT.mailingAddress;
 function envelopeChecks(formsCount, statements) {
   return [
     ["forms", `<b>${formsCount} × Form A</b> im Original, je 5 Seiten, vom Finanzamt auf Seite 5 gestempelt und unterschrieben`],
-    ["signatures", "Ihre Unterschriften auf <b>Seite 3 und Seite 5</b> jedes Formulars"],
+    ["signatures", "Deine Unterschriften auf <b>Seite 3 und Seite 5</b> jedes Formulars"],
     ["statements", `<b>Kopien der ${statements} Dividendenabrechnung${statements === 1 ? "" : "en"}</b>`],
     ["letter", "<b>Begleitschreiben</b>, unterschrieben"],
   ];
@@ -43,7 +43,7 @@ function render(container, reclaimCase) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 5)}
-    <p class="ch-lead">Sobald das Finanzamt die Formulare bestätigt zurückgeschickt hat, gehen sie zusammen mit Kopien Ihrer Abrechnungen und dem Begleitschreiben per Post an die italienische Steuerbehörde.</p>
+    <p class="ch-lead">Sobald das Finanzamt die Formulare bestätigt zurückgeschickt hat, gehen sie zusammen mit Kopien deiner Abrechnungen und dem Begleitschreiben per Post an die italienische Steuerbehörde.</p>
 
     ${timelineHtml(reclaimCase)}
 
@@ -89,8 +89,8 @@ function render(container, reclaimCase) {
                   <div class="done-sub">Am ${esc(formatDateDe(reclaimCase.it.mailedAt.slice(0, 10)))} nach Italien versendet · erwartete Erstattung ${formatEurPlain(total)} €</div>
                 </div>
               </div>
-              <p class="ch-text">Wenn die Erstattung da ist, können Sie sie in Schritt 6 festhalten (optional).</p>`
-            : `<p class="ch-text">Wenn der Umschlag unterwegs ist, ist Ihr DivRebound abgeschlossen. Die Erstattung können Sie später in Schritt 6 eintragen.</p>
+              <p class="ch-text">Wenn die Erstattung da ist, kannst du sie in Schritt 6 festhalten (optional).</p>`
+            : `<p class="ch-text">Wenn der Umschlag unterwegs ist, ist dein DivRebound abgeschlossen. Die Erstattung kannst du später in Schritt 6 eintragen.</p>
               <button class="btn-primary" data-action="mark-mailed" ${allChecked ? "" : "disabled"} type="button">✓ Als versendet markieren</button>
               ${allChecked ? "" : `<div class="field-hint" style="margin-top:6px;">Bitte zuerst die Punkte oben abhaken.</div>`}`
         }

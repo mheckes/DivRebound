@@ -140,7 +140,7 @@ function render(container) {
   container.innerHTML = `
     ${stepHeader(reclaimCase, 4)}
 
-    <p class="ch-lead">Die Wohnsitzbescheinigung (Formular 02.050) muss vom deutschen Finanzamt bestätigt werden. DivRebound hat das Formular für Sie ausgefüllt.</p>
+    <p class="ch-lead">Die Wohnsitzbescheinigung (Formular 02.050) muss vom deutschen Finanzamt bestätigt werden. DivRebound hat das Formular für dich ausgefüllt.</p>
 
     ${dkTimelineHtml(reclaimCase)}
 
@@ -189,7 +189,7 @@ function render(container) {
       <div class="card-body">
         <div class="step-row"><span class="step-num">1</span><span>Wohnsitzbescheinigung ausdrucken, unterschreiben und mit dem Anschreiben per Post an das Finanzamt senden.</span></div>
         <div class="step-row"><span class="step-num">2</span><span>Das Finanzamt bestätigt (Stempel und Unterschrift) und schickt die Bescheinigung zurück.</span></div>
-        <div class="step-row"><span class="step-num">3</span><span>Danach geht es weiter mit <a href="#" data-go-step="5">Schritt 5: SKAT-Portal ausfüllen</a> – dort laden Sie die bestätigte Bescheinigung hoch.</span></div>
+        <div class="step-row"><span class="step-num">3</span><span>Danach geht es weiter mit <a href="#" data-go-step="5">Schritt 5: SKAT-Portal ausfüllen</a> – dort lädst du die bestätigte Bescheinigung hoch.</span></div>
       </div>
     </div>
 

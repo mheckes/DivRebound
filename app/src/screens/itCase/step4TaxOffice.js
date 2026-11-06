@@ -54,7 +54,7 @@ function render(container, reclaimCase) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 4)}
-    <p class="ch-lead">DivRebound hat für jedes Unternehmen ein Form A ausgefüllt. Drucken Sie alle Seiten aus, unterschreiben Sie zweimal und senden Sie die Formulare mit dem Anschreiben an Ihr Finanzamt. Das Finanzamt bestätigt auf Seite 5 Ihre Ansässigkeit.</p>
+    <p class="ch-lead">DivRebound hat für jedes Unternehmen ein Form A ausgefüllt. Drucke alle Seiten aus, unterschreibe zweimal und sende die Formulare mit dem Anschreiben an dein Finanzamt. Das Finanzamt bestätigt auf Seite 5 deine Ansässigkeit.</p>
 
     ${timelineHtml(reclaimCase)}
 

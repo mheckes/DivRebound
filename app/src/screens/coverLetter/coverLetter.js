@@ -103,7 +103,7 @@ function render(container) {
           ${field(profile, "taxOfficePostalCode", "Postleitzahl", { placeholder: "z.B. 80335" })}
           ${field(profile, "taxOfficeCity", "Ort", { placeholder: "z.B. München" })}
         </div>
-        <div class="field-hint">Bitte prüfen. Aus Ihren persönlichen Daten übernommen.</div>
+        <div class="field-hint">Bitte prüfen. Aus deinen persönlichen Daten übernommen.</div>
       </div>
     </div>
 

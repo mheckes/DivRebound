@@ -67,7 +67,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
   .hero-actions .btn-ghost { width: 100%; text-align: center; padding: 10px 6px; }
   /* Kennzahlen als kompakte Zeilen: Wert links, Erklärung rechts */
   .stat-row { grid-template-columns: 1fr; gap: 8px; margin-top: 18px; }
-  .stat-card { display: grid; grid-template-columns: 118px 1fr; gap: 12px; align-items: center; padding: 11px 14px; }
+  .stat-card { display: grid; grid-template-columns: 140px 1fr; gap: 12px; align-items: center; padding: 11px 14px; }
   .stat-value { font-size: 16px; margin-bottom: 0; white-space: nowrap; }
 }
 
@@ -75,6 +75,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
 .section { margin-bottom: 72px; scroll-margin-top: 90px; }
 .section-heading { font-family: var(--font-display); font-weight: 400; font-size: 30px; margin-bottom: 12px; letter-spacing: -0.01em; line-height: 1.25; }
 .section-intro { color: var(--muted); font-size: 15px; max-width: 620px; margin-bottom: 32px; }
+.section-intro-wide { max-width: none; }
 @media (max-width: 720px) {
   .section { margin-bottom: 48px; scroll-margin-top: 76px; }
   .section-heading { font-size: 25px; }
@@ -160,22 +161,22 @@ main { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
 .group-count { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 4px; background: rgba(255,255,255,0.7); font-weight: 500; }
 .accent-cell { font-family: var(--font-mono); color: var(--cyan-dark); font-weight: 600; }
 .source-note { font-size: 11px; color: var(--muted); margin-top: 10px; }
-/* Handy: oben Land und Erstattungspotenzial, darunter klein die beiden Sätze. */
+/* Handy: oben Land und Erstattungspotenzial, darunter klein der Quellensteuersatz.
+   "In DE anrechenbar" ist ausgeblendet, damit nicht zu viele Prozentzahlen stehen. */
 @media (max-width: 720px) {
   .country-row.head { display: none; }
   .country-group-head { padding: 8px 14px; }
   .country-row {
-    grid-template-columns: auto 1fr auto; grid-template-areas: "name name pot" "rate cred cred";
+    grid-template-columns: 1fr auto; grid-template-areas: "name pot" "rate rate";
     gap: 2px 8px; padding: 11px 14px; font-size: 15px;
   }
   .country-row > div:nth-child(n + 2) { text-align: left; }
   .country-row > div:nth-child(1) { grid-area: name; font-weight: 600; }
   .country-row > div:nth-child(2) { grid-area: rate; }
-  .country-row > div:nth-child(3) { grid-area: cred; }
+  .country-row > div:nth-child(3) { display: none; }
   .country-row > div:nth-child(4) { grid-area: pot; justify-self: end; white-space: nowrap; }
-  .country-row > div:nth-child(2), .country-row > div:nth-child(3) { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .country-row > div:nth-child(2) { font-size: 12px; color: var(--muted); white-space: nowrap; }
   .country-row > div:nth-child(2)::before { content: "Quellensteuer "; }
-  .country-row > div:nth-child(3)::before { content: "· in DE anrechenbar "; }
 }
 /* Lange Listen auf dem Handy zunächst gekürzt (site.js markiert die Zeilen
    ab dem n-ten Eintrag mit .is-extra und fügt den Schalter ein) */

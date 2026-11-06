@@ -11,7 +11,7 @@ export function mount(container, reclaimCase) {
   mountDividendUpload(container, reclaimCase, {
     corridor: corridors.IT,
     headerHtml: stepHeader(reclaimCase, 2),
-    lead: "Laden Sie Ihre Dividendenabrechnungen italienischer Aktien hoch. DivRebound liest die relevanten Informationen aus und bereitet die Erstellung von Formularen vor.",
+    lead: "Lade deine Dividendenabrechnungen italienischer Aktien hoch. DivRebound liest die relevanten Informationen aus und bereitet die Erstellung von Formularen vor.",
     countryName: "Italien",
     shareAdjective: "italienische",
     groupBy: "issuer",

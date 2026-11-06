@@ -17,7 +17,7 @@ const GUIDES = {
   upload: {
     title: "Anleitung: Hochladen im ePortal",
     steps: [
-      ["Antragsübersicht öffnen", "Kachel „Verrechnungssteuer“ → Liste Ihrer Anträge."],
+      ["Antragsübersicht öffnen", "Kachel „Verrechnungssteuer“ → Liste deiner Anträge."],
       ["Antrag auswählen", "Den Antrag öffnen."],
       ["Bestätigten Antrag hochladen", "Das eingescannte PDF hochladen und absenden."],
     ],

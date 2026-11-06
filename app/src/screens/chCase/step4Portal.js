@@ -20,7 +20,7 @@ const PORTAL_BOX = {
   title: "ePortal",
   sub: "eigener Zugang nötig",
   docTitle: "ePortal der Eidgenössischen Steuerverwaltung",
-  text: "Öffnen Sie das ePortal in einem zweiten Fenster, melden Sie sich an und wählen Sie die Kachel <b>„Verrechnungssteuer“</b> → <b>Neuen Antrag anlegen</b>.",
+  text: "Öffne das ePortal in einem zweiten Fenster, melde dich an und wähle die Kachel <b>„Verrechnungssteuer“</b> → <b>Neuen Antrag anlegen</b>.",
   url: corridor.onlinePortalUrl,
   buttonLabel: "ePortal öffnen ↗",
 };
@@ -206,7 +206,7 @@ function render(container, reclaimCase) {
   if (currentPage === "questions") {
     body =
       questions(profile).map(([q, a], i) => row(reclaimCase, `q${i}`, q, a, { assumption: true })).join("") +
-      `<div class="ch-pane-warning ch-pane-warning-soft">Trifft eine Antwort bei Ihnen nicht zu (z.B. Aktien geerbt oder verliehen), ist das ein Sonderfall, den DivRebound nicht abdeckt. Bitte lassen Sie sich dann beraten.</div>`;
+      `<div class="ch-pane-warning ch-pane-warning-soft">Trifft eine Antwort bei dir nicht zu (z.B. Aktien geerbt oder verliehen), ist das ein Sonderfall, den DivRebound nicht abdeckt. Bitte lass dich dann beraten.</div>`;
   }
   if (currentPage === "additional") {
     const p = (key) => PROFILE_FIELDS[key].read(profile);

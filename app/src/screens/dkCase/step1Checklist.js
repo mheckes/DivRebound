@@ -36,7 +36,7 @@ export function mount(container) {
       <h1 class="content-title">Unterlagen prüfen</h1>
       <div class="content-breadcrumb">Dänemark <b>›</b> ${caseLabel(reclaimCase)} <b>›</b> 1 von ${DK_STEPS.length}${feedbackLinkHtml()}</div>
     </div>
-    <p class="ch-lead">Für die Erstattung der dänischen Quellensteuer erzeugt DivRebound eine Wohnsitzbescheinigung, die Ihr deutsches Finanzamt bestätigt. Anschließend tragen Sie Ihren Antrag im Online-Formular von SKAT ein.</p>
+    <p class="ch-lead">Für die Erstattung der dänischen Quellensteuer erzeugt DivRebound eine Wohnsitzbescheinigung, die dein deutsches Finanzamt bestätigt. Anschließend trägst du deinen Antrag im Online-Formular von SKAT ein.</p>
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Checkliste</span><span class="count-pill" data-summary></span></div>
@@ -48,13 +48,13 @@ export function mount(container) {
       ${PROFILE_ITEMS.map((item) => profileRow(profile, item)).join("")}
       ${AUTOSAVE_ROW}
 
-      <div class="ch-check-group">Aus Ihren Dividendenabrechnungen</div>
+      <div class="ch-check-group">Aus deinen Dividendenabrechnungen</div>
       ${
         confirmed
           ? textRow("ok", "Dividendenabrechnungen", `${confirmed} Ausschüttung${confirmed === 1 ? "" : "en"} erfasst.`, `<span class="badge badge-extracted">Schritt 2</span>`)
           : textRow("later", "Dividendenabrechnungen", "Je eine pro Ausschüttung einer dänischen Aktie (ISIN beginnt mit DK), höchstens 3 Jahre zurück.", `<span class="badge badge-extracted">Schritt 2</span>`)
       }
-      ${textRow("later", "Zeitraum der Ansässigkeit", "Wird aus den Zahltagen Ihrer Abrechnungen abgeleitet.", `<span class="badge badge-extracted">Schritt 3</span>`)}
+      ${textRow("later", "Zeitraum der Ansässigkeit", "Wird aus den Zahltagen deiner Abrechnungen abgeleitet.", `<span class="badge badge-extracted">Schritt 3</span>`)}
     </div>
 
     <div class="ch-two-col">
@@ -64,7 +64,7 @@ export function mount(container) {
         <li>Anschreiben ans Finanzamt</li>
         <li>Spickzettel für das SKAT-Online-Formular</li>
       </ul></div></div>
-      <div class="card"><div class="card-head"><span class="card-title">Das machen Sie selbst</span></div><div class="card-body"><ul class="ch-list">
+      <div class="card"><div class="card-head"><span class="card-title">Das machst du selbst</span></div><div class="card-body"><ul class="ch-list">
         <li>Wohnsitzbescheinigung ausdrucken und unterschreiben</li>
         <li>Beim Finanzamt bestätigen lassen</li>
         <li>Angaben ins SKAT-Formular übertragen</li>

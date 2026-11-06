@@ -75,7 +75,7 @@ function render(container, reclaimCase, transactions) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 5)}
-    <p class="ch-lead">Ihr Antrag muss vom deutschen Finanzamt bestätigt werden. Speichern Sie ihn als PDF, unterschreiben Sie ihn und senden Sie ihn mit dem Anschreiben an Ihr Finanzamt.</p>
+    <p class="ch-lead">Dein Antrag muss vom deutschen Finanzamt bestätigt werden. Speichere ihn als PDF, unterschreibe ihn und sende ihn mit dem Anschreiben an dein Finanzamt.</p>
 
     ${statusTimelineHtml({ title: timelineTitle(reclaimCase, total), steps: CH_TIMELINE, doneCount: chTimelineDone(reclaimCase) })}
 

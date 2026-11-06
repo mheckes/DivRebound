@@ -67,7 +67,7 @@ function render(container) {
   if (!profile) {
     container.innerHTML = `
       <div class="content-header"><h1 class="content-title">Wertpapierbestand Schweiz</h1></div>
-      <div class="info-banner"><span class="icon">ℹ</span><div>Bitte legen Sie zuerst Ihre <a href="#/profile">persönlichen Daten</a> an.</div></div>`;
+      <div class="info-banner"><span class="icon">ℹ</span><div>Bitte lege zuerst deine <a href="#/profile">persönlichen Daten</a> an.</div></div>`;
     return;
   }
 
@@ -90,15 +90,15 @@ function render(container) {
       askForChanges
         ? `<div class="holdings-question">
             <h3>Hat sich seit dem ${esc(formatDateDe(lastTx.tradeDate))} etwas geändert?</h3>
-            <p>Ihr Wertpapierbestand ist bereits erfasst. Die zuletzt erfasste Transaktion ist ein ${lastTx.type === "buy" ? "Kauf" : "Verkauf"} vom <b>${esc(formatDateDe(lastTx.tradeDate))}</b>. Gab es seitdem Käufe oder Verkäufe Schweizer Aktien – oder fehlen noch ältere?</p>
+            <p>Dein Wertpapierbestand ist bereits erfasst. Die zuletzt erfasste Transaktion ist ein ${lastTx.type === "buy" ? "Kauf" : "Verkauf"} vom <b>${esc(formatDateDe(lastTx.tradeDate))}</b>. Gab es seitdem Käufe oder Verkäufe Schweizer Aktien – oder fehlen noch ältere?</p>
             <div class="holdings-actions">
               <button class="btn-accent" data-action="no-changes" type="button">Nein, Bestand ist aktuell</button>
               <button class="btn-secondary holdings-question-secondary" data-action="open-capture" type="button">Ja, Änderungen erfassen</button>
             </div>
           </div>`
         : lastTx
-        ? `<div class="info-banner"><span class="icon">ℹ</span><div>Zuletzt erfasst: ${lastTx.type === "buy" ? "Kauf" : "Verkauf"} vom <b>${esc(formatDateDe(lastTx.tradeDate))}</b>. Ergänzen Sie hier Käufe und Verkäufe, die seitdem dazugekommen sind oder noch fehlen. Daraus berechnet DivRebound das Erwerbsdatum Ihrer Aktien, das im ePortal anzugeben ist.</div></div>`
-        : `<p class="holdings-lead">Im ePortal geben Sie zu jeder Dividende an, wann Sie die Aktien gekauft haben, die Sie am Stichtag hielten (Erwerbsdatum). Damit DivRebound das berechnen kann, erfassen Sie hier <b>alle Käufe und Verkäufe</b> Ihrer Schweizer Aktien, lückenlos ab dem ersten Kauf. Am einfachsten per Upload der Abrechnungen: DivRebound liest Handelstag, Stückzahl und ISIN aus. Beim nächsten DivRebound ergänzen Sie nur noch, was neu dazugekommen ist.</p>`
+        ? `<div class="info-banner"><span class="icon">ℹ</span><div>Zuletzt erfasst: ${lastTx.type === "buy" ? "Kauf" : "Verkauf"} vom <b>${esc(formatDateDe(lastTx.tradeDate))}</b>. Ergänze hier Käufe und Verkäufe, die seitdem dazugekommen sind oder noch fehlen. Daraus berechnet DivRebound das Erwerbsdatum deiner Aktien, das im ePortal anzugeben ist.</div></div>`
+        : `<p class="holdings-lead">Im ePortal gibst du zu jeder Dividende an, wann du die Aktien gekauft hast, die du am Stichtag hieltest (Erwerbsdatum). Damit DivRebound das berechnen kann, erfasst du hier <b>alle Käufe und Verkäufe</b> deiner Schweizer Aktien, lückenlos ab dem ersten Kauf. Am einfachsten per Upload der Abrechnungen: DivRebound liest Handelstag, Stückzahl und ISIN aus. Beim nächsten DivRebound ergänzt du nur noch, was neu dazugekommen ist.</p>`
     }
 
     ${askForChanges ? "" : renderCaptureCard()}
@@ -111,7 +111,7 @@ function render(container) {
       <summary>Wie DivRebound den Bestand berechnet (FIFO)</summary>
       <div class="help-disclosure-body">
         <p>Bei Teilverkäufen gilt: <b>zuerst gekaufte Aktien werden zuerst verkauft</b>. Ist eine Tranche ganz verkauft, entfällt sie. Ist sie teilweise verkauft, bleibt ihr ursprüngliches Erwerbsdatum, nur die Stückzahl sinkt.</p>
-        <p><b>Abgleich:</b> Legen Sie die Tabelle neben Ihren aktuellen Depotauszug. Weicht eine Stückzahl ab, fehlt eine Abrechnung. Zusätzlich prüft DivRebound später, ob die Stückzahlen auf den Tax Vouchern zum berechneten Bestand passen.</p>
+        <p><b>Abgleich:</b> Lege die Tabelle neben deinen aktuellen Depotauszug. Weicht eine Stückzahl ab, fehlt eine Abrechnung. Zusätzlich prüft DivRebound später, ob die Stückzahlen auf den Tax Vouchern zum berechneten Bestand passen.</p>
         <p><b>Erwerbsdatum</b> ist immer der Handelstag, nicht das Auftragsdatum und nicht die Valuta.</p>
       </div>
     </details>
@@ -126,7 +126,7 @@ function render(container) {
 function renderCaptureCard() {
   return `
     <div class="card">
-      <div class="card-head"><span class="card-title">Käufe und Verkäufe erfassen</span><span class="holdings-sub">Dateien verlassen Ihren Rechner nicht</span></div>
+      <div class="card-head"><span class="card-title">Käufe und Verkäufe erfassen</span><span class="holdings-sub">Dateien verlassen deinen Rechner nicht</span></div>
       <div class="card-body">
         <div class="dropzone" id="dropzone">
           <input type="file" id="file-input" multiple accept="application/pdf" hidden />

@@ -11,7 +11,7 @@ export function mount(container, reclaimCase) {
   mountDividendUpload(container, reclaimCase, {
     corridor,
     headerHtml: stepHeader(reclaimCase, 2),
-    lead: "Laden Sie Ihre Dividendenabrechnungen dänischer Aktien hoch. DivRebound liest die relevanten Informationen aus und bereitet die Erstellung von Formularen vor.",
+    lead: "Lade deine Dividendenabrechnungen dänischer Aktien hoch. DivRebound liest die relevanten Informationen aus und bereitet die Erstellung von Formularen vor.",
     countryName: "Dänemark",
     shareAdjective: "dänische",
     groupBy: "year",

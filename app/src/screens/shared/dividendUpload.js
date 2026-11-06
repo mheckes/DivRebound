@@ -130,7 +130,7 @@ export function mountDividendUpload(container, reclaimCase, options) {
         <summary>
           <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
           <span class="issues-icon">⚠</span>
-          <span>${issues.length} Hinweis(e) zu Ihren Dateien</span>
+          <span>${issues.length} Hinweis(e) zu deinen Dateien</span>
           <span class="issues-sub">${rejected} nicht übernommen · ${issues.length - rejected} ggf. bereits beantragt</span>
         </summary>
         <div class="issues-body">
@@ -271,7 +271,7 @@ export function mountDividendUpload(container, reclaimCase, options) {
         <div class="du-help-body">
           ${esc(options.countryName)} behält auf Dividenden an Nicht-Ansässige im Regelfall <b>${pct(corridor.standardWithholdingRate)}</b> ein, nach dem Doppelbesteuerungsabkommen dürfen es nur <b>${pct(corridor.treatyRateByResidence.DE)}</b> sein. DivRebound liest Steuer und Satz von der Abrechnung und rechnet zur Kontrolle Steuer ÷ Brutto nach.<br><br>
           <b>${pct(corridor.standardWithholdingRate)}:</b> Regelfall, wird übernommen.<br>
-          <b>darunter, aber über ${pct(corridor.treatyRateByResidence.DE)}:</b> z. B. Ausschüttung teilweise aus Kapitalrücklagen – Sie bestätigen die Zeile.<br>
+          <b>Zwischen ${pct(corridor.treatyRateByResidence.DE)} und ${pct(corridor.standardWithholdingRate)}:</b> z. B. Ausschüttung teilweise aus Kapitalrücklagen – du bestätigst die Zeile.<br>
           <b>${pct(corridor.treatyRateByResidence.DE)} oder weniger:</b> nichts zu erstatten – kommt nicht ins Formular.<br><br>
           Erstattet wird immer <b>tatsächlich gezahlte Steuer − ${pct(corridor.treatyRateByResidence.DE)} vom Brutto</b>. Frist: ${corridor.limitationPeriodYears * 12} Monate ab dem Steuerabzug.
         </div>

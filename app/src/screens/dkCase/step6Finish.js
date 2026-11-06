@@ -27,7 +27,7 @@ function render(container, reclaimCase) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 6)}
-    <p class="ch-lead">Der Antrag ist eingereicht, sobald Sie ihn im SKAT-Formular mit „Send“ abschicken. Danach prüft die dänische Steuerverwaltung Ihren Antrag und überweist die Erstattung.</p>
+    <p class="ch-lead">Der Antrag ist eingereicht, sobald du ihn im SKAT-Formular mit „Send“ abschickst. Danach prüft die dänische Steuerverwaltung deinen Antrag und überweist die Erstattung.</p>
 
     ${dkTimelineHtml(reclaimCase)}
 
@@ -41,7 +41,7 @@ function render(container, reclaimCase) {
                 <div class="done-icon">✓</div>
                 <div>
                   <div class="done-title">DivRebound abgeschlossen</div>
-                  <div class="done-sub">Bei SKAT eingereicht${doneAt}. Wenn die Erstattung da ist, können Sie sie in Schritt 7 festhalten (optional).</div>
+                  <div class="done-sub">Bei SKAT eingereicht${doneAt}. Wenn die Erstattung da ist, kannst du sie in Schritt 7 festhalten (optional).</div>
                 </div>
               </div>`
             : `<button class="btn-primary" data-action="finish" ${allChecked ? "" : "disabled"} type="button">✓ Eingereicht – DivRebound abschließen</button>
