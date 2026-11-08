@@ -3,7 +3,7 @@
 // Website). Die URLs dort sind relativ zur Website-Wurzel ("/impressum/").
 import nav from "../../../site/_data/nav.json";
 
-// BASE_URL = "/DivRebound/app/" -> Website-Wurzel "/DivRebound/"
+// BASE_URL = "/app/" -> Website-Wurzel "/"
 const siteRoot = import.meta.env.BASE_URL.replace(/app\/$/, "");
 
 const toSite = (url) => siteRoot + url.replace(/^\//, "");

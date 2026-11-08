@@ -30,7 +30,7 @@ lässt sich die App rein statisch hosten (z. B. GitHub Pages) und skaliert koste
 ## Lokal starten
 
 Website und App liegen im selben Repo und werden gemeinsam veröffentlicht:
-Website unter `/DivRebound/` (Eleventy, `site/`), App unter `/DivRebound/app/` (Vite, `app/`).
+Website unter `/` (Eleventy, `site/`), App unter `/app/` (Vite, `app/`), live auf https://divrebound.com.
 
 Nur die App entwickeln:
 
@@ -47,7 +47,7 @@ npm install
 npm run dev
 ```
 
-Gesamt-Build (Website + App nach `dist/`) und Vorschau unter http://localhost:4174/DivRebound/:
+Gesamt-Build (Website + App nach `dist/`) und Vorschau unter http://localhost:4174/:
 
 ```bash
 npm run build
@@ -57,7 +57,7 @@ npm run preview
 ## Deployment
 
 Der Gesamt-Build wird automatisch per GitHub Actions (`.github/workflows/deploy.yml`) auf GitHub Pages
-veröffentlicht, bei jedem Push auf `main`.
+veröffentlicht, bei jedem Push auf `main`. Eigene Domain: `divrebound.com` (in den Repo-Einstellungen unter Pages eingetragen, DNS bei INWX).
 
 ## Website pflegen
 
@@ -65,7 +65,6 @@ veröffentlicht, bei jedem Push auf `main`.
 - Länder-Tabelle und Europakarte: `site/_data/countries.yml`
 - Neue Seite: Markdown-Datei in `site/` anlegen und in `nav.json` eintragen
 - Farben und Fonts: `app/src/style/tokens.css` (gilt für App und Website)
-- Eigene Domain: in `eleventy.config.js` `pathPrefix` auf `"/"` setzen, in `app/vite.config.js` `base` auf `"/app/"`
 
 ## Projektstruktur
 

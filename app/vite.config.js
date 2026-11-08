@@ -20,9 +20,9 @@ function appVersion() {
 }
 
 export default defineConfig({
-  // Die App liegt unter /DivRebound/app/, die Website unter /DivRebound/
+  // Die App liegt unter /app/, die Website unter / (divrebound.com)
   // (Gesamt-Build siehe package.json im Repo-Root).
-  base: "/DivRebound/app/",
+  base: "/app/",
   define: {
     __APP_VERSION__: JSON.stringify(appVersion()),
   },

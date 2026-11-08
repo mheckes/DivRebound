@@ -6,8 +6,8 @@ import yaml from "js-yaml";
 // package.json "build"). Eleventy fasst app/ nicht an.
 export default function (eleventyConfig) {
   // Alle internen Links werden als "/pfad/" geschrieben; das Plugin setzt
-  // beim Build den pathPrefix davor. Umzug auf eine eigene Domain (z.B.
-  // divrebound.de) = pathPrefix auf "/" setzen, sonst nichts.
+  // beim Build den pathPrefix davor. Seit dem Umzug auf divrebound.com liegt
+  // die Website an der Wurzel ("/"); vorher "/DivRebound/" auf github.io.
   eleventyConfig.addPlugin(HtmlBasePlugin);
 
   eleventyConfig.addDataExtension("yml", (contents) => yaml.load(contents));
@@ -52,7 +52,7 @@ export default function (eleventyConfig) {
 
   return {
     dir: { input: "site", output: "dist" },
-    pathPrefix: "/DivRebound/",
+    pathPrefix: "/",
     markdownTemplateEngine: "liquid",
     htmlTemplateEngine: "liquid",
   };
