@@ -83,6 +83,27 @@ function render(container) {
       <div class="content-breadcrumb">Startseite</div>
     </div>
 
+    <section class="home-beta" aria-labelledby="home-beta-title">
+      <div class="home-beta-main">
+        <span class="home-beta-badge">Beta-Test</span>
+        <h2 class="home-beta-title" id="home-beta-title">Danke, dass du DivRebound testest!</h2>
+        <p class="home-beta-lead">
+          Jede Rückmeldung hilft uns weiter. Alles, was dir auffällt, ist wertvoll:
+          ein Fehler, ein unklarer Text oder ein Schritt, der hakt. Und wenn du Ideen hast, was DivRebound noch können sollte, freuen wir uns genauso darüber.
+        </p>
+        <button type="button" class="home-beta-btn" data-feedback="home-beta">💬 Feedback geben</button>
+      </div>
+      <div class="home-beta-focus">
+        <div class="home-beta-focus-icon" aria-hidden="true">📄</div>
+        <div class="home-beta-focus-title">Besonders gesucht: Dokumente anderer Banken</div>
+        <p class="home-beta-focus-text">
+          Bisher kennt DivRebound nur eine kleine Anzahl von Dividendenabrechnungen und Layouts.
+          Bitte prüfe es sorgfältig und sag uns, ob deine Dokumente richtig erkannt werden.
+          Ein kurzes „hat geklappt“ mit dem Namen deiner Bank hilft uns schon.
+        </p>
+      </div>
+    </section>
+
     <div class="home-tiles">
       <div class="home-tile" data-action="new-case">
         <div class="home-tile-icon">＋</div>

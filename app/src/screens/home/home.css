@@ -52,3 +52,114 @@
   color: var(--muted);
   line-height: 1.6;
 }
+
+/* Beta-Hinweis über den Kacheln: dunkle Navy-Fläche mit Cyan-Akzent, rechts
+   ein heller Kasten für das, was gerade am meisten hilft (Bank-Dokumente). */
+#divrebound-app .home-beta {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 28px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(15, 34, 64, 0.18);
+}
+#divrebound-app .home-beta::after {
+  content: "";
+  position: absolute;
+  right: -70px;
+  top: -70px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 180, 216, 0.35) 0%, rgba(0, 180, 216, 0) 70%);
+  pointer-events: none;
+}
+#divrebound-app .home-beta-main,
+#divrebound-app .home-beta-focus {
+  position: relative;
+  z-index: 1;
+}
+#divrebound-app .home-beta-badge {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--cyan);
+  color: var(--charcoal);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+#divrebound-app .home-beta-title {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #fff;
+}
+#divrebound-app .home-beta-lead {
+  margin: 0 0 18px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.85);
+}
+#divrebound-app .home-beta-btn {
+  background: var(--cyan);
+  color: var(--charcoal);
+  border: none;
+  padding: 11px 20px;
+  border-radius: 9px;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+#divrebound-app .home-beta-btn:hover {
+  background: #33c6e2;
+  transform: translateY(-1px);
+}
+#divrebound-app .home-beta-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+#divrebound-app .home-beta-focus {
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+#divrebound-app .home-beta-focus-icon {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+#divrebound-app .home-beta-focus-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #fff;
+}
+#divrebound-app .home-beta-focus-text {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 760px) {
+  #divrebound-app .home-beta {
+    grid-template-columns: 1fr;
+    padding: 22px;
+  }
+  #divrebound-app .home-beta-title {
+    font-size: 22px;
+  }
+}
