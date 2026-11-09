@@ -15,7 +15,7 @@
 import { getState } from "../../store/store.js";
 import * as transactionRepo from "../../db/transactionRepo.js";
 import { parseBrokerStatement } from "../../lib/parseBrokerStatement.js";
-import { computeHoldings } from "../../lib/holdings.js";
+import { computeHoldings, findSameTrade } from "../../lib/holdings.js";
 import { corridors } from "../../config/corridors.js";
 import { formatDateDe } from "../../util/format.js";
 import { isValidIsin } from "../../util/validate.js";
@@ -177,6 +177,7 @@ const IMPORT_STATUS = {
   added: '<span class="badge badge-confirmed">übernommen</span>',
   check: '<span class="badge badge-warn">bitte prüfen</span>',
   duplicate: '<span class="badge badge-extracted">bereits erfasst – übersprungen</span>',
+  linked: '<span class="badge badge-confirmed">bereits erfasst – Abrechnung zugeordnet</span>',
   voucher: '<span class="badge badge-dupe">Tax Voucher – wird im DivRebound zugeordnet</span>',
   notSwiss: '<span class="badge badge-danger">keine Schweizer Aktie</span>',
   unknown: '<span class="badge badge-danger">nicht erkannt</span>',
@@ -438,7 +439,24 @@ async function handleFiles(container, fileList) {
         continue;
       }
       const needsCheck = parsed.warnings.length > 0 || parsed.executions.some((e) => !e.tradeDate || !e.quantity);
-      for (const execution of parsed.executions) {
+      // Plausi-Check: gleicher Kauf/Verkauf (Tag + Stückzahl) schon erfasst?
+      // Manuelle Einträge werden durch die Abrechnung belegt statt verdoppelt;
+      // ein gleicher Eintrag aus einer anderen Abrechnung wird übersprungen.
+      const matched = new Set();
+      const matches = parsed.executions.map((e) => {
+        const m = findSameTrade(transactions, { isin: parsed.isin, type: parsed.type, ...e }, matched);
+        if (m) matched.add(m.transactionId);
+        return m;
+      });
+      for (const [i, execution] of parsed.executions.entries()) {
+        const match = matches[i];
+        if (match?.source?.kind === "manual") {
+          const updated = { ...match, source, extractionConfidence: "confirmed" };
+          await transactionRepo.put(updated);
+          transactions = transactions.map((x) => (x.transactionId === updated.transactionId ? updated : x));
+          continue;
+        }
+        if (match) continue;
         const transaction = {
           transactionId: crypto.randomUUID(),
           profileId: profile.profileId,
@@ -454,7 +472,14 @@ async function handleFiles(container, fileList) {
         await transactionRepo.put(transaction);
         transactions.push(transaction);
       }
-      results.push({ ...summary, status: needsCheck ? "check" : "added" });
+      const status = matches.some((m) => m?.source?.kind === "manual")
+        ? "linked"
+        : matches.some(Boolean)
+        ? "duplicate"
+        : needsCheck
+        ? "check"
+        : "added";
+      results.push({ ...summary, status });
     } catch (err) {
       console.error("[holdings] Abrechnung konnte nicht gelesen werden:", err);
       results.push({ ...base, status: "error" });
@@ -485,13 +510,24 @@ async function saveManual(container) {
     return;
   }
 
+  const type = value("type") === "sell" ? "sell" : "buy";
+  const same = findSameTrade(transactions, { isin, type, tradeDate, quantity });
+  if (same) {
+    const ok = await openConfirmModal(
+      "Schon erfasst?",
+      `Ein ${type === "buy" ? "Kauf" : "Verkauf"} von ${quantity} Stk. ${esc(knownName(isin) || isin)} am ${formatDateDe(tradeDate)} ist bereits erfasst${same.source?.kind === "pdf" ? ` (aus ${esc(same.source.fileName ?? "einer Abrechnung")})` : ""}. Nur hinzufügen, wenn es wirklich ein zweiter, getrennter Auftrag war.`,
+      { confirmLabel: "Trotzdem hinzufügen", cancelLabel: "Nicht hinzufügen" }
+    );
+    if (!ok) return;
+  }
+
   const transaction = {
     transactionId: crypto.randomUUID(),
     profileId: profile.profileId,
     depotId: "",
     isin,
     issuerName: knownName(isin) || value("issuerName"),
-    type: value("type") === "sell" ? "sell" : "buy",
+    type,
     tradeDate,
     quantity,
     source: { kind: "manual", importedAt: new Date().toISOString() },

@@ -110,6 +110,28 @@ export function computeHoldings(transactions) {
     .sort((a, b) => a.depotId.localeCompare(b.depotId) || a.issuerName.localeCompare(b.issuerName) || a.isin.localeCompare(b.isin));
 }
 
+/**
+ * Plausibilitätscheck gegen Doppelerfassung: bereits erfasste Transaktion mit
+ * gleicher ISIN, Art, Handelstag und Stückzahl (Quelle egal). Typischer Fall:
+ * ein Kauf wurde erst manuell erfasst und später die Abrechnung hochgeladen.
+ * @param {Transaction[]} existing
+ * @param {{ isin: string, type: string, tradeDate: string|null, quantity: number|null }} candidate
+ * @param {Set<string>} [ignoreIds] schon zugeordnete Transaktionen (mehrere gleiche Käufe am selben Tag)
+ */
+export function findSameTrade(existing, candidate, ignoreIds = new Set()) {
+  if (!candidate.tradeDate || !candidate.quantity) return null;
+  return (
+    existing.find(
+      (t) =>
+        !ignoreIds.has(t.transactionId) &&
+        t.isin === candidate.isin &&
+        t.type === candidate.type &&
+        t.tradeDate === candidate.tradeDate &&
+        t.quantity === candidate.quantity
+    ) ?? null
+  );
+}
+
 const round2 = (n) => Math.round(n * 100) / 100;
 
 /**

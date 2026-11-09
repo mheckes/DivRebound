@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { computeLots, computeHoldings, computeEntitlements } from "../src/lib/holdings.js";
+import { computeLots, computeHoldings, computeEntitlements, findSameTrade } from "../src/lib/holdings.js";
 
 const JF = "CH0017875789"; // Jungfraubahn Holding AG
 const MU = "CH0012345678"; // fiktive Muster Holding AG
@@ -123,4 +123,17 @@ test("Bestandsübersicht: pro Depot und ISIN mit letzter Transaktion", () => {
     [MU, 30, "2025-02-12"],
     [JF, 25, "2026-04-27"],
   ]);
+});
+
+test("findSameTrade: gleicher Kauf (Tag + Stückzahl) wird erkannt, anderer Tag nicht", () => {
+  const existing = [
+    { transactionId: "m1", isin: JF, type: "buy", tradeDate: "2024-10-25", quantity: 2, source: { kind: "manual" } },
+    { transactionId: "m2", isin: JF, type: "buy", tradeDate: "2024-10-25", quantity: 2, source: { kind: "manual" } },
+  ];
+  const candidate = { isin: JF, type: "buy", tradeDate: "2024-10-25", quantity: 2 };
+  assert.equal(findSameTrade(existing, candidate).transactionId, "m1");
+  assert.equal(findSameTrade(existing, candidate, new Set(["m1"])).transactionId, "m2");
+  assert.equal(findSameTrade(existing, { ...candidate, tradeDate: "2024-10-24" }), null);
+  assert.equal(findSameTrade(existing, { ...candidate, type: "sell" }), null);
+  assert.equal(findSameTrade(existing, { ...candidate, tradeDate: null }), null);
 });
