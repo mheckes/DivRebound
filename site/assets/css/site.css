@@ -159,14 +159,6 @@ main { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
 .country-group-head.group-live { background: var(--success-bg); color: var(--success); }
 .country-group-head.group-no { background: var(--bg); color: var(--muted); }
 .group-count { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 4px; background: rgba(255,255,255,0.7); font-weight: 500; }
-.name-cell { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; }
-.wish-btn {
-  font: 600 11px var(--font-body); color: var(--cyan-dark); background: var(--surface);
-  border: 1px solid var(--cyan); border-radius: 999px; padding: 2px 10px; cursor: pointer; white-space: nowrap;
-}
-.wish-btn:hover:not(:disabled) { background: var(--cyan-light); }
-.wish-btn:disabled { cursor: default; }
-.wish-btn.is-done { color: var(--success); border-color: var(--success); background: var(--success-bg); }
 .accent-cell { font-family: var(--font-mono); color: var(--cyan-dark); font-weight: 600; }
 .source-note { font-size: 11px; color: var(--muted); margin-top: 10px; }
 /* Handy: oben Land und Erstattungspotenzial, darunter klein der Quellensteuersatz.
