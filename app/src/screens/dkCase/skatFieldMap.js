@@ -12,10 +12,13 @@
 //   SKAT-Formular nach, z.B. "The shareholder is" -> klappt Namensfelder auf)
 // - reveals: true, wenn das Anhaken DIESER Zeile eine Gruppe (group === diese id)
 //   aufklappt
-// - assumption: true für Zeilen, die wir bewusst leer lassen bzw. mit einem
-//   Festwert beantworten (visuell abgesetzt, wie .row-value.assumption im Mockup)
+// - assumption: true für Zeilen, die wir bewusst leer lassen (visuell
+//   abgesetzt, wie .row-value.assumption im Mockup). Ohne Checkbox und
+//   Kopier-Button, zählen nicht zum Fortschritt - es gibt nichts zu übertragen.
 // - isDownload: true für die einzige Zeile, die statt "kopieren" ein Dokument
 //   referenziert (Wohnsitzbescheinigung aus Schritt 1)
+// - noCopy: true für reine Handlungsschritte (Sprache umstellen, Datei
+//   hochladen, "Create new record" klicken) - nur abhaken, nichts zu kopieren
 // - resolve(...) liefert { display, copyValue, assumption } - display ist der
 //   Text, der im Cheat Sheet angezeigt wird, copyValue der Text, der tatsächlich
 //   in die Zwischenablage kopiert wird (i.d.R. identisch, außer z.B. bei der
@@ -59,10 +62,25 @@ function emptyOnPurpose(displayText) {
   return () => val(displayText, "", true);
 }
 
+/**
+ * Bankdaten aus dem Case-Snapshot; ist der leer (Case angelegt, bevor die
+ * Bankverbindung im Profil stand), aus dem aktuellen Profil.
+ */
+function bankValue(profile, reclaimCase, snapshotKey, profileKey) {
+  return reclaimCase.applicantSnapshot?.bank?.[snapshotKey] || profile.bank?.[profileKey] || "";
+}
+
 // -------------------------------------------------------------------------
 // Seite 1 - About the claimant
 // -------------------------------------------------------------------------
 const page1Rows = [
+  {
+    id: "m0",
+    labelEn: "Language",
+    hint: "Ganz oben im Header neben dem skat.dk-Logo: zuerst auf English umstellen, dann stimmen alle Feldnamen mit diesem Spickzettel überein",
+    noCopy: true,
+    resolve: () => val("English"),
+  },
   {
     id: "m1",
     labelEn: "I claim refund of Danish dividend tax as",
@@ -242,14 +260,14 @@ const page5Rows = [
     labelEn: "Name of bank",
     hint: "Kriterium: Kann das Konto normale SEPA-Überweisungen empfangen? Muss kein separates Girokonto sein.",
     group: "m29",
-    resolve: (profile, reclaimCase) => val(reclaimCase.applicantSnapshot.bank.name),
+    resolve: (profile, reclaimCase) => val(bankValue(profile, reclaimCase, "name", "bankName")),
   },
   {
     id: "m31",
     labelEn: "Name of account holder",
     hint: "Kontoinhaber",
     group: "m29",
-    resolve: (profile, reclaimCase) => val(reclaimCase.applicantSnapshot.bank.holder),
+    resolve: (profile, reclaimCase) => val(bankValue(profile, reclaimCase, "holder", "accountHolderName")),
   },
   {
     id: "m70",
@@ -264,14 +282,14 @@ const page5Rows = [
     labelEn: "BIC/SWIFT",
     hint: "BIC",
     group: "m29",
-    resolve: (profile, reclaimCase) => val(reclaimCase.applicantSnapshot.bank.bic),
+    resolve: (profile, reclaimCase) => val(bankValue(profile, reclaimCase, "bic", "bic")),
   },
   {
     id: "m33",
     labelEn: "IBAN no.",
     hint: "IBAN",
     group: "m29",
-    resolve: (profile, reclaimCase) => val(reclaimCase.applicantSnapshot.bank.iban),
+    resolve: (profile, reclaimCase) => val(bankValue(profile, reclaimCase, "iban", "iban")),
   },
   {
     id: "m71",
@@ -345,6 +363,7 @@ const SHARE_HELP_NOTE = {
   title: "Warum diese Werte so gewählt sind",
   items: [
     '"Distribution approved" = Ex-Datum, fällt meist mit der Hauptversammlung zusammen.',
+    '"Danish tax rate withheld" und "Tax rate payable to Denmark" füllt SKAT selbst vor – nur mit unseren Werten vergleichen.',
     'Wertpapierleihe-Fragen: "No" ist der Standardfall ohne Wertpapierleihe.',
     '"Amount of refund" berechnet SKAT automatisch — unsere Zahl ist nur ein Plausibilitäts-Check.',
   ],
@@ -352,6 +371,11 @@ const SHARE_HELP_NOTE = {
 
 const REFUND_REASON_TEXT =
   "Double taxation agreement or other agreement between Denmark and the country specified by the shareholder.";
+
+/** Prozentsatz wie im SKAT-Formular: eine Nachkommastelle, Punkt als Trenner ("27.0"). */
+function formatRateSkat(rate) {
+  return (Math.round(rate * 1000) / 10).toFixed(1);
+}
 
 /**
  * Erzeugt Seite 3 ("Refund information") - wiederholt sich pro Distribution
@@ -364,56 +388,102 @@ const REFUND_REASON_TEXT =
  * @returns {Array<{ distributionId: string, shareIndex: number, shareCount: number, headLabel: string, rows: Array, plausibilityEstimate: number }>}
  */
 export function buildSharePages(distributions, corridor, residenceCountryCode) {
+  const treaty = corridor.treatyRateByResidence[residenceCountryCode] ?? corridor.treatyRateByResidence.DE;
   return distributions.map((d, i) => {
     const n = i + 1;
+    const id = `d${d.distributionId}`;
     // gezahlte Steuer − DBA-Satz × Brutto, wie in Schritt 2 (lib/withholding.js)
     const plausibilityEstimate = refundFor(d, corridor, residenceCountryCode).refund;
     const grossWhole = Math.round(d.grossDividend);
+    // Tatsächlich einbehaltener Satz (bei Teil-Einbehalt unter 27 %), höchstens Regelsatz
+    const effectiveRate =
+      d.grossDividend && d.withheldTax != null ? d.withheldTax / d.grossDividend : corridor.standardWithholdingRate;
+    const withheldRate = formatRateSkat(Math.min(effectiveRate, corridor.standardWithholdingRate));
+    const statementName = d.sourceFile ?? "Dividendenabrechnung";
 
+    // Reihenfolge exakt wie im SKAT-Formular; "Amount of refund" sitzt
+    // zwischen "-payable" und "-doc" (Plausibilitäts-Check, siehe step5Skat.js)
     const rows = [
       {
-        id: `d${d.distributionId}-reason`,
+        id: `${id}-reason`,
         labelEn: "State the reason the shareholder is entitled to a refund of dividend tax",
         hint: "Grund für die Erstattung",
         resolve: () => val(REFUND_REASON_TEXT),
       },
       {
-        id: `d${d.distributionId}-isin`,
+        id: `${id}-idtype`,
         labelEn: "Select how you want to identify the share",
         hint: "Identifikation der Aktie",
-        resolve: () => val(`ISIN code: ${d.isin}`, d.isin),
+        resolve: () => val("ISIN code"),
       },
       {
-        id: `d${d.distributionId}-issuer`,
-        labelEn: "Name of distributing company",
-        hint: "Name des ausschüttenden Unternehmens",
+        id: `${id}-isin`,
+        labelEn: "ISIN-code",
+        hint: "ISIN eintragen, danach „Draw company information“ klicken",
+        resolve: () => val(d.isin),
+      },
+      {
+        id: `${id}-issuer`,
+        labelEn: "Name of distributing company (optional field)",
+        hint: "Füllt SKAT über „Draw company information“ selbst aus – nur prüfen",
         resolve: () => val(d.issuerName),
       },
       {
-        id: `d${d.distributionId}-date`,
+        id: `${id}-date`,
         labelEn: "Select date for when the dividend distribution was approved",
         hint: "Ex-Datum – fällt meist mit der Hauptversammlung zusammen",
         resolve: () => val(formatDateSkat(d.paymentDate)),
       },
       {
-        id: `d${d.distributionId}-gross`,
+        id: `${id}-gross`,
         labelEn: "Dividend received before tax (in whole DKK)",
         hint: "Bruttodividende vor Steuern, ganze Kronen",
         resolve: () => val(String(grossWhole)),
       },
       {
-        id: `d${d.distributionId}-borrowed`,
-        labelEn: "...shares you borrowed from others...?",
+        id: `${id}-withheld`,
+        labelEn: "Danish tax rate withheld",
+        hint: "Einbehaltener Steuersatz in % – von SKAT vorausgefüllt, nur bestätigen",
+        resolve: () => val(withheldRate),
+      },
+      {
+        id: `${id}-payable`,
+        labelEn: "Tax rate payable to Denmark, e.g. according to double taxation agreement.",
+        hint: "Steuersatz laut DBA in % – von SKAT vorausgefüllt, nur bestätigen",
+        resolve: () => val(formatRateSkat(treaty)),
+      },
+      {
+        id: `${id}-doc`,
+        labelEn: "Documentation for dividend received and tax withheld",
+        hint: "Hier die Dividendenabrechnung dieser Ausschüttung hochladen (dieselbe Datei wie in Schritt 2)",
+        noCopy: true,
+        resolve: () => val(statementName),
+      },
+      {
+        id: `${id}-borrowed`,
+        labelEn:
+          "Are you applying for a dividend tax refund on shares you borrowed from others at the time when the dividend was adopted?",
         hint: "Aktien geliehen? Für Privatanleger i.d.R. Nein",
         resolve: () => val("No"),
       },
       {
-        id: `d${d.distributionId}-lent`,
-        labelEn: "...shares that were lent to others...?",
+        id: `${id}-lent`,
+        labelEn:
+          "Are you applying for a dividend tax refund on shares that were lent to others at the time when the dividend was adopted?",
         hint: "Aktien verliehen? Für Privatanleger i.d.R. Nein",
         resolve: () => val("No"),
       },
     ];
+
+    if (n < distributions.length) {
+      rows.push({
+        id: `${id}-newrecord`,
+        labelEn: "Create new record",
+        hint: `Button unter dem Aktien-Block klicken – öffnet „Share number ${n + 1}“ für die nächste Ausschüttung`,
+        noCopy: true,
+        resolve: () => val("klicken"),
+      });
+    }
 
     return {
       distributionId: d.distributionId,
@@ -421,6 +491,7 @@ export function buildSharePages(distributions, corridor, residenceCountryCode) {
       shareCount: distributions.length,
       headLabel: `Share number ${n} of ${distributions.length}`,
       rows,
+      plausibilityAfterRowId: `${id}-payable`,
       plausibilityEstimate,
     };
   });

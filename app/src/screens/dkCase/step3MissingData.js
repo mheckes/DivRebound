@@ -22,7 +22,8 @@ import { DK_STEPS, dkStepRoute } from "../../config/caseSteps.js";
 import { feedbackLinkHtml } from "../../components/feedbackModal.js";
 
 // Pflichtangaben der Wohnsitzbescheinigung 02.050 (fillResidencyCertificate.js)
-const REQUIRED = ["name", "address", "birthDate", "birthPlace", "tin"];
+// Bankdaten braucht das SKAT-Formular auf Seite 5 (Name of bank, account holder, BIC, IBAN)
+const REQUIRED = ["name", "address", "birthDate", "birthPlace", "tin", "bankName", "bank", "bic"];
 
 function escapeHtml(str) {
   return String(str ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -156,7 +157,7 @@ function attachListeners(container, reclaimCase) {
   });
   container.querySelector("[data-step-back]").addEventListener("click", () => navigate(dkStepRoute(reclaimCase.caseId, 2)));
   container.querySelector("[data-step-next]").addEventListener("click", async () => {
-    const { residence } = getState().currentProfile;
+    const { residence, bank } = getState().currentProfile;
     // Snapshot für das Cheat Sheet aktuell halten (liest teils aus dem Snapshot).
     Object.assign(reclaimCase.applicantSnapshot, {
       firstName: residence.firstName,
@@ -165,6 +166,7 @@ function attachListeners(container, reclaimCase) {
       postalCode: residence.postalCode,
       city: residence.city,
       tin: residence.tin,
+      bank: { name: bank.bankName, holder: bank.accountHolderName, bic: bank.bic, iban: bank.iban },
     });
     reclaimCase.dkStepsDone = [...new Set([...(reclaimCase.dkStepsDone ?? []), 3])];
     await saveCase(reclaimCase);

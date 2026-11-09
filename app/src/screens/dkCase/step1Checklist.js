@@ -12,7 +12,7 @@ import {
 import { DK_STEPS, dkStepRoute } from "../../config/caseSteps.js";
 import { feedbackLinkHtml } from "../../components/feedbackModal.js";
 
-const PROFILE_ITEMS = ["name", "address", "birthDate", "birthPlace", "tin", "taxOffice", "bank", "bic"].map((k) => PROFILE_ITEM[k]);
+const PROFILE_ITEMS = ["name", "address", "birthDate", "birthPlace", "tin", "taxOffice", "bankName", "bank", "bic"].map((k) => PROFILE_ITEM[k]);
 
 function caseLabel(reclaimCase) {
   const d = new Date(reclaimCase.createdAt);

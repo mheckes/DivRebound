@@ -53,7 +53,7 @@ export function mount(container, reclaimCase, profile) {
     title: "SKAT-Formular",
     sub: "kein Login und keine MitID nötig",
     docTitle: "„Refusion af udbytteskat / Claim for refund of Danish dividend tax“",
-    text: "Öffne das Formular in einem zweiten Fenster und ordne es neben dieser Seite an. Halte die vom Finanzamt bestätigte Wohnsitzbescheinigung bereit, du lädst sie auf Seite 4 hoch.",
+    text: "Öffne das Formular in einem zweiten Fenster und ordne es neben dieser Seite an. Stelle dort zuerst ganz oben im Header die Sprache auf „English“ um – der Spickzettel nutzt die englischen Feldnamen. Halte die vom Finanzamt bestätigte Wohnsitzbescheinigung bereit, du lädst sie auf Seite 4 hoch.",
     url: corridor.onlinePortalUrl,
     buttonLabel: "SKAT-Formular öffnen ↗",
   };
@@ -97,6 +97,16 @@ export function mount(container, reclaimCase, profile) {
     });
   }
 
+  /** Zeilen mit Checkbox - bewusst leer gelassene Felder zählen nicht zum Fortschritt */
+  function tickableRows(tab) {
+    return tab.rows.filter((r) => !r.assumption);
+  }
+
+  function isTabDone(tab, tickedIds) {
+    const rows = tickableRows(tab);
+    return rows.length > 0 && rows.every((r) => tickedIds.includes(r.id));
+  }
+
   function setTicked(chunk, rowId, checked) {
     const list = chunk.tickedRowIds ?? (chunk.tickedRowIds = []);
     if (checked) {
@@ -117,12 +127,20 @@ export function mount(container, reclaimCase, profile) {
     const { display, assumption } = row.resolve(profile, reclaimCase, corridor);
     const checked = tickedIds.includes(row.id);
     const valueClass = assumption ? "row-value assumption" : "row-value";
-    const actionBtn = row.isDownload
+    // Bewusst leer gelassene Felder: nichts zu übertragen, also nichts abzuhaken
+    const checkbox = row.assumption
+      ? `<span></span>`
+      : `<input type="checkbox" data-row-id="${row.id}" ${checked ? "checked" : ""} />`;
+    const actionBtn = row.assumption
+      ? `<span></span>`
+      : row.isDownload
       ? `<button class="copy-btn" data-action="download" data-row-id="${row.id}" title="Download">⬇</button>`
+      : row.noCopy
+      ? `<span></span>`
       : `<button class="copy-btn" data-action="copy" data-row-id="${row.id}">⧉</button>`;
     return `
       <div class="row" data-row-id="${row.id}">
-        <input type="checkbox" data-row-id="${row.id}" ${checked ? "checked" : ""} />
+        ${checkbox}
         <div class="row-label">${escapeHtml(row.labelEn)}<span class="en">${escapeHtml(row.hint)}</span></div>
         <div class="${valueClass}">${escapeHtml(display)}</div>
         ${actionBtn}
@@ -159,18 +177,23 @@ export function mount(container, reclaimCase, profile) {
     const sharePages = tabDef.sharePages ?? [];
     const blocks = sharePages
       .map((sp) => {
-        const rowsHtml = sp.rows.map((row) => renderRowHtml(row, activeChunk().tickedRowIds ?? [])).join("");
+        const ticked = activeChunk().tickedRowIds ?? [];
+        // Plausibilitäts-Check steht an der Stelle von "Amount of refund" im SKAT-Formular
+        const splitAt = sp.rows.findIndex((r) => r.id === sp.plausibilityAfterRowId) + 1 || sp.rows.length;
+        const rowsBefore = sp.rows.slice(0, splitAt).map((row) => renderRowHtml(row, ticked)).join("");
+        const rowsAfter = sp.rows.slice(splitAt).map((row) => renderRowHtml(row, ticked)).join("");
         return `
           <div class="share-block-head">${escapeHtml(sp.headLabel)}</div>
-          ${rowsHtml}
+          ${rowsBefore}
           <div class="plausibility-check">
-            <div class="pc-label">🔍 Plausibilitäts-Check "Amount of refund" <span class="en">wird von SKAT automatisch berechnet, nicht von uns eingetragen</span></div>
+            <div class="pc-label">🔍 Amount of refund (DKK) – Plausibilitäts-Check <span class="en">wird von SKAT automatisch berechnet, nicht von uns eingetragen</span></div>
             <div class="pc-row">
               <span>Unsere Schätzung: <b>${sp.plausibilityEstimate.toFixed(2)} DKK</b></span>
               <span>SKAT zeigt: <input type="text" class="pc-input" data-pc="${sp.distributionId}" placeholder="DKK"></span>
               <span class="pc-result" data-pc-result="${sp.distributionId}"></span>
             </div>
-          </div>`;
+          </div>
+          ${rowsAfter}`;
       })
       .join("");
     return blocks + renderHelpNote(shareHelpNote);
@@ -217,7 +240,7 @@ export function mount(container, reclaimCase, profile) {
 
   function updateProgressUI(tabs, chunk) {
     const allRowIds = new Set();
-    tabs.forEach((t) => t.rows.forEach((r) => allRowIds.add(r.id)));
+    tabs.forEach((t) => tickableRows(t).forEach((r) => allRowIds.add(r.id)));
     const total = allRowIds.size;
     const tickedIds = chunk.tickedRowIds ?? [];
     const done = tickedIds.filter((id) => allRowIds.has(id)).length;
@@ -231,7 +254,7 @@ export function mount(container, reclaimCase, profile) {
     container.querySelectorAll(".page-tab").forEach((tabEl) => {
       const tabDef = tabs.find((t) => t.id === tabEl.dataset.tab);
       if (!tabDef) return;
-      const tabDone = tabDef.rows.length > 0 && tabDef.rows.every((r) => tickedIds.includes(r.id));
+      const tabDone = isTabDone(tabDef, tickedIds);
       const mark = tabEl.querySelector(".done-mark");
       if (tabDone && !mark) {
         tabEl.insertAdjacentHTML("beforeend", ' <span class="done-mark">✓</span>');
@@ -299,7 +322,7 @@ export function mount(container, reclaimCase, profile) {
     const rowsById = new Map();
     tabs.forEach((t) => t.rows.forEach((r) => rowsById.set(r.id, r)));
 
-    const allRowIds = new Set(rowsById.keys());
+    const allRowIds = new Set(tabs.flatMap((t) => tickableRows(t).map((r) => r.id)));
     const total = allRowIds.size;
     const done = tickedIds.filter((id) => allRowIds.has(id)).length;
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
@@ -308,7 +331,7 @@ export function mount(container, reclaimCase, profile) {
 
     const tabsHtml = tabs
       .map((t) => {
-        const tabDone = t.rows.length > 0 && t.rows.every((r) => tickedIds.includes(r.id));
+        const tabDone = isTabDone(t, tickedIds);
         const activeClass = t.id === activeTabId ? " active" : "";
         return `<div class="page-tab${activeClass}" data-tab="${t.id}">${escapeHtml(t.label)}${
           tabDone ? ' <span class="done-mark">✓</span>' : ""
@@ -354,6 +377,11 @@ export function mount(container, reclaimCase, profile) {
             </div>
           </div>
 
+          <nav class="page-tabs-bottom" aria-label="Formularseite wechseln">
+            <div class="page-tabs-bottom-label">Formularseite wechseln</div>
+            <div class="page-tabs">${tabsHtml}</div>
+          </nav>
+
         </div>
 
         ${portalSideHtml(portalSide)}
@@ -386,8 +414,11 @@ export function mount(container, reclaimCase, profile) {
     });
     container.querySelectorAll(".page-tab").forEach((el) => {
       el.addEventListener("click", () => {
+        const fromBottom = Boolean(el.closest(".page-tabs-bottom"));
         activeTabId = el.dataset.tab;
         render();
+        // Unten gewechselt: an den Anfang der neuen Formularseite springen
+        if (fromBottom) container.querySelector(".page-tabs")?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     });
     container.querySelectorAll(".chunk-tab").forEach((el) => {
