@@ -116,7 +116,7 @@ function renderGeneral(reclaimCase, profile, years) {
 /** Bruttodividende pro Titel wie im Portal: "8,50000" */
 const formatPerShare = (n) => n.toLocaleString("de-CH", { minimumFractionDigits: 5, maximumFractionDigits: 5 }).replace(/’/g, "");
 
-// Eine Zeile = ein Formular "Erfassung - Wertpapier" im Portal. Die Spalten
+// Eine Zeile = ein Formular "Neuer Vermögenswert - Wertpapier" im Portal. Die Spalten
 // folgen der Reihenfolge der Pflichtfelder dort: ISIN -> Fälligkeit ->
 // Erwerbsdatum -> Anzahl Titel. Der berechnete Betrag dient nur zur Kontrolle.
 function entryRow(reclaimCase, id, entry) {
@@ -158,7 +158,7 @@ function renderAssets(reclaimCase, results, years) {
     ? `<div class="ch-pane-warning">⚠ ${warnings.join(" ")} <a href="#" data-go-step="3">Schritt 3 prüfen</a></div>`
     : "";
   if (results.length === 0) return html + `<div class="ch-pane-empty">Noch keine vollständigen Dividenden erfasst – bitte zuerst Schritt 3 abschließen.</div>`;
-  html += `<div class="ch-pane-note ch-pane-note-top">Jede Zeile ist ein Formular <b>„Erfassung – Wertpapier“</b> im Portal: Werte von links nach rechts eintragen, dann <b>„Hinzufügen“</b>. Valoren-Nr., Name, Sitz und Titelart füllt das Portal nach der ISIN selbst aus. Der Betrag rechts sollte dem <b>„Berechneten Rückerstattungs-Betrag“</b> entsprechen.</div>`;
+  html += `<div class="ch-pane-note ch-pane-note-top">Jede Zeile ist ein Formular <b>„Neuer Vermögenswert – Wertpapier“</b> im Portal. Valoren-Nr., Name, Sitz und Titelart füllt das Portal nach der ISIN selbst aus. Der Betrag rechts sollte dem <b>„Berechneten Rückerstattungs-Betrag“</b> entsprechen.</div>`;
 
   let total = 0;
   for (const year of years) {
@@ -224,11 +224,12 @@ function render(container, reclaimCase) {
   }
   if (currentPage === "additional") {
     const p = (key) => PROFILE_FIELDS[key].read(profile);
+    // Reihenfolge wie im Portal: erst Zahlungsinformationen, dann Kontakt.
     body = `
-      ${row(reclaimCase, "email", "E-Mail", p("email"), { hint: "Kontaktperson" })}
-      ${row(reclaimCase, "phone", "Telefonnummer", phoneForPortal(p("phone")), { hint: "mit 0049 statt +49" })}
-      ${row(reclaimCase, "iban", "IBAN", p("iban"))}
-      ${row(reclaimCase, "holder", "Name des Kontoinhabers", p("accountHolderName"))}`;
+      ${row(reclaimCase, "iban", "IBAN", p("iban"), { hint: "Zahlungsinformationen" })}
+      ${row(reclaimCase, "holder", "Name des Kontoinhabers", p("accountHolderName"))}
+      ${row(reclaimCase, "email", "E-Mail", p("email"), { hint: "Kontakt" })}
+      ${row(reclaimCase, "phone", "Telefonnummer", phoneForPortal(p("phone")), { hint: "mit 0049 statt +49" })}`;
   }
   if (currentPage === "review") body = renderReview(results, years);
 
