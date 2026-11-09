@@ -199,8 +199,8 @@
 }
 
 /* Reiter-Wiederholung unter dem Spickzettel: Navigation ohne Hochscrollen.
-   Abgesetzt von der Tabelle (eigener Kasten) und von der Schritt-Navigation
-   darunter (helle, kleinere Reiter statt Buttons). */
+   Reiter sehen genauso aus wie oben; nur der Kasten setzt sie von der
+   Tabelle und der Schritt-Navigation darunter ab. */
 #divrebound-app .page-tabs-bottom {
   margin-top: 16px;
   padding: 12px 14px 4px;
@@ -218,10 +218,6 @@
 }
 #divrebound-app .page-tabs-bottom .page-tabs {
   margin-bottom: 8px;
-}
-#divrebound-app .page-tabs-bottom .page-tab {
-  padding: 6px 11px;
-  font-size: 11.5px;
 }
 
 #divrebound-app .layout {
