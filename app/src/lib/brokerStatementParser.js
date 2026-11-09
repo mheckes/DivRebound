@@ -4,7 +4,8 @@
 // pdf.js, damit es mit `npm test` direkt geprüft werden kann.
 //
 // KALIBRIERUNG: Baader Bank / Smartbroker+ (Kaufabrechnungen 09.01.2026 und
-// 27.04.2026, Tax-Voucher-Anschreiben 17.07.2026). Verkaufsabrechnungen sind
+// 27.04.2026, Tax-Voucher-Anschreiben 17.07.2026); comdirect
+// (Kaufabrechnungen 2024, siehe parseComdirectTrade). Verkaufsabrechnungen sind
 // noch nicht an einem echten Beleg geprüft - angenommen wird derselbe Aufbau
 // mit "Wertpapierabrechnung: Verkauf".
 //
@@ -46,7 +47,60 @@ function findValue(lines, pattern) {
 
 function detectBroker(lines) {
   if (lines.some((l) => /Baader Bank/i.test(l))) return "baader";
+  if (lines.some((l) => /^Ihre comdirect\b/i.test(l) || /^comdirect$/i.test(l))) return "comdirect";
   return null;
+}
+
+// comdirect (Geschäftsabrechnungen 11.03.2024, 25.10.2024, 28.10.2024):
+// - Kopf "GESCHÄFTSABRECHNUNG VOM <Briefdatum>", darunter "Wertpapierkauf" /
+//   "Wertpapierverkauf" (ggf. mit Zusatz "nur" / "restliche" bei Teilausführung).
+// - Handelstag steht in "Geschäftstag : TT.MM.JJJJ" - nicht das Briefdatum,
+//   nicht die Valuta. Jede Teilausführung bekommt eine eigene Abrechnung mit
+//   eigener Geschäftsnummer (Ordernummer ...-001, ...-002).
+// - ISIN steht ohne "ISIN:" am Ende der zweiten Bezeichnungszeile
+//   ("Nam.-Akt. SF 1,50 CH0017875789"), Stückzahl in "St. 15 EUR 180,00".
+const COMDIRECT_TRADE = /^Wertpapier(kauf|verkauf)\b/i;
+const BARE_ISIN = /\b([A-Z]{2}[A-Z0-9]{9}\d)\b/;
+
+function parseComdirectTrade(lines, broker) {
+  const tradeLine = lines.find((l) => COMDIRECT_TRADE.test(l));
+  const type = /verkauf/i.test(tradeLine) ? "sell" : "buy";
+  const warnings = [];
+
+  const nameIdx = lines.findIndex((l) => /^Wertpapier-Bezeichnung\b/i.test(l));
+  let isin = null;
+  let issuerName = "";
+  if (nameIdx >= 0) {
+    // "Jungfraubahn Holding AG A0CACJ" - WKN am Zeilenende abschneiden
+    issuerName = (lines[nameIdx + 1] ?? "").replace(/\s+[A-Z0-9]{6}$/, "").trim();
+    for (let i = nameIdx + 1; i < Math.min(lines.length, nameIdx + 4); i++) {
+      const m = lines[i].match(BARE_ISIN);
+      if (m && /\d/.test(m[1].slice(2))) { isin = m[1]; break; }
+    }
+  }
+  if (!isin) isin = findValue(lines, /WKN \/ ISIN:\s*\S+\s*\/\s*([A-Z]{2}[A-Z0-9]{9}\d)\b/);
+
+  const qtyRaw = findValue(lines, /^St(?:k)?\.\s+([\d.,]+)\s+[A-Z]{3}\s/);
+  const quantity = qtyRaw ? parseQuantity(qtyRaw) : null;
+  const tradeDate = toIsoDate(findValue(lines, /^Geschäftstag\s*:\s*(\d{2}\.\d{2}\.\d{4})/)?.match(DATE_DE) ?? null);
+  const geschaeft = findValue(lines, /^Geschäftsnummer\s*:\s*([\d ]+\d)/)?.replace(/\s/g, "") ?? null;
+  const depot = findValue(lines, /^Depotnr\.:\s*([\d ]+\d)/)?.replace(/\s/g, "") ?? "";
+
+  if (!isin) warnings.push("ISIN nicht gefunden.");
+  if (quantity === null) warnings.push("Stückzahl nicht gefunden.");
+  if (!tradeDate) warnings.push("Handelstag nicht gefunden. Bitte aus der Abrechnung händisch übernehmen.");
+
+  return {
+    kind: "trade",
+    broker,
+    type,
+    isin,
+    issuerName,
+    depotId: depot,
+    documentRef: geschaeft,
+    executions: [{ quantity, tradeDate }],
+    warnings,
+  };
 }
 
 function headerSection(lines) {
@@ -131,6 +185,10 @@ export function parseStatementLines(lines) {
       executions,
       warnings,
     };
+  }
+
+  if (lines.some((l) => /^GESCHÄFTSABRECHNUNG\b/i.test(l)) && lines.some((l) => COMDIRECT_TRADE.test(l))) {
+    return parseComdirectTrade(lines, broker);
   }
 
   if (lines.some((l) => /^Tax Voucher\b/i.test(l))) {

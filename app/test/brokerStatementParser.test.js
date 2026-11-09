@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { parseStatementLines } from "../src/lib/brokerStatementParser.js";
 import { buyJanuary, buyApril, sellPartialExecutions, taxVoucher5 } from "./fixtures/baaderStatements.js";
+import { comdirectBuyEur, comdirectBuyChfPartial } from "./fixtures/comdirectStatements.js";
 
 test("Baader-Kauf: ISIN, Name, Depot, Belegnummer, Handelstag", () => {
   const r = parseStatementLines(buyJanuary);
@@ -57,6 +58,32 @@ test("Tax-Voucher-Anschreiben: ISIN, Stückzahl, Vorgangs-Nr., Briefdatum", () =
   assert.equal(r.documentRef, "5000001/1000000002");
   assert.equal(r.letterDate, "2026-07-17");
   assert.deepEqual(r.warnings, []);
+});
+
+test("comdirect-Kauf in EUR: ISIN, Name, Depot, Geschäftsnummer, Geschäftstag", () => {
+  const r = parseStatementLines(comdirectBuyEur);
+  assert.equal(r.kind, "trade");
+  assert.equal(r.broker, "comdirect");
+  assert.equal(r.type, "buy");
+  assert.equal(r.isin, "CH0017875789");
+  assert.equal(r.issuerName, "Jungfraubahn Holding AG");
+  assert.equal(r.depotId, "123456700");
+  assert.equal(r.documentRef, "92000001");
+  assert.deepEqual(r.executions, [{ quantity: 15, tradeDate: "2024-03-11" }]);
+  assert.deepEqual(r.warnings, []);
+});
+
+test("comdirect-Teilausführung in CHF: Geschäftstag statt Briefdatum", () => {
+  const r = parseStatementLines(comdirectBuyChfPartial);
+  assert.equal(r.kind, "trade");
+  assert.equal(r.documentRef, "92000002");
+  assert.deepEqual(r.executions, [{ quantity: 2, tradeDate: "2024-10-25" }]);
+  assert.deepEqual(r.warnings, []);
+});
+
+test("comdirect-Verkauf", () => {
+  const lines = comdirectBuyEur.map((l) => (l === "Wertpapierkauf" ? "Wertpapierverkauf" : l));
+  assert.equal(parseStatementLines(lines).type, "sell");
 });
 
 test("Unbekanntes Dokument", () => {
