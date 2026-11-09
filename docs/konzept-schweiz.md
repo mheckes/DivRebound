@@ -233,8 +233,8 @@ Erkenntnisse aus den Referenzdokumenten:
 ## 6. Folgefälle und Bestandsübersicht
 
 1. **Stand anzeigen:** Bestand pro Depot und ISIN mit Tranchen, letzte erfasste Transaktion, bereits beantragte Termine mit Antrags-ID.
-2. **„Hat sich seit dem [Datum der letzten Transaktion] etwas geändert?“**
-   *Nein* → weiter. *Ja* → neue Abrechnungen hochladen oder manuell erfassen, Duplikate werden ignoriert.
+2. **„Ist dein Bestand seit dem [Datum der letzten Transaktion] noch aktuell?“**
+   *Ja* → weiter. *Nein* → neue Abrechnungen hochladen oder manuell erfassen, Duplikate werden ignoriert.
 3. **Abgleich:** Die Übersicht ist so aufgebaut, dass sie neben den Depotauszug des Brokers gelegt werden kann (Stückzahl pro ISIN). Abweichung = fehlende Transaktion.
 4. Bereits beantragte Termine werden nicht erneut angeboten.
 

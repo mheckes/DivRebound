@@ -11,7 +11,7 @@
   margin: 0 0 16px;
   max-width: 680px;
 }
-/* Frage im Folge-DivRebound: "Hat sich seit … etwas geändert?" */
+/* Frage im Folge-DivRebound: "Ist dein Bestand seit … noch aktuell?" */
 #divrebound-app .holdings-question {
   background: var(--navy);
   color: #fff;

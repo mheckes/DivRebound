@@ -9,8 +9,8 @@
 //
 // Zwei Einstiege: eigenständig über die Sidebar ("Schweiz › Wertpapierbestand")
 // und eingebettet als Schritt 2 eines DivRebound (params.reclaimCase). Im Fall
-// fragt die Seite bei vorhandenem Bestand zuerst "Hat sich seit … etwas
-// geändert?" und zeigt die Erfassung erst bei "Ja" (Konzept §6).
+// fragt die Seite bei vorhandenem Bestand zuerst "Ist dein Bestand seit …
+// noch aktuell?" und zeigt die Erfassung erst bei "Nein" (Konzept §6).
 
 import { getState } from "../../store/store.js";
 import * as transactionRepo from "../../db/transactionRepo.js";
@@ -89,11 +89,11 @@ function render(container) {
     ${
       askForChanges
         ? `<div class="holdings-question">
-            <h3>Hat sich seit dem ${esc(formatDateDe(lastTx.tradeDate))} etwas geändert?</h3>
-            <p>Dein Wertpapierbestand ist bereits erfasst. Die zuletzt erfasste Transaktion ist ein ${lastTx.type === "buy" ? "Kauf" : "Verkauf"} vom <b>${esc(formatDateDe(lastTx.tradeDate))}</b>. Gab es seitdem Käufe oder Verkäufe Schweizer Aktien – oder fehlen noch ältere?</p>
+            <h3>Ist dein Bestand seit dem ${esc(formatDateDe(lastTx.tradeDate))} noch aktuell?</h3>
+            <p>Dein Wertpapierbestand ist bereits erfasst. Die zuletzt erfasste Transaktion ist ein ${lastTx.type === "buy" ? "Kauf" : "Verkauf"} vom <b>${esc(formatDateDe(lastTx.tradeDate))}</b>. Er ist aktuell, wenn du seitdem keine Schweizer Aktien gekauft oder verkauft hast und auch keine älteren Käufe oder Verkäufe fehlen.</p>
             <div class="holdings-actions">
-              <button class="btn-accent" data-action="no-changes" type="button">Nein, Bestand ist aktuell</button>
-              <button class="btn-secondary holdings-question-secondary" data-action="open-capture" type="button">Ja, Änderungen erfassen</button>
+              <button class="btn-accent" data-action="no-changes" type="button">Ja, Bestand ist aktuell</button>
+              <button class="btn-secondary holdings-question-secondary" data-action="open-capture" type="button">Nein, Änderungen erfassen</button>
             </div>
           </div>`
         : lastTx
