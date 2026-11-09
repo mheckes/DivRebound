@@ -378,7 +378,6 @@ export function mount(container, reclaimCase, profile) {
           </div>
 
           <nav class="page-tabs-bottom" aria-label="Formularseite wechseln">
-            <div class="page-tabs-bottom-label">Formularseite wechseln</div>
             <div class="page-tabs">${tabsHtml}</div>
           </nav>
 

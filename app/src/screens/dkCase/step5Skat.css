@@ -198,26 +198,13 @@
   color: var(--cyan);
 }
 
-/* Reiter-Wiederholung unter dem Spickzettel: Navigation ohne Hochscrollen.
-   Reiter sehen genauso aus wie oben; nur der Kasten setzt sie von der
-   Tabelle und der Schritt-Navigation darunter ab. */
+/* Reiter-Wiederholung unter dem Spickzettel: Navigation ohne Hochscrollen,
+   bewusst exakt wie die Reiter oben (kein eigener Kasten). */
 #divrebound-app .page-tabs-bottom {
   margin-top: 16px;
-  padding: 12px 14px 4px;
-  border: 1px dashed var(--divider);
-  border-radius: 12px;
-  background: var(--bg);
-}
-#divrebound-app .page-tabs-bottom-label {
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--stone);
-  margin-bottom: 8px;
 }
 #divrebound-app .page-tabs-bottom .page-tabs {
-  margin-bottom: 8px;
+  margin-bottom: 0;
 }
 
 #divrebound-app .layout {
