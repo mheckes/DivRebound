@@ -12,7 +12,7 @@ import { esc, corridor, saveCase, loadTransactions, entitlementsFor, stepHeader,
 // Reihenfolge wie im ePortal (Seite "Unterzeichneten Antrag hochladen"):
 // Datei wählen -> Antrags-ID eingeben -> drei Bestätigungen -> einreichen.
 const UPLOAD_CHECKS = [
-  ["stamp", "<b>Prüfen:</b> Stempel, Unterschrift und Datum des Finanzamts sind auf Seite 1 vorhanden. Keine handschriftlichen Korrekturen oder Anmerkungen – die führen zur Ablehnung."],
+  ["stamp", "<b>Prüfen:</b> Stempel, Unterschrift und Datum des Finanzamts und von dir sind auf Seite 1 vorhanden. Keine handschriftlichen Korrekturen oder Anmerkungen (diese können zur Ablehnung führen)."],
   ["scan", "<b>Einscannen:</b> alle Seiten als <b>eine</b> PDF-Datei, gut lesbar, höchstens 10 MB."],
   ["upload", "<b>Hochladen:</b> im ePortal unter „Verrechnungssteuer“ → „Anträge“ auf <b>„Unterzeichneten Antrag hochladen“</b> klicken und das PDF auswählen."],
   ["antragsId", "<b>Antrags-ID eingeben:</b> so wie sie auf Seite 1 deines Antrags oben rechts steht, z.B. <span class=\"mono\" style=\"white-space:nowrap\">DE-1234-5678-00</span>. Sie steht auch in der Antragsübersicht. Das Portal meldet dann „Die Antrags-ID ist gültig“."],
