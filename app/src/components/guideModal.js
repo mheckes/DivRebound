@@ -17,9 +17,10 @@ const GUIDES = {
   upload: {
     title: "Anleitung: Hochladen im ePortal",
     steps: [
-      ["Antragsübersicht öffnen", "Kachel „Verrechnungssteuer“ → Liste deiner Anträge."],
-      ["Antrag auswählen", "Den Antrag öffnen."],
-      ["Bestätigten Antrag hochladen", "Das eingescannte PDF hochladen und absenden."],
+      ["Antragsübersicht öffnen", "Kachel „Verrechnungssteuer“ → „Anträge“."],
+      ["Unterzeichneten Antrag hochladen", "Auf den Button „Unterzeichneten Antrag hochladen“ klicken und das eingescannte PDF auswählen (eine Datei, höchstens 10 MB)."],
+      ["Antrags-ID eingeben", "Die Antrags-ID von Seite 1 des Antrags eintragen, z.B. DE-1234-5678-00."],
+      ["Bestätigen und einreichen", "Die drei Bestätigungen anhaken und „Antrag einreichen“ klicken."],
     ],
   },
 };

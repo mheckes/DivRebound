@@ -9,10 +9,14 @@ import { formatDateDe } from "../../util/format.js";
 import { CH_TIMELINE, timelineTitle, chTimelineDone } from "./step5TaxOffice.js";
 import { esc, corridor, saveCase, loadTransactions, entitlementsFor, stepHeader, stepNavHtml, bindStepNav } from "./chShared.js";
 
+// Reihenfolge wie im ePortal (Seite "Unterzeichneten Antrag hochladen"):
+// Datei wählen -> Antrags-ID eingeben -> drei Bestätigungen -> einreichen.
 const UPLOAD_CHECKS = [
-  ["stamp", "<b>Prüfen:</b> Stempel, Unterschrift und Datum des Finanzamts sind auf Seite 1 vorhanden."],
-  ["scan", "<b>Einscannen:</b> alle Seiten als <b>ein</b> PDF, gut lesbar."],
-  ["upload", "<b>Hochladen:</b> im ePortal unter „Verrechnungssteuer“ → Antragsübersicht → Antrag öffnen und das PDF hochladen."],
+  ["stamp", "<b>Prüfen:</b> Stempel, Unterschrift und Datum des Finanzamts sind auf Seite 1 vorhanden. Keine handschriftlichen Korrekturen oder Anmerkungen – die führen zur Ablehnung."],
+  ["scan", "<b>Einscannen:</b> alle Seiten als <b>eine</b> PDF-Datei, gut lesbar, höchstens 10 MB."],
+  ["upload", "<b>Hochladen:</b> im ePortal unter „Verrechnungssteuer“ → „Anträge“ auf <b>„Unterzeichneten Antrag hochladen“</b> klicken und das PDF auswählen."],
+  ["antragsId", "<b>Antrags-ID eingeben:</b> so wie sie auf Seite 1 deines Antrags oben rechts steht, z.B. <span class=\"mono\" style=\"white-space:nowrap\">DE-1234-5678-00</span>. Sie steht auch in der Antragsübersicht. Das Portal meldet dann „Die Antrags-ID ist gültig“."],
+  ["confirm", "<b>Bestätigen und einreichen:</b> die drei Bestätigungen anhaken (beglaubigt, rechtsgültig unterzeichnet, vollständig und richtig) und auf <b>„Antrag einreichen“</b> klicken."],
 ];
 
 export async function mount(container, reclaimCase) {
@@ -57,8 +61,8 @@ function render(container, reclaimCase, transactions) {
                 </div>
               </div>
               <p class="ch-text">Wenn die Erstattung da ist, kannst du sie in Schritt 7 festhalten (optional).</p>`
-            : `<button class="btn-primary" data-action="finish" ${allChecked ? "" : "disabled"} type="button">✓ Hochgeladen – DivRebound abschließen</button>
-              ${allChecked ? "" : `<div class="field-hint" style="margin-top:6px;">Bitte zuerst die drei Punkte oben abhaken.</div>`}`
+            : `<button class="btn-primary" data-action="finish" ${allChecked ? "" : "disabled"} type="button">✓ Eingereicht – DivRebound abschließen</button>
+              ${allChecked ? "" : `<div class="field-hint" style="margin-top:6px;">Bitte zuerst alle Punkte oben abhaken.</div>`}`
         }
       </div>
     </div>
