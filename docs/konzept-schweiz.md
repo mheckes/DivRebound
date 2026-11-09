@@ -220,7 +220,7 @@ Erkenntnisse aus den Referenzdokumenten:
 
 | Frage im Portal | Standardantwort | Abweichung → |
 |---|---|---|
-| Im Sinne des DBA in [Ort] ansässig? | Ja | außerhalb Leistungsumfang |
+| Im Sinne des DBA in [Ort] ansässig? (im Portal auf „Allgemeine Angaben“, nach der Jahresauswahl) | Ja | außerhalb Leistungsumfang |
 | Nutzungsberechtigt zum Zeitpunkt der Fälligkeiten? | Ja | außerhalb Leistungsumfang |
 | Für eigene Rechnung einkassiert? | Ja | außerhalb Leistungsumfang |
 | Eigenbestände, nicht für Drittbegünstigte? | Ja | außerhalb Leistungsumfang |

@@ -47,10 +47,16 @@ function phoneForPortal(raw) {
   return String(raw ?? "").trim().replace(/^\+/, "00").replace(/[^\d]/g, "");
 }
 
-function questions(profile) {
+/** Steht im Portal auf "Allgemeine Angaben", direkt nach der Jahresauswahl. */
+function residencyQuestion(profile) {
   const city = profile.residence.city || "Deutschland";
+  return `Waren Sie zum Zeitpunkt der erfassten Fälligkeiten im Sinne des Doppelbesteuerungsabkommens in ${city} ansässig?`;
+}
+
+// Fragen im Reiter "Fragen". Die IDs bleiben q1..q6 (q0 war früher die
+// Ansässigkeitsfrage), damit bereits gesetzte Haken erhalten bleiben.
+function questions() {
   return [
-    [`Waren Sie zum Zeitpunkt der erfassten Fälligkeiten im Sinne des Doppelbesteuerungsabkommens in ${city} ansässig?`, "Ja"],
     ["Waren Sie zum Zeitpunkt der Fälligkeiten an den erfassten Vermögenserträgen nutzungsberechtigt?", "Ja"],
     ["Haben Sie die erfassten Vermögenserträge für eigene Rechnung einkassiert?", "Ja"],
     ["Handelt es sich bei den erfassten Vermögenswerten um Eigenbestände (Nostro / eigenes Wertschriftendepot) und nicht um Bestände von Drittbegünstigten?", "Ja"],
@@ -96,6 +102,7 @@ function renderGeneral(reclaimCase, profile, years) {
           .join("")}</div>
       </div>
     </div>
+    ${row(reclaimCase, "q0", residencyQuestion(profile), "Ja", { assumption: true })}
     ${row(reclaimCase, "firstName", "Vorname", p("firstName"))}
     ${row(reclaimCase, "lastName", "Nachname", p("lastName"))}
     ${row(reclaimCase, "street", "Strasse", p("address"))}
@@ -106,14 +113,20 @@ function renderGeneral(reclaimCase, profile, years) {
     ${row(reclaimCase, "taxNumber", "Steuernummer", p("taxNumber"))}`;
 }
 
-function entryRow(reclaimCase, id, n, entry) {
+/** Bruttodividende pro Titel wie im Portal: "8,50000" */
+const formatPerShare = (n) => n.toLocaleString("de-CH", { minimumFractionDigits: 5, maximumFractionDigits: 5 }).replace(/’/g, "");
+
+// Eine Zeile = ein Formular "Erfassung - Wertpapier" im Portal. Die Spalten
+// folgen der Reihenfolge der Pflichtfelder dort: ISIN -> Fälligkeit ->
+// Erwerbsdatum -> Anzahl Titel. Der berechnete Betrag dient nur zur Kontrolle.
+function entryRow(reclaimCase, id, entry) {
   const checked = reclaimCase.ch.checkedRows.includes(id);
   const cell = (value) => `<span class="ch-entry-cell"><span class="row-value">${esc(value)}</span><button class="copy-btn" data-copy="${esc(value)}" type="button">⧉</button></span>`;
   return `
     <div class="ch-entry ${checked ? "row-done" : ""}">
       <input type="checkbox" data-check="${esc(id)}" ${checked ? "checked" : ""}>
-      <span class="ch-entry-n">${n}</span>
       ${cell(entry.isin)}
+      ${cell(formatDatePortal(entry.paymentDate))}
       ${cell(formatDatePortal(entry.acquisitionDate))}
       ${cell(String(entry.quantity))}
       <span class="ch-entry-refund mono">${entry.refund === null ? "–" : formatChf(entry.refund)}</span>
@@ -145,6 +158,7 @@ function renderAssets(reclaimCase, results, years) {
     ? `<div class="ch-pane-warning">⚠ ${warnings.join(" ")} <a href="#" data-go-step="3">Schritt 3 prüfen</a></div>`
     : "";
   if (results.length === 0) return html + `<div class="ch-pane-empty">Noch keine vollständigen Dividenden erfasst – bitte zuerst Schritt 3 abschließen.</div>`;
+  html += `<div class="ch-pane-note ch-pane-note-top">Jede Zeile ist ein Formular <b>„Erfassung – Wertpapier“</b> im Portal: Werte von links nach rechts eintragen, dann <b>„Hinzufügen“</b>. Valoren-Nr., Name, Sitz und Titelart füllt das Portal nach der ISIN selbst aus. Der Betrag rechts sollte dem <b>„Berechneten Rückerstattungs-Betrag“</b> entsprechen.</div>`;
 
   let total = 0;
   for (const year of years) {
@@ -157,10 +171,10 @@ function renderAssets(reclaimCase, results, years) {
       html += `
         <div class="share-block-head ch-dist-head">
           <span><b>${esc(shareNames(transactions).nameFor(d.isin) || d.issuerName || d.isin)}</b> · ${esc(d.isin)}</span>
-          <span>Fälligkeit <b>${esc(formatDatePortal(d.paymentDate))}</b>${d.grossPerShare ? ` · Brutto ${formatChf(d.grossPerShare)}/Stk.` : ""} · ${r.entries.length} ${r.entries.length === 1 ? "Eintrag" : "Einträge"}</span>
+          <span>${d.grossPerShare ? `Bruttodividende pro Titel <b>${esc(formatPerShare(d.grossPerShare))}</b> · ` : ""}${r.entries.length} ${r.entries.length === 1 ? "Eintrag" : "Einträge"}</span>
         </div>
-        <div class="ch-entry ch-entry-head"><span></span><span>#</span><span>ISIN</span><span>Erwerbsdatum</span><span>Anzahl</span><span>Erstattung</span></div>
-        ${r.entries.map((e, i) => entryRow(reclaimCase, `e:${d.distributionId}:${e.depotId}:${e.acquisitionDate}`, i + 1, e)).join("")}
+        <div class="ch-entry ch-entry-head"><span></span><span>ISIN</span><span>Fälligkeit</span><span>Erwerbsdatum</span><span>Anzahl Titel</span><span>Betrag</span></div>
+        ${r.entries.map((e) => entryRow(reclaimCase, `e:${d.distributionId}:${e.depotId}:${e.acquisitionDate}`, e)).join("")}
         ${derivationHtml(d)}`;
     }
   }
@@ -205,7 +219,7 @@ function render(container, reclaimCase) {
   if (currentPage === "assets") body = renderAssets(reclaimCase, results, years);
   if (currentPage === "questions") {
     body =
-      questions(profile).map(([q, a], i) => row(reclaimCase, `q${i}`, q, a, { assumption: true })).join("") +
+      questions().map(([q, a], i) => row(reclaimCase, `q${i + 1}`, q, a, { assumption: true })).join("") +
       `<div class="ch-pane-warning ch-pane-warning-soft">Trifft eine Antwort bei dir nicht zu (z.B. Aktien geerbt oder verliehen), ist das ein Sonderfall, den DivRebound nicht abdeckt. Bitte lass dich dann beraten.</div>`;
   }
   if (currentPage === "additional") {
