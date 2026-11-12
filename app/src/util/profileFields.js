@@ -5,7 +5,7 @@
 // Speichern-Meldung kommen von hier, damit dasselbe Feld an jeder Stelle gleich
 // funktioniert (siehe docs/konzept-schweiz.md §2a-2c).
 
-import { isValidTin, tinHint, isValidTaxNumber } from "./validate.js";
+import { isValidTin, tinHint, isValidTaxNumber, isValidIban } from "./validate.js";
 import { normalizeTaxOffice } from "./taxOffice.js";
 
 function residenceField(key, label, extra = {}) {
@@ -74,6 +74,10 @@ export const PROFILE_FIELDS = {
   accountHolderName: bankField("accountHolderName", "Kontoinhaber"),
   bic: bankField("bic", "BIC"),
   iban: bankField("iban", "IBAN", {
-    validate: (v) => /^[A-Z]{2}\d{2}[A-Z0-9 ]{10,32}$/i.test(v) || "IBAN beginnt mit Länderkürzel und Prüfziffer, z. B. DE89 …",
+    validate: (v) =>
+      isValidIban(v) ||
+      (/^[A-Z]{2}\d{2}/i.test(v.replace(/\s+/g, ""))
+        ? "IBAN ungültig – bitte auf Tippfehler prüfen"
+        : "IBAN beginnt mit Länderkürzel und Prüfziffer, z. B. DE89 …"),
   }),
 };

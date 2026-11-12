@@ -15,6 +15,7 @@ import * as profileRepo from "../db/profileRepo.js";
 import { PROFILE_FIELDS } from "./profileFields.js";
 import { confirmedFieldClasses } from "./fieldDisplay.js";
 import { showToast } from "../components/toast.js";
+import { deriveBankFields } from "./bankLookup.js";
 
 const TYPING_DELAY_MS = 800;
 
@@ -85,12 +86,44 @@ export function bindProfileAutosave(container, { getProfile, onSaved }) {
     }
   }
 
-  async function persist(key, value) {
+  /** @param {Record<string, string>} values key aus PROFILE_FIELDS -> Wert */
+  async function persist(values) {
     const updated = structuredClone(getProfile());
-    PROFILE_FIELDS[key].write(updated, value);
+    for (const [key, value] of Object.entries(values)) PROFILE_FIELDS[key].write(updated, value);
     await profileRepo.put(updated);
     setState({ currentProfile: updated });
-    onSaved?.(updated, key);
+    for (const key of Object.keys(values)) onSaved?.(updated, key);
+  }
+
+  /** Abgeleiteten Wert auch in ein evtl. sichtbares Feld desselben Screens schreiben. */
+  function showDerived(key, value) {
+    invalidFields.delete(key);
+    for (const el of container.querySelectorAll(`[data-field="${key}"]`)) {
+      el.value = value;
+      clearError(el, key);
+      refreshFieldLook(el, value);
+    }
+  }
+
+  /**
+   * Felder, die sich aus dem gerade gespeicherten Feld ergeben (bisher: Bank
+   * aus der IBAN, util/bankLookup.js). Gibt die vorherigen Werte für
+   * "Rückgängig" zurück und die Meldung für den Toast.
+   */
+  async function applyDerived(key) {
+    if (key !== "iban") return { previous: {}, message: null };
+    const derived = await deriveBankFields(getProfile());
+    if (!derived) return { previous: {}, message: null };
+    const profile = getProfile();
+    const changes = Object.fromEntries(
+      Object.entries(derived.values).filter(([k, v]) => PROFILE_FIELDS[k].read(profile) !== v)
+    );
+    const previous = Object.fromEntries(Object.keys(changes).map((k) => [k, PROFILE_FIELDS[k].read(profile)]));
+    if (Object.keys(changes).length) {
+      await persist(changes);
+      for (const [k, v] of Object.entries(changes)) showDerived(k, v);
+    }
+    return { previous, message: Object.keys(changes).length ? derived.message : null };
   }
 
   async function doSave(input, key, { silent }) {
@@ -107,16 +140,20 @@ export function bindProfileAutosave(container, { getProfile, onSaved }) {
     clearError(input, key);
 
     const before = spec.read(getProfile());
-    if (value !== before) await persist(key, value);
+    if (value !== before) await persist({ [key]: value });
     refreshFieldLook(input, value);
 
     if (silent) return;
     const original = valueAtFocus.has(input) ? valueAtFocus.get(input) : before;
+    // Erst beim Verlassen des Felds, nicht schon während des Tippens - und nur,
+    // wenn sich der Wert seit dem Fokus geändert hat.
+    const { previous, message } =
+      value && original !== value ? await applyDerived(key) : { previous: {}, message: null };
     valueAtFocus.set(input, value);
-    if (original !== value) {
-      showToast(`✓ ${spec.label} gespeichert`, {
+    if (original !== value || message) {
+      showToast(message ?? `✓ ${spec.label} gespeichert`, {
         actionLabel: "Rückgängig",
-        onAction: () => undo(input, key, original),
+        onAction: () => undo(input, key, original, previous),
       });
     }
   }
@@ -129,9 +166,10 @@ export function bindProfileAutosave(container, { getProfile, onSaved }) {
     return queue;
   }
 
-  function undo(input, key, original) {
+  function undo(input, key, original, previousDerived = {}) {
     queue = queue.then(async () => {
-      await persist(key, original);
+      await persist({ ...previousDerived, [key]: original });
+      for (const [k, v] of Object.entries(previousDerived)) showDerived(k, v);
       invalidFields.delete(key);
       if (input.isConnected) {
         input.value = original;

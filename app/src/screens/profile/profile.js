@@ -178,12 +178,12 @@ function render(container, profile) {
       <div class="card-head head-navy"><span class="card-title">Bankverbindung</span></div>
       <div class="card-body">
         <div class="field-grid">
-          ${field(profile, "bankName", "Name der Bank")}
+          ${field(profile, "iban", "IBAN", { mono: true, hint: "Bank wird bei deutscher IBAN automatisch erkannt", placeholder: "z.B. DE89 3704 0044 0532 0130 00" })}
           ${field(profile, "accountHolderName", "Kontoinhaber")}
         </div>
         <div class="field-grid">
+          ${field(profile, "bankName", "Name der Bank")}
           ${field(profile, "bic", "BIC / SWIFT", { mono: true })}
-          ${field(profile, "iban", "IBAN", { mono: true })}
         </div>
         <div class="field-grid">
           ${field(profile, "bankAddress", "Adresse der Bank", { hint: "optional, für Italien", wide: true, placeholder: "z.B. Kaiserplatz, 60311 Frankfurt am Main" })}

@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test \"test/*.test.js\"",
-    "update-swiss-shares": "node scripts/updateSwissShares.mjs"
+    "update-swiss-shares": "node scripts/updateSwissShares.mjs",
+    "update-german-banks": "node scripts/updateGermanBanks.mjs"
   },
   "devDependencies": {
     "vite": "^8.2.2"
