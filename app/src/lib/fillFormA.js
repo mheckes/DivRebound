@@ -21,7 +21,9 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { corridors } from "../config/corridors.js";
 import { refundFor, yearsOf, yearsText, issuerDetails, formatEur } from "./italy.js";
 
-const INK = rgb(0.05, 0.15, 0.45);
+// Fast schwarz wie im Begleitschreiben - Blau auf den Unterstreichungen des
+// Formulars sah wie ein Hyperlink aus.
+const INK = rgb(0.1, 0.1, 0.12);
 const SIZE = 10;
 
 // Tabelle "Description of the dividends received" (Seite 4)
@@ -62,13 +64,30 @@ export async function buildFormADocument(templateBytes, profile, form, { attachm
   const pages = pdfDoc.getPages();
   const { residence, bank } = profile;
 
-  /** Text, bei Bedarf verkleinert, damit er in maxWidth passt */
-  function text(pageIndex, value, x, y, { maxWidth = 545 - x, size = SIZE } = {}) {
+  /**
+   * Text, bei Bedarf verkleinert, damit er in maxWidth passt.
+   *
+   * Jeder Eintrag endet mit einem (unsichtbaren) Leerzeichen: PDF-Viewer wie
+   * Chrome/Edge setzen den Seitentext sonst ohne Trenner zusammen und machten
+   * aus "Germany" + "---" + E-Mail einen gemeinsamen mailto-Link.
+   * noLink: E-Mail so zeichnen, dass der Viewer sie nicht als Link erkennt -
+   * optisch lückenlos, im PDF aber "@domain" VOR dem Namen, so dass in der
+   * Textreihenfolge kein Name direkt vor dem "@" steht.
+   */
+  function text(pageIndex, value, x, y, { maxWidth = 545 - x, size = SIZE, noLink = false } = {}) {
     const str = String(value ?? "").trim();
     if (!str) return;
     let s = size;
     while (s > 6 && font.widthOfTextAtSize(str, s) > maxWidth) s -= 0.5;
-    pages[pageIndex].drawText(str, { x, y, size: s, font, color: INK });
+    const draw = (part, px) => pages[pageIndex].drawText(`${part} `, { x: px, y, size: s, font, color: INK });
+    const at = noLink ? str.indexOf("@") : -1;
+    if (at > 0) {
+      const name = str.slice(0, at);
+      draw(str.slice(at), x + font.widthOfTextAtSize(name, s));
+      draw(name, x);
+    } else {
+      draw(str, x);
+    }
   }
   /** Kreuz in ein Kästchen der Vorlage (x/y = Position des Kästchen-Zeichens; Seite 4 hat größere Kästchen) */
   function cross(pageIndex, x, y, { large = false } = {}) {
@@ -88,21 +107,25 @@ export async function buildFormADocument(templateBytes, profile, form, { attachm
   text(0, residence.birthPlace, 349, 461, { maxWidth: 98 });
   text(0, residence.birthDate ? formatDate(residence.birthDate) : "", 453, 461, { maxWidth: 90 });
   text(0, "---", 156, 422);
-  const tins = [residence.taxNumber && `Tax Number: ${residence.taxNumber}`, residence.tin && `Tax ID: ${residence.tin}`].filter(Boolean);
-  text(0, tins.join("  ;  "), 199, 398, { maxWidth: 345 });
+  // Foreign TIN = Steuer-ID (IdNr), die Deutschland international als TIN
+  // meldet. Die Steuernummer ist eine örtliche Nummer des Finanzamts und
+  // gehört nicht hierher (sie steht im Anschreiben ans Finanzamt).
+  // Mittig zwischen Tabellenlinie (407,9) und Unterstreichung (396,1)
+  text(0, residence.tin, 199, 398.7, { maxWidth: 345 });
   text(0, "---", 157, 337);
   text(0, "Germany", 155, 298, { maxWidth: 80 });
   text(0, fullAddress(residence), 242, 297, { maxWidth: 300 });
   text(0, "---", 155, 259);
   text(0, "---", 241, 260);
-  text(0, residence.email, 155, 207, { maxWidth: 390 });
+  text(0, residence.email, 155, 207, { maxWidth: 390, noLink: true });
 
   // --- Seite 3: Zahlungsweg ---
-  text(2, bank.bankName, 172, 394, { maxWidth: 370 });
+  // Grundlinie jeweils ca. 3 pt über der Linie der Vorlage
+  text(2, bank.bankName, 172, 396, { maxWidth: 370 });
   text(2, bank.accountHolderName || undersigned, 172, 375, { maxWidth: 370 });
   text(2, bank.bic, 245, 354, { maxWidth: 70 });
   text(2, bank.iban, 380, 354, { maxWidth: 165 });
-  text(2, bank.address, 242, 300, { maxWidth: 300 });
+  text(2, bank.address, 242, 303, { maxWidth: 300 });
   const attachments = attachmentsCount ?? form.rows.length;
   text(2, `Dividend statements (${attachments})`, 141, 204, { maxWidth: 116 });
 
@@ -137,7 +160,7 @@ export async function buildFormADocument(templateBytes, profile, form, { attachm
   text(4, "beneficial owner", 311, 723, { maxWidth: 230 });
   text(4, undersigned, 179, 672, { maxWidth: 150 });
   text(4, "Germany", 397, 672, { maxWidth: 80 });
-  text(4, "Germany", 144, 659, { maxWidth: 110 });
+  text(4, "Germany", 144, 660, { maxWidth: 110 });
   text(4, yearsText(years, "and"), 384, 659, { maxWidth: 66 });
   cross(4, 50, 570); // subject to tax in the country of residence
   cross(4, 50, 368); // refund of taxes
@@ -146,7 +169,7 @@ export async function buildFormADocument(templateBytes, profile, form, { attachm
   const taxOfficeCity = residence.taxOffice?.city ?? "";
   text(4, taxOfficeCity, 161, 242, { maxWidth: 90 });
   text(4, yearsText(years, "&"), 417, 242, { maxWidth: 54 });
-  text(4, "Germany", 196, 229, { maxWidth: 95 });
+  text(4, "Germany", 196, 230, { maxWidth: 95 });
   text(4, String(corridor.treatyArticle), 398, 229, { maxWidth: 16 });
 
   pdfDoc.setTitle(`Form A – ${payer.name || form.isin} – ${fullName}`);

@@ -61,7 +61,7 @@ Die Koordinaten unten stammen aus den FreeText-Anmerkungen des Referenzantrags (
 | Surname / Name | Mustermann / Max | Profil | 155,455 / 259,455 |
 | Place / Date of Birth | Augsburg / 14.06.1975 | Profil | 349,456 / 453,456 |
 | Business Name | --- | fest | 156,416 |
-| Foreign TIN | `Tax Number: 143/123/45678 ; Tax ID: 12345678901` | Profil (`taxNumber`, `tin`) | 199,388 |
+| Foreign TIN | `12345678901` (nur Steuer-ID, die deutsche TIN; die Steuernummer ist eine örtliche Nummer und steht nur im Anschreiben ans Finanzamt) | Profil (`tin`) | 199,388 |
 | Italian TIN | --- | fest | 157,331 |
 | Residence State / Full address | Germany / `Straße ; PLZ Ort ; Germany` | Profil | 155,292 / 242,291 |
 | Domicile State / Full address | --- / --- | fest | 155,253 / 241,254 |
