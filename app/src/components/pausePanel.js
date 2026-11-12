@@ -14,8 +14,8 @@ import * as transactionRepo from "../db/transactionRepo.js";
 import { exportEncrypted, exportPlain, triggerJsonDownload } from "../crypto/exportImport.js";
 import { openExportOptionsModal } from "./modal.js";
 
-const COUNTRY_FILE = { DK: "Daenemark", CH: "Schweiz", IT: "Italien" };
-const AUTHORITY = { DK: "SKAT", CH: "die Eidgenössische Steuerverwaltung", IT: "die Agenzia delle Entrate" };
+const COUNTRY_FILE = { DK: "Daenemark", CH: "Schweiz", IT: "Italien", SE: "Schweden" };
+const AUTHORITY = { DK: "SKAT", CH: "die Eidgenössische Steuerverwaltung", IT: "die Agenzia delle Entrate", SE: "Skatteverket" };
 
 const NOTES = {
   taxOffice: { label: "Bearbeitung pausiert", text: () => "Wartet auf die Bestätigung durch das Finanzamt (meist 2–3 Wochen)." },

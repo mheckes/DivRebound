@@ -6,7 +6,7 @@
 
 /** ISO-Zeitpunkt der Einreichung (DK: bei SKAT, CH: im ePortal, IT: Post) oder null */
 export function submittedAt(reclaimCase) {
-  return reclaimCase.submittedAt ?? reclaimCase.ch?.completedAt ?? reclaimCase.it?.mailedAt ?? null;
+  return reclaimCase.submittedAt ?? reclaimCase.ch?.completedAt ?? reclaimCase.it?.mailedAt ?? reclaimCase.se?.mailedAt ?? null;
 }
 
 export function isSubmitted(reclaimCase) {

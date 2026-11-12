@@ -60,7 +60,7 @@ export function mount(container) {
     <div class="ch-two-col">
       <div class="card"><div class="card-head"><span class="card-title">Das übernimmt DivRebound</span></div><div class="card-body"><ul class="ch-list">
         <li>Dividendenabrechnungen auslesen und Erstattung berechnen</li>
-        <li>Wohnsitzbescheinigung (Formular 02.050) ausfüllen</li>
+        <li>Wohnsitzbescheinigung (Formular „02.050“) ausfüllen</li>
         <li>Anschreiben ans Finanzamt</li>
         <li>Spickzettel für das SKAT-Online-Formular</li>
       </ul></div></div>

@@ -12,11 +12,27 @@ function treatyRate(corridor, residenceCountry = "DE") {
   return corridor.treatyRateByResidence[residenceCountry] ?? corridor.treatyRateByResidence.DE;
 }
 
-/** Frist ab dem Steuerabzug (= Zahltag), in Monaten gerechnet */
+/**
+ * Frist für die Erstattung. Normalfall: ab dem Steuerabzug (= Zahltag), in
+ * Monaten gerechnet. Schweden (limitationRule "calendarYearEnd"): fünf Jahre ab
+ * dem Ende des Kalenderjahres, in dem die Dividende ausgezahlt wurde - eine
+ * Dividende vom 11.10.2022 kann also bis zum 31.12.2027 beantragt werden.
+ */
 export function isTimeBarred(paymentDate, corridor, today = new Date()) {
+  if (corridor.limitationRule === "calendarYearEnd") {
+    const deadline = new Date(Number(paymentDate.slice(0, 4)) + corridor.limitationPeriodYears, 11, 31, 23, 59, 59);
+    return today > deadline;
+  }
   const cutoff = new Date(today);
   cutoff.setMonth(cutoff.getMonth() - corridor.limitationPeriodYears * 12);
   return new Date(paymentDate) < cutoff;
+}
+
+/** Frist in Worten, für Hinweise in der Oberfläche */
+export function limitationText(corridor) {
+  return corridor.limitationRule === "calendarYearEnd"
+    ? `${corridor.limitationPeriodYears} Jahre ab Ende des Kalenderjahres, in dem die Dividende ausgezahlt wurde`
+    : `${corridor.limitationPeriodYears * 12} Monate ab dem Steuerabzug`;
 }
 
 /**

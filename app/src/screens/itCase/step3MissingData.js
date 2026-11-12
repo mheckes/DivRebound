@@ -55,7 +55,7 @@ function render(container, reclaimCase, profile) {
       ${
         missing.length
           ? missing.map((k) => profileRow(profile, PROFILE_ITEM[k])).join("") + AUTOSAVE_ROW
-          : `<div class="card-body"><div class="md-all-done">✓ Alle Pflichtangaben für Form A sind vollständig. Sie stammen aus deinen persönlichen Daten – <a href="#" data-go-checklist>ansehen oder ändern</a>.</div></div>`
+          : `<div class="card-body"><div class="md-all-done">✓ Alle Pflichtangaben für das Formular „Form A“ sind vollständig. Sie stammen aus deinen persönlichen Daten – <a href="#" data-go-checklist>ansehen oder ändern</a>.</div></div>`
       }
     </div>
 
@@ -63,7 +63,7 @@ function render(container, reclaimCase, profile) {
       <div class="card-head"><span class="card-title">Optional</span><span class="ch-head-sub">blockiert nicht – Weiter geht auch ohne</span></div>
       ${optionalProfileRow(profile, PROFILE_ITEM.bankAddress)}
       ${optionalProfileRow(profile, PROFILE_ITEM.email)}
-      ${groups.length ? `<div class="ch-check-group">Angaben zu den Unternehmen (Form A Seite 4, „Italian dividend payer“)</div>${groups.map((g) => issuerRow(g, profile)).join("")}` : ""}
+      ${groups.length ? `<div class="ch-check-group">Angaben zu den Unternehmen (Formular „Form A“, Seite 4, „Italian dividend payer“)</div>${groups.map((g) => issuerRow(g, profile)).join("")}` : ""}
     </div>
 
     ${stepNavHtml(3)}

@@ -1,0 +1,18 @@
+/* DivRebound Schweden. Basisklassen kommen aus base.css, shared/dividendUpload.css
+   (Schritt 2), chCase.css (Checkliste, Schritt-Navigation), dkCase/step4TaxOffice.css
+   (.doc-item, .pause-note) und dkCase/step5Skat.css (.help-disclosure).
+   Hier nur, was Schweden zusätzlich braucht. */
+
+#divrebound-app .se-doc-all {
+  background: #fafbfc;
+}
+
+#divrebound-app .se-address {
+  display: inline-block;
+  font-size: 12.5px;
+  line-height: 1.6;
+  background: var(--bg);
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}

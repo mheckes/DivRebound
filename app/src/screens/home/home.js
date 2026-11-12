@@ -15,7 +15,7 @@ import { nextStep, stepRoute } from "../../util/caseNav.js";
 import { isSubmitted, submittedAt, refundReceived, parseAmount, monthsBetween } from "../../util/caseProgress.js";
 import { isEligible, totalRefund } from "../../lib/withholding.js";
 
-const COUNTRY_LABELS = { DK: "Dänemark", CH: "Schweiz", IT: "Italien" };
+const COUNTRY_LABELS = { DK: "Dänemark", CH: "Schweiz", IT: "Italien", SE: "Schweden" };
 
 function statusLabel(reclaimCase) {
   if (isSubmitted(reclaimCase)) return refundReceived(reclaimCase).received ? "Abgeschlossen, Erstattung erhalten" : "Abgeschlossen";
@@ -23,7 +23,7 @@ function statusLabel(reclaimCase) {
   return `Schritt ${step.n}: ${step.title}`;
 }
 
-/** Erwartete Erstattung aus den bestätigten Ausschüttungen (DK in DKK, IT in EUR) */
+/** Erwartete Erstattung aus den bestätigten Ausschüttungen (DK in DKK, IT in EUR, SE in SEK) */
 function expectedRefund(reclaimCase, residenceCountry) {
   const corridor = corridors[reclaimCase.targetCountry];
   const eligible = reclaimCase.distributions.filter((d) => isEligible(d, corridor, { residenceCountry }));
@@ -74,6 +74,7 @@ function render(container) {
   const stats = statistics(allCases, residence);
   const openDkk = allCases.filter((c) => c.targetCountry === "DK" && !refundReceived(c).received).reduce((sum, c) => sum + expectedRefund(c, residence), 0);
   const openEur = allCases.filter((c) => c.targetCountry === "IT" && !refundReceived(c).received).reduce((sum, c) => sum + expectedRefund(c, residence), 0);
+  const openSek = allCases.filter((c) => c.targetCountry === "SE" && !refundReceived(c).received).reduce((sum, c) => sum + expectedRefund(c, residence), 0);
   const mostRecent = [...allCases].sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""))[0] ?? null;
   const greetingName = profile?.residence?.firstName ? `, ${escapeHtml(profile.residence.firstName)}` : "";
 
@@ -136,6 +137,7 @@ function render(container) {
           ${allCases.length} DivRebound${allCases.length === 1 ? "" : "s"} angelegt, davon ${completedCount} abgeschlossen<br>
           ${openDkk ? `${formatNumberDe(openDkk)} DKK Erstattung ausstehend (Dänemark)<br>` : ""}
           ${openEur ? `${formatNumberDe(openEur)} EUR Erstattung ausstehend (Italien)<br>` : ""}
+          ${openSek ? `${formatNumberDe(openSek)} SEK Erstattung ausstehend (Schweden)<br>` : ""}
           ${stats.receivedCount ? `${formatNumberDe(stats.receivedEur)} EUR erhalten (${stats.receivedCount} ${stats.receivedCount === 1 ? "Erstattung" : "Erstattungen"})<br>` : ""}
           ${stats.extraEur ? `davon ${formatNumberDe(stats.extraEur)} EUR mehr als erwartet (z. B. Zinsen)<br>` : ""}
           ${stats.avgWait !== null ? `Ø Wartezeit bis zur Auszahlung: ${stats.avgWait} ${stats.avgWait === 1 ? "Monat" : "Monate"}` : ""}

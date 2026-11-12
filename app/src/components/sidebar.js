@@ -54,6 +54,7 @@ export function renderSidebar(container) {
   const dkCases = state.cases.filter((c) => c.targetCountry === "DK");
   const chCases = state.cases.filter((c) => c.targetCountry === "CH");
   const itCases = state.cases.filter((c) => c.targetCountry === "IT");
+  const seCases = state.cases.filter((c) => c.targetCountry === "SE");
 
   container.innerHTML = `
     <div class="sidebar-brand">
@@ -107,6 +108,12 @@ export function renderSidebar(container) {
         <summary>${chevron()} Italien</summary>
         <div class="nav-case-group">
           ${itCases.map((c) => renderCaseNav(c, activeCaseId)).join("")}
+        </div>
+      </details>
+      <details class="nav-country" open>
+        <summary>${chevron()} Schweden</summary>
+        <div class="nav-case-group">
+          ${seCases.map((c) => renderCaseNav(c, activeCaseId)).join("")}
         </div>
       </details>
     </div>

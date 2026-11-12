@@ -30,6 +30,19 @@ export const IT_STEPS = [
 
 export const itStepRoute = (caseId, n) => `#/it/${caseId}/${n}`;
 
+// Schweden: gleicher Ablauf wie Italien (Papierformular SKV 3740, Finanzamt,
+// Versand per Post), docs/konzept-schweden.md.
+export const SE_STEPS = [
+  { n: 1, title: "Unterlagen prüfen" },
+  { n: 2, title: "Dividendenabrechnungen" },
+  { n: 3, title: "Fehlende Angaben" },
+  { n: 4, title: "Formular & Finanzamt" },
+  { n: 5, title: "Versand nach Schweden" },
+  { n: 6, title: REFUND_STEP_TITLE, optional: true },
+];
+
+export const seStepRoute = (caseId, n) => `#/se/${caseId}/${n}`;
+
 // Dänemark: Schritt 5 ist der Spickzettel fürs SKAT-Formular, Schritt 6 der
 // Abschluss (wie "Hochladen & abschließen" bei der Schweiz).
 export const DK_STEPS = [

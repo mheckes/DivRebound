@@ -1,5 +1,5 @@
 // Dänemark, Schritt 4 "Formular & Finanzamt" (vormals "Zusammenfassung &
-// Download"): Wohnsitzbescheinigung (Formular 02.050) und Anschreiben erzeugen.
+// Download"): Wohnsitzbescheinigung (Formular „02.050“) und Anschreiben erzeugen.
 // Gleicher Aufbau wie bei der Schweiz (docs/konzept-schweiz.md §1a):
 // Status-Zeitleiste, Formular (kompakte Zeile mit Vorschau und PDF, wie bei
 // Italien), Anschreiben, nächste Schritte, "Bearbeitung pausiert". Die frühere
@@ -76,7 +76,7 @@ function documentSubline(reclaimCase) {
 }
 
 function buildLetter(profile) {
-  return buildTaxOfficeLetter(profile, { reference: "Wohnsitzbescheinigung (Formular 02.050) zur Erstattung dänischer Quellensteuer" });
+  return buildTaxOfficeLetter(profile, { reference: "Wohnsitzbescheinigung (Formular „02.050“) zur Erstattung dänischer Quellensteuer" });
 }
 
 function letterFileName(profile, reclaimCase) {
@@ -140,7 +140,7 @@ function render(container) {
   container.innerHTML = `
     ${stepHeader(reclaimCase, 4)}
 
-    <p class="ch-lead">Die Wohnsitzbescheinigung (Formular 02.050) muss vom deutschen Finanzamt bestätigt werden. DivRebound hat das Formular für dich ausgefüllt.</p>
+    <p class="ch-lead">Die Wohnsitzbescheinigung (Formular „02.050“) muss vom deutschen Finanzamt bestätigt werden. DivRebound hat das Formular für dich ausgefüllt.</p>
 
     ${dkTimelineHtml(reclaimCase)}
 
@@ -151,7 +151,7 @@ function render(container) {
       </div>
       <div class="doc-item">
         <div>
-          <div class="doc-title">Wohnsitzbescheinigung (Formular 02.050)</div>
+          <div class="doc-title">Wohnsitzbescheinigung (Formular „02.050“)</div>
           <div class="doc-sub">${esc(documentSubline(reclaimCase))}</div>
           <div class="doc-file">${esc(fileNamePreview)}</div>
         </div>

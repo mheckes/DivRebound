@@ -23,7 +23,7 @@ function letterFileName(profile, years) {
 }
 
 function buildLetter(profile) {
-  return buildTaxOfficeLetter(profile, { reference: "Form A zur Erstattung italienischer Quellensteuer auf Dividenden (Art. 10 DBA Deutschland–Italien), Bestätigung auf Seite 5" });
+  return buildTaxOfficeLetter(profile, { reference: "Formular „Form A“ zur Erstattung italienischer Quellensteuer auf Dividenden (Art. 10 DBA Deutschland–Italien), Bestätigung auf Seite 5" });
 }
 
 function render(container, reclaimCase) {
@@ -54,7 +54,7 @@ function render(container, reclaimCase) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 4)}
-    <p class="ch-lead">DivRebound hat für jedes Unternehmen ein Form A ausgefüllt. Drucke alle Seiten aus, unterschreibe zweimal und sende die Formulare mit dem Anschreiben an dein Finanzamt. Das Finanzamt bestätigt auf Seite 5 deine Ansässigkeit.</p>
+    <p class="ch-lead">DivRebound hat für jedes Unternehmen ein Formular „Form A“ ausgefüllt. Drucke alle Seiten aus, unterschreibe zweimal und sende die Formulare mit dem Anschreiben an dein Finanzamt. Das Finanzamt bestätigt auf Seite 5 deine Ansässigkeit.</p>
 
     ${timelineHtml(reclaimCase)}
 
@@ -86,7 +86,7 @@ function render(container, reclaimCase) {
       <div class="doc-item">
         <div>
           <div class="doc-title">Anschreiben an das Finanzamt</div>
-          <div class="doc-sub">Bitte um Bestätigung der Ansässigkeit auf den beigefügten Formularen (Form A, Seite 5), mit Steuer-ID und Steuernummer.</div>
+          <div class="doc-sub">Bitte um Bestätigung der Ansässigkeit auf den beigefügten Formularen (Formular „Form A“, Seite 5), mit Steuer-ID und Steuernummer.</div>
           <div class="doc-file">${esc(letterFileName(profile, years))}</div>
         </div>
         <div class="doc-actions">

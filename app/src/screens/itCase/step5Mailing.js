@@ -19,7 +19,7 @@ const ADDRESS = corridors.IT.mailingAddress;
 
 function envelopeChecks(formsCount, statements) {
   return [
-    ["forms", `<b>${formsCount} × Form A</b> im Original, je 5 Seiten, vom Finanzamt auf Seite 5 gestempelt und unterschrieben`],
+    ["forms", `<b>${formsCount} × Formular „Form A“</b> im Original, je 5 Seiten, vom Finanzamt auf Seite 5 gestempelt und unterschrieben`],
     ["signatures", "Deine Unterschriften auf <b>Seite 3 und Seite 5</b> jedes Formulars"],
     ["statements", `<b>Kopien der ${statements} Dividendenabrechnung${statements === 1 ? "" : "en"}</b>`],
     ["letter", "<b>Begleitschreiben</b>, unterschrieben"],

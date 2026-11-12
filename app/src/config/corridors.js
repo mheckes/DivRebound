@@ -58,4 +58,28 @@ export const corridors = {
     nativeCurrency: "EUR",
     mailingAddress: ["Agenzia delle Entrate", "Centro Operativo di Pescara", "Via Rio Sparto 21", "65129 Pescara", "Italy"],
   },
+  SE: {
+    targetCountry: "SE",
+    // Vorerst nur deutsche Ansässige (DBA DE-SE, Art. 10). docs/konzept-schweden.md
+    residencyCountries: ["DE"],
+    // Wie Italien nur Papier: SKV 3740 ausfüllen, Finanzamt bestätigt die
+    // Ansässigkeit auf Seite 2, per Post (oder E-Mail) an Skatteverket.
+    flow: "form+mail",
+    formId: "SKV3740",
+    // Datenzeilen der Tabelle IV auf Seite 2; mehr Ausschüttungen -> weiteres Formular
+    maxDistributionsPerForm: 12,
+    // Frist: fünf Jahre ab dem ENDE des Kalenderjahres, in dem die Dividende
+    // ausgezahlt wurde (nicht ab dem Zahltag) - siehe lib/withholding.js
+    limitationPeriodYears: 5,
+    limitationRule: "calendarYearEnd",
+    standardWithholdingRate: 0.3,
+    treatyRateByResidence: { DE: 0.15 },
+    treatyArticle: 10,
+    isinPrefix: "SE",
+    // Das Formular rechnet in SEK; ausgezahlt wird auf Wunsch in EUR.
+    nativeCurrency: "SEK",
+    payoutCurrency: "EUR",
+    mailingAddress: ["Skatteverket", "Box 6037", "171 06 Solna", "Sweden"],
+    mailingEmail: "skatteverket@skatteverket.se",
+  },
 };

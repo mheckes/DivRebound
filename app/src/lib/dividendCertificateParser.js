@@ -47,6 +47,8 @@
  * @param {CorridorConfig} corridorConfig - liefert isinPrefix + nativeCurrency + standardWithholdingRate
  * @returns {ParseResult}
  */
+import { isTimeBarred } from "./withholding.js";
+
 export function parseDividendLines(lines, corridorConfig) {
   const fullText = lines.join("\n");
   const { isinPrefix, nativeCurrency, standardWithholdingRate } = corridorConfig;
@@ -55,12 +57,23 @@ export function parseDividendLines(lines, corridorConfig) {
 
   const isin = extractField(lines, ISIN_EXTRACTORS);
   const issuerName = extractIssuerName(lines);
-  const paymentDate = extractField(lines, PAYMENT_DATE_EXTRACTORS, parseDateFlexible);
-  const shares = extractField(lines, SHARES_EXTRACTORS, parseNumberFlexible);
+  // DAB BNP Paribas / Smartbroker: eine Tabellenzeile mit Stück, Ex-Tag, Zahltag, Dividende je Stück
+  const dabRow = extractDabDividendRow(lines);
+  const paymentDate = dabRow?.paymentDate ?? extractField(lines, PAYMENT_DATE_EXTRACTORS, parseDateFlexible);
+  const exDate = dabRow?.exDate ?? extractField(lines, [/Ex-Tag[:\s]+(\d{1,2}[.\-/]\d{1,2}[.\-/]\d{2,4})/i], parseDateFlexible);
+  const shares = dabRow?.shares ?? extractField(lines, SHARES_EXTRACTORS, parseNumberFlexible);
 
-  const grossDividend = extractAmountForCurrency(lines, GROSS_LABELS, nativeCurrency);
   const withholdingRatePercent = extractWithholdingRatePercent(lines);
   let withheldTax = extractAmountForCurrency(lines, WITHHOLDING_LABELS, nativeCurrency);
+  let grossDividend = extractAmountForCurrency(lines, GROSS_LABELS, nativeCurrency);
+  const perShareNative = dabRow && dabRow.currency === nativeCurrency ? dabRow.perShare : null;
+  if (grossDividend === null && perShareNative !== null && shares) {
+    // DAB weist den Bruttobetrag nur in EUR aus, in der Fremdwährung aber
+    // Stück und Dividende je Stück: Brutto = Stück × Dividende je Stück (exakt).
+    grossDividend = round2(shares * perShareNative);
+  } else if (grossDividend === null && withheldTax !== null && withholdingRatePercent) {
+    grossDividend = round2(withheldTax / (withholdingRatePercent / 100));
+  }
 
   if (withheldTax === null && grossDividend !== null && withholdingRatePercent !== null) {
     // Fallback: Betrag in Zielwährung nicht direkt ausgewiesen (z.B. Baader zeigt
@@ -129,10 +142,12 @@ export function parseDividendLines(lines, corridorConfig) {
         // Verjährungsfrist zählt der tatsächliche Erhalt, also der Zahltag.
         taxYear: paymentDate ? Number(paymentDate.slice(0, 4)) : null,
         paymentDate,
+        exDate,
         shares,
         // Form A Italien verlangt die Dividende je Stück; fehlt sie auf der
         // Abrechnung, aus Brutto ÷ Stück.
         dividendPerShare:
+          perShareNative ??
           extractDividendPerShare(lines, nativeCurrency) ??
           (grossDividend !== null && shares ? Math.round((grossDividend / shares) * 10000) / 10000 : null),
         grossDividend,
@@ -142,7 +157,7 @@ export function parseDividendLines(lines, corridorConfig) {
         currency: nativeCurrency,
         extractionConfidence: "extracted",
         withinLimitationPeriod: paymentDate
-          ? isWithinLimitationPeriod(paymentDate, corridorConfig.limitationPeriodYears)
+          ? !isTimeBarred(paymentDate, corridorConfig)
           : null,
       }
     : null;
@@ -186,7 +201,12 @@ function stripTrailingMetadata(line) {
   return line.replace(/\s+\S*:\S*[\s\S]*$/, "");
 }
 
-function extractAddressBlock(lines) {
+// DAB/Smartbroker setzt das Feld-Label "Depotinhaber" der rechten Spalte auf
+// dieselbe Höhe wie Straße bzw. PLZ/Ort ("81377 München Depotinhaber").
+const stripDepotinhaber = (line) => line.replace(/\s+Depotinhaber$/i, "");
+
+function extractAddressBlock(rawLines) {
+  const lines = rawLines.map(stripDepotinhaber);
   for (let i = 0; i < lines.length; i++) {
     const postalMatch = stripTrailingMetadata(lines[i]).match(POSTAL_CITY_LINE);
     if (!postalMatch) continue;
@@ -248,6 +268,13 @@ function extractIssuerName(lines) {
     }
   }
 
+  // DAB/Smartbroker: Zeile nach "Gattungsbezeichnung ISIN" ("Thule Group AB (publ) Namn-Aktier o.N. SE0006422390")
+  const headIdx = lines.findIndex((l) => /^Gattungsbezeichnung\b/i.test(l));
+  if (headIdx >= 0) {
+    const m = lines[headIdx + 1]?.match(/^(.+?)\s+[A-Z]{2}[A-Z0-9]{9}\d$/);
+    if (m) return cleanSecurityName(m[1]);
+  }
+
   // Fallback für Layouts wie Trade Republic, bei denen der Name in einer eigenen
   // Zeile direkt VOR der Zeile mit ISIN/Stückzahl/Betrag steht, z.B.:
   //   "McDonald's"
@@ -261,6 +288,33 @@ function extractIssuerName(lines) {
     }
   }
 
+  return null;
+}
+
+/** "Thule Group AB (publ) Namn-Aktier o.N." -> "Thule Group AB" (Name des Unternehmens) */
+function cleanSecurityName(raw) {
+  return raw
+    .replace(/\(publ\)/gi, "")
+    .replace(/\s+(?:Namn-|Inhaber-|Vorzugs-)?Aktie[rn]?\b.*$/i, "")
+    .replace(/\s+o\.\s?N\.?$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** "STK 57,000 28.04.2023 05.05.2023 SEK 4,600000" (Nominal, Ex-Tag, Zahltag, Dividende je Stück) */
+function extractDabDividendRow(lines) {
+  for (const line of lines) {
+    const m = line.match(/^STK\s+([\d.,]+)\s+(\d{1,2}\.\d{1,2}\.\d{4})\s+(\d{1,2}\.\d{1,2}\.\d{4})\s+([A-Z]{3})\s+([\d.,]+)$/);
+    if (m) {
+      return {
+        shares: parseNumberFlexible(m[1]),
+        exDate: parseDateFlexible(m[2]),
+        paymentDate: parseDateFlexible(m[3]),
+        currency: m[4],
+        perShare: parseNumberFlexible(m[5]),
+      };
+    }
+  }
   return null;
 }
 
@@ -280,12 +334,12 @@ function extractIssuerName(lines) {
 // Betrag ("DKK 795,00"), Trade Republic NACH dem Betrag ("477.00 DKK") -
 // beide Reihenfolgen werden jetzt erkannt.
 // ---------------------------------------------------------------------------
-const GROSS_LABELS = ["Bruttobetrag", "Bruttodividende", "GESAMT"];
+const GROSS_LABELS = ["Bruttobetrag", "Bruttodividende", "GESAMT", "ausländische Dividende"];
 const WITHHOLDING_LABELS = ["Quellensteuer"]; // bewusst NICHT "Quellensteuer-Anrechnung" (andere Bedeutung, siehe unten)
 
 function extractAmountForCurrency(lines, labels, currency) {
   for (const line of lines) {
-    if (/Quellensteuer-Anrechnung/i.test(line)) continue; // andere Kennzahl, keine Ist-Steuer
+    if (/Quellensteuer-Anrechnung|erstattungsfähige|anrechenbare/i.test(line)) continue; // andere Kennzahlen, keine Ist-Steuer
     for (const label of labels) {
       if (!line.includes(label)) continue;
       const pattern = new RegExp(`${currency}\\s*(-?[\\d.,]+)|(-?[\\d.,]+)\\s*${currency}\\b`, "i");
@@ -311,8 +365,8 @@ function extractDividendPerShare(lines, currency) {
 
 function extractWithholdingRatePercent(lines) {
   for (const line of lines) {
-    if (/Quellensteuer-Anrechnung/i.test(line)) continue;
-    const match = line.match(/([\d]+,\d+)\s*%\s*Quellensteuer|Quellensteuer\s*(\d+,\d+)\s*%/i);
+    if (/Quellensteuer-Anrechnung|erstattungsfähige|anrechenbare/i.test(line)) continue;
+    const match = line.match(/(\d+(?:,\d+)?)\s*%\s*Quellensteuer|Quellensteuer\s*(\d+(?:,\d+)?)\s*%/i);
     if (match) return parseNumberFlexible(match[1] ?? match[2]);
   }
   return null;
@@ -324,6 +378,11 @@ function extractBankComputedRefundHint(lines) {
     if (match) {
       return { currency: match[1] ?? null, amount: parseNumberFlexible(match[2]) };
     }
+  }
+  // DAB/Smartbroker: "erstattungsfähige Quellensteuer 15% SEK 39,33"
+  for (const line of lines) {
+    const match = line.match(/erstattungsfähige\s+Quellensteuer\s*\d+(?:,\d+)?\s*%\s*([A-Z]{3})\s*([\d.,]+)/i);
+    if (match) return { currency: match[1], amount: parseNumberFlexible(match[2]) };
   }
   return null;
 }
@@ -413,8 +472,3 @@ function parseDateFlexible(raw) {
   return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 }
 
-function isWithinLimitationPeriod(paymentDateIso, limitationYears) {
-  const cutoff = new Date();
-  cutoff.setFullYear(cutoff.getFullYear() - limitationYears);
-  return new Date(paymentDateIso) >= cutoff;
-}

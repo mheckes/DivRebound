@@ -9,7 +9,7 @@ import { getState, setState } from "../../store/store.js";
 import * as caseRepo from "../../db/caseRepo.js";
 import * as profileRepo from "../../db/profileRepo.js";
 import { parseDividendCertificate } from "../../lib/parseDividendCertificate.js";
-import { classifyWithholding, refundFor, isEligible, totalRefund } from "../../lib/withholding.js";
+import { classifyWithholding, refundFor, isEligible, totalRefund, limitationText } from "../../lib/withholding.js";
 import { isDuplicateDistribution } from "../../util/validate.js";
 import { applyProfileHints } from "../../util/profileHints.js";
 import { formatNumberDe, parseNumberDe, formatDateDe } from "../../util/format.js";
@@ -42,10 +42,13 @@ const pct = (rate) => {
 function reasons(corridor) {
   const std = pct(corridor.standardWithholdingRate);
   const treaty = pct(corridor.treatyRateByResidence.DE);
+  const calendar = corridor.limitationRule === "calendarYearEnd";
   const months = corridor.limitationPeriodYears * 12;
   return {
     none: `Höchstens ${treaty} Quellensteuer einbehalten. Es gibt keine Erstattung.`,
-    expired: `Zahltag liegt mehr als ${months} Monate zurück. Die Frist für die Erstattung ist abgelaufen.`,
+    expired: calendar
+      ? `Die Frist für die Erstattung ist abgelaufen (${limitationText(corridor)}).`
+      : `Zahltag liegt mehr als ${months} Monate zurück. Die Frist für die Erstattung ist abgelaufen.`,
     partial: `Weniger als ${std} einbehalten (z. B. Ausschüttung teilweise aus Kapitalrücklagen). Erstattet wird nur der tatsächliche Abzug über ${treaty}. Bitte prüfen und bestätigen.`,
     partialConfirmed: `Erstattet wird nur der tatsächliche Abzug über ${treaty}.`,
     high: `Mehr als ${std} einbehalten – das ist ungewöhnlich. Bitte die Beträge mit der Abrechnung vergleichen. Erstattet werden höchstens ${pct(corridor.standardWithholdingRate - corridor.treatyRateByResidence.DE)} vom Brutto.`,
@@ -273,7 +276,7 @@ export function mountDividendUpload(container, reclaimCase, options) {
           <b>${pct(corridor.standardWithholdingRate)}:</b> Regelfall, wird übernommen.<br>
           <b>Zwischen ${pct(corridor.treatyRateByResidence.DE)} und ${pct(corridor.standardWithholdingRate)}:</b> z. B. Ausschüttung teilweise aus Kapitalrücklagen – du bestätigst die Zeile.<br>
           <b>${pct(corridor.treatyRateByResidence.DE)} oder weniger:</b> nichts zu erstatten – kommt nicht ins Formular.<br><br>
-          Erstattet wird immer <b>tatsächlich gezahlte Steuer − ${pct(corridor.treatyRateByResidence.DE)} vom Brutto</b>. Frist: ${corridor.limitationPeriodYears * 12} Monate ab dem Steuerabzug.
+          Erstattet wird immer <b>tatsächlich gezahlte Steuer − ${pct(corridor.treatyRateByResidence.DE)} vom Brutto</b>. Frist: ${limitationText(corridor)}.
         </div>
       </details>
 

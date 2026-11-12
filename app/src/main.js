@@ -12,6 +12,7 @@ import "./screens/profile/profile.css";
 import "./screens/holdings/holdings.css";
 import "./screens/chCase/chCase.css";
 import "./screens/itCase/itCase.css";
+import "./screens/seCase/seCase.css";
 import "./screens/shared/dividendUpload.css";
 import "./screens/shared/refundReceived.css";
 import "./components/statusTimeline.css";
@@ -43,6 +44,7 @@ import * as holdingsScreen from "./screens/holdings/holdings.js";
 import * as chCase from "./screens/chCase/chCase.js";
 import * as dkCase from "./screens/dkCase/dkCase.js";
 import * as itCase from "./screens/itCase/itCase.js";
+import * as seCase from "./screens/seCase/seCase.js";
 
 import { websiteHome } from "./config/siteLinks.js";
 
@@ -95,6 +97,10 @@ route("#/ch/:caseId/:step", async (p) => {
 route("#/it/:caseId/:step", async (p) => {
   await ensureCaseSelected(p.caseId);
   mountScreen(itCase, p);
+});
+route("#/se/:caseId/:step", async (p) => {
+  await ensureCaseSelected(p.caseId);
+  mountScreen(seCase, p);
 });
 route("#/dk/:caseId/:step", async (p) => {
   await ensureCaseSelected(p.caseId);

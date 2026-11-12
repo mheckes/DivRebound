@@ -75,6 +75,18 @@ export function createItalianCaseData() {
   };
 }
 
+export function createSwedishCaseData() {
+  return {
+    /** mit "Weiter" verlassene Schritte */
+    stepsDone: [],
+    /** Anzahl erledigter Punkte der Status-Zeitleiste (0-5) */
+    timelineStep: 0,
+    /** abgehakte Punkte der Umschlag-Checkliste (Schritt 5) */
+    envelopeChecks: [],
+    mailedAt: null,
+  };
+}
+
 export async function createCase(profile, targetCountry) {
   const now = new Date().toISOString();
   const { residence, bank } = profile;
@@ -111,6 +123,7 @@ export async function createCase(profile, targetCountry) {
   };
   if (targetCountry === "CH") reclaimCase.ch = createSwissCaseData();
   if (targetCountry === "IT") reclaimCase.it = createItalianCaseData();
+  if (targetCountry === "SE") reclaimCase.se = createSwedishCaseData();
   await put(reclaimCase);
   return reclaimCase;
 }

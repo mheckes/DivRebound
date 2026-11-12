@@ -17,7 +17,7 @@ export function mount(container, reclaimCase, profile) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 1)}
-    <p class="ch-lead">Die Erstattung der italienischen Quellensteuer läuft komplett auf Papier. DivRebound füllt für jedes italienische Unternehmen das offizielle Form A aus. Dein Finanzamt bestätigt es, danach schickst du es per Post nach Italien.</p>
+    <p class="ch-lead">Die Erstattung der italienischen Quellensteuer läuft komplett auf Papier. DivRebound füllt für jedes italienische Unternehmen das offizielle Formular „Form A“ aus. Dein Finanzamt bestätigt es, danach schickst du es per Post nach Italien.</p>
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Checkliste</span><span class="count-pill" data-summary></span></div>
@@ -41,14 +41,14 @@ export function mount(container, reclaimCase, profile) {
     <div class="ch-two-col">
       <div class="card"><div class="card-head"><span class="card-title">Das übernimmt DivRebound</span></div><div class="card-body"><ul class="ch-list">
         <li>Abrechnungen auslesen, Steuersatz prüfen</li>
-        <li>Form A ausfüllen, eines pro Unternehmen</li>
+        <li>Formular „Form A“ ausfüllen (eines pro Unternehmen)</li>
         <li>Anschreiben ans Finanzamt</li>
         <li>Begleitschreiben nach Italien (Englisch)</li>
       </ul></div></div>
       <div class="card"><div class="card-head"><span class="card-title">Das machst du selbst</span></div><div class="card-body"><ul class="ch-list">
-        <li>Form A ausdrucken und zweimal unterschreiben</li>
+        <li>Formular „Form A“ ausdrucken und zweimal unterschreiben</li>
         <li>Per Post ans Finanzamt schicken</li>
-        <li>Bestätigtes Form A mit Kopien der Abrechnungen nach Italien senden</li>
+        <li>Bestätigtes Formular „Form A“ mit Kopien der Abrechnungen nach Italien senden</li>
       </ul></div></div>
     </div>
 

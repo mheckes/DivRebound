@@ -4,7 +4,7 @@
 // wurde, sich aus dem Fall ergibt (z.B. eingereicht) bzw. - beim optionalen
 // letzten Schritt "Erstattung erhalten" - die Erstattung eingetragen ist.
 
-import { CH_STEPS, chStepRoute, DK_STEPS, dkStepRoute, IT_STEPS, itStepRoute } from "../config/caseSteps.js";
+import { CH_STEPS, chStepRoute, DK_STEPS, dkStepRoute, IT_STEPS, itStepRoute, SE_STEPS, seStepRoute } from "../config/caseSteps.js";
 import { isSubmitted, refundReceived } from "./caseProgress.js";
 
 const DK_STATUS_ORDER = ["draft", "residency_form_generated", "awaiting_tax_office", "ready_for_skat_submission", "skat_form_verified", "submitted"];
@@ -17,6 +17,7 @@ const NAV = {
   },
   CH: { steps: CH_STEPS, route: chStepRoute, isDone: (c, n) => (c.ch?.stepsDone ?? []).includes(n) || (isSubmitted(c) && n <= 6) },
   IT: { steps: IT_STEPS, route: itStepRoute, isDone: (c, n) => (c.it?.stepsDone ?? []).includes(n) || (isSubmitted(c) && n <= 5) },
+  SE: { steps: SE_STEPS, route: seStepRoute, isDone: (c, n) => (c.se?.stepsDone ?? []).includes(n) || (isSubmitted(c) && n <= 5) },
 };
 
 export function stepsFor(reclaimCase) {

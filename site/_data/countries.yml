@@ -17,7 +17,7 @@
 - {name: Finnland,   rate: 35,   creditable: 15,   potential: 20,   status: planned}
 - {name: Schweiz,    rate: 35,   creditable: 15,   potential: 20,   status: live,    code: CH, companies: [Nestlé, Roche, Zurich Insurance, Swiss Re]}
 - {name: Israel,     rate: 25,   creditable: 10,   potential: 15,   status: planned}
-- {name: Schweden,   rate: 30,   creditable: 15,   potential: 15,   status: planned, code: SE, companies: [Volvo, Svenska Handelsbanken, Investor AB]}
+- {name: Schweden,   rate: 30,   creditable: 15,   potential: 15,   status: live,    code: SE, companies: [Volvo, Svenska Handelsbanken, Investor AB]}
 - {name: Portugal,   rate: 28,   creditable: 15,   potential: 13,   status: planned}
 - {name: Österreich, rate: 27.5, creditable: 15,   potential: 12.5, status: no}
 - {name: Frankreich, rate: 25,   creditable: 12.8, potential: 12.2, status: no}

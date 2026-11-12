@@ -219,7 +219,7 @@ const page4Rows = [
   {
     id: "m26",
     labelEn: "Documentation that the shareholder is liable to pay tax in another country",
-    hint: "Wohnsitznachweis (Ansässigkeitsbescheinigung, Formular 02.050, vom Finanzamt bestätigt)",
+    hint: "Wohnsitznachweis (Ansässigkeitsbescheinigung, Formular „02.050“, vom Finanzamt bestätigt)",
     isDownload: true,
     resolve: (profile, reclaimCase) => {
       const doc = (reclaimCase.generatedDocuments ?? []).find((d) => d.type === "residency_certificate");
