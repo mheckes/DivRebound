@@ -1,3 +1,9 @@
+// Seitenleiste: Logo mit Beta-Tag, Übersicht, Profil und - sobald ein Antrag
+// geöffnet ist - dessen Schritte, gruppiert nach den drei Phasen
+// (config/caseSteps.js). Alle Anträge stehen auf der Startseite, nicht hier.
+// Unten das Konto-Feld: heute "Daten nur in diesem Browser" mit Sicherung als
+// Datei, später der Platz für Anmelden/Abmelden.
+
 import { getState, setState, subscribe } from "../store/store.js";
 import { navigate } from "../router/router.js";
 import * as caseRepo from "../db/caseRepo.js";
@@ -11,50 +17,53 @@ import {
   isEncryptedFile,
   triggerJsonDownload,
 } from "../crypto/exportImport.js";
-import { openPassphraseModal, openExportOptionsModal, openInfoModal, openConfirmModal } from "./modal.js";
-import { openNewCaseWizard } from "./newCaseWizard.js";
+import { openPassphraseModal, openExportOptionsModal, openInfoModal } from "./modal.js";
 import { legalLinks } from "../config/siteLinks.js";
-import { stepFromHash } from "../config/caseSteps.js";
+import { stepFromHash, stepOf, displayNumber, PHASES, PHASE_ORDER } from "../config/caseSteps.js";
 import { stepsFor, stepRoute, isStepDone } from "../util/caseNav.js";
+import { caseName } from "../util/caseName.js";
+import { flagHtml } from "./flow.js";
 
-function caseLabel(reclaimCase) {
-  const d = new Date(reclaimCase.createdAt);
-  return `DivRebound ${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 }
 
-function chevron() {
-  return `<svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
-}
-
-// Nummerierte Schritte je Fall (Ziffer im Kreis, erledigt = ✓), gleich für
-// alle Länder - Fortschritt aus util/caseNav.js.
-function renderCaseNav(reclaimCase, activeCaseId) {
-  const isActive = reclaimCase.caseId === activeCaseId;
-  const currentStep = isActive ? stepFromHash(window.location.hash, reclaimCase.targetCountry.toLowerCase()) : 0;
+function renderCase(reclaimCase) {
+  const steps = stepsFor(reclaimCase);
+  const hashStep = stepOf(steps, stepFromHash(window.location.hash, reclaimCase.targetCountry.toLowerCase()));
+  // Folgeseiten (parent) markieren die Zeile ihres Schritts
+  const currentN = hashStep?.parent ?? hashStep?.n ?? 0;
+  const row = (s) => {
+    const children = steps.filter((c) => c.parent === s.n);
+    const done = isStepDone(reclaimCase, s) && children.every((c) => isStepDone(reclaimCase, c));
+    const cls = s.n === currentN ? "current" : done ? "done" : "";
+    const num = s.intro ? "i" : displayNumber(steps, s.n);
+    return `<div class="nav-step nav-step-numbered ${cls}" data-nav="${stepRoute(reclaimCase, s.n)}"><span class="nav-step-num">${cls === "done" ? "✓" : num}</span>${esc(s.title)}</div>`;
+  };
+  const visible = steps.filter((s) => !s.hidden && !s.parent);
   return `
-    <details class="nav-case ${isActive ? "active" : ""}" ${isActive ? "open" : ""} data-case-id="${reclaimCase.caseId}">
-      <summary>
-        ${chevron()}
-        <span style="flex:1;">${caseLabel(reclaimCase)}</span>
-        <button class="nav-case-delete" data-action="delete-case" data-case-id="${reclaimCase.caseId}" title="Fall löschen">✕</button>
-      </summary>
-      <div class="nav-steps">
-        ${stepsFor(reclaimCase).map((s) => {
-          const isDone = isStepDone(reclaimCase, s);
-          const cls = s.n === currentStep ? "current" : isDone ? "done" : "";
-          return `<div class="nav-step nav-step-numbered ${cls}" data-nav="${stepRoute(reclaimCase, s.n)}"><span class="nav-step-num">${cls === "done" ? "✓" : s.n}</span>${s.title}</div>`;
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Aktueller Antrag</div>
+      <div class="side-case">
+        <div class="side-case-name">${flagHtml(reclaimCase.targetCountry)}${esc(caseName(reclaimCase))}</div>
+        ${visible.filter((s) => s.intro).map(row).join("")}
+        ${PHASE_ORDER.map((phase) => {
+          const ofPhase = visible.filter((s) => s.phase === phase);
+          if (!ofPhase.length) return "";
+          return `<div class="side-phase">${esc(PHASES[phase].title)}</div>${ofPhase.map(row).join("")}`;
         }).join("")}
       </div>
-    </details>`;
+    </div>`;
 }
 
 export function renderSidebar(container) {
   const state = getState();
-  const activeCaseId = state.currentCase?.caseId ?? null;
-  const dkCases = state.cases.filter((c) => c.targetCountry === "DK");
-  const chCases = state.cases.filter((c) => c.targetCountry === "CH");
-  const itCases = state.cases.filter((c) => c.targetCountry === "IT");
-  const seCases = state.cases.filter((c) => c.targetCountry === "SE");
+  const hash = window.location.hash;
+  const profile = state.currentProfile;
+  const onCase = /^#\/(dk|ch|it|se)\/[^/]+\/\d$/.test(hash);
+  const hasSwiss = state.cases.some((c) => c.targetCountry === "CH");
+  const name = [profile?.residence?.firstName, profile?.residence?.lastName].filter(Boolean).join(" ");
+  const link = (route, label) => `<a class="sidebar-link ${hash === route ? "active" : ""}" data-nav="${route}">${label}</a>`;
 
   container.innerHTML = `
     <div class="sidebar-brand">
@@ -70,106 +79,49 @@ export function renderSidebar(container) {
       </div>
     </div>
 
-    <div class="sidebar-actions">
-      <button class="sidebar-btn" data-action="load">📂 Bearbeitung laden</button>
-      <button class="sidebar-btn" data-action="save">💾 Bearbeitung speichern</button>
-      <input type="file" accept="application/json,.json" class="sidebar-load-input" hidden />
-    </div>
-
-    <div class="sidebar-divider"></div>
-
-    <a class="sidebar-link" data-nav="#/home">Home</a>
-
     <div class="sidebar-section">
-      <div class="sidebar-section-title">Nutzer</div>
-      <a class="sidebar-link" data-nav="#/profile">Persönliche Daten</a>
-      <a class="sidebar-link" data-nav="#/anschreiben">Anschreiben Finanzamt</a>
+      ${link("#/home", "Übersicht")}
+      ${link("#/profile", "Mein Profil")}
+      ${hasSwiss ? link("#/ch/bestand", "Wertpapierbestand Schweiz") : ""}
+      ${link("#/anschreiben", "Anschreiben Finanzamt")}
     </div>
 
-    <div class="sidebar-section">
-      <div class="sidebar-section-title">Quellensteuer</div>
-      <div class="sidebar-new" data-action="new-case">＋ Neuer DivRebound</div>
+    ${onCase && state.currentCase ? renderCase(state.currentCase) : ""}
 
-      <details class="nav-country" open>
-        <summary>${chevron()} Dänemark</summary>
-        <div class="nav-case-group">
-          ${dkCases.map((c) => renderCaseNav(c, activeCaseId)).join("")}
-        </div>
-      </details>
-
-      <details class="nav-country" open>
-        <summary>${chevron()} Schweiz</summary>
-        <div class="nav-case-group">
-          <div class="nav-holdings" data-nav="#/ch/bestand">Wertpapierbestand</div>
-          ${chCases.map((c) => renderCaseNav(c, activeCaseId)).join("")}
-        </div>
-      </details>
-      <details class="nav-country" open>
-        <summary>${chevron()} Italien</summary>
-        <div class="nav-case-group">
-          ${itCases.map((c) => renderCaseNav(c, activeCaseId)).join("")}
-        </div>
-      </details>
-      <details class="nav-country" open>
-        <summary>${chevron()} Schweden</summary>
-        <div class="nav-case-group">
-          ${seCases.map((c) => renderCaseNav(c, activeCaseId)).join("")}
-        </div>
-      </details>
+    <div class="sidebar-bottom">
+      <div class="side-account">
+        <span class="side-avatar">${esc((name || "?").slice(0, 1).toUpperCase())}</span>
+        <div><b>${esc(name || "Ohne Konto")}</b><small>Daten nur in diesem Browser</small></div>
+      </div>
+      <div class="sidebar-actions">
+        <button class="sidebar-btn" data-action="save">💾 Sicherung speichern</button>
+        <button class="sidebar-btn" data-action="load">📂 Sicherung laden</button>
+        <input type="file" accept="application/json,.json" class="sidebar-load-input" hidden />
+      </div>
+      <button class="sidebar-btn sidebar-feedback" type="button" data-feedback="sidebar">💬 Feedback geben</button>
+      <nav class="sidebar-foot" aria-label="Rechtliches">
+        ${legalLinks.map((l) => `<a href="${l.href}">${l.title}</a>`).join("")}
+      </nav>
     </div>
-
-    <button class="sidebar-btn sidebar-feedback" type="button" data-feedback="sidebar">💬 Feedback geben</button>
-
-    <nav class="sidebar-foot" aria-label="Rechtliches">
-      ${legalLinks.map((l) => `<a href="${l.href}">${l.title}</a>`).join("")}
-    </nav>
   `;
 
   container.querySelectorAll("[data-nav]").forEach((el) => {
     el.addEventListener("click", () => navigate(el.dataset.nav));
   });
 
-  container.querySelector('[data-action="new-case"]').addEventListener("click", () => {
-    openNewCaseWizard();
-  });
-
-  container.querySelectorAll('[data-action="delete-case"]').forEach((btn) => {
-    btn.addEventListener("click", async (e) => {
-      e.preventDefault(); // verhindert, dass <summary> das <details> auf-/zuklappt
-      e.stopPropagation();
-      const caseId = btn.dataset.caseId;
-      const reclaimCase = getState().cases.find((c) => c.caseId === caseId);
-      const confirmed = await openConfirmModal(
-        "Fall wirklich löschen?",
-        `„${caseLabel(reclaimCase)}" wird unwiderruflich gelöscht, inklusive aller erfassten Ausschüttungen. Bereits heruntergeladene Dokumente sind davon nicht betroffen.`,
-        { confirmLabel: "Löschen", danger: true }
-      );
-      if (!confirmed) return;
-      await caseRepo.remove(caseId);
-      const remainingCases = getState().cases.filter((c) => c.caseId !== caseId);
-      const wasActive = getState().currentCase?.caseId === caseId;
-      setState({
-        cases: remainingCases,
-        currentCase: wasActive ? null : getState().currentCase,
-      });
-      if (wasActive) {
-        // Nicht mehr auf den ersten verbliebenen Fall springen: der kann aus
-        // einem anderen Land sein (eigene Routen je Land).
-        navigate("#/home");
-      }
-    });
-  });
-
   container.querySelector('[data-action="save"]').addEventListener("click", async () => {
-    const profile = getState().currentProfile;
-    if (!profile) return;
+    const current = getState().currentProfile;
+    if (!current) {
+      await openInfoModal("Noch nichts zu sichern", "Lege zuerst einen Antrag an oder trage dein Profil ein.");
+      return;
+    }
     const choice = await openExportOptionsModal();
     if (!choice) return;
-    const cases = await caseRepo.getByProfileId(profile.profileId);
-    const transactions = await transactionRepo.getByProfileId(profile.profileId);
-    const payload = { investorProfiles: [profile], reclaimCases: cases, transactions };
+    const cases = await caseRepo.getByProfileId(current.profileId);
+    const transactions = await transactionRepo.getByProfileId(current.profileId);
+    const payload = { investorProfiles: [current], reclaimCases: cases, transactions };
     const fileJson = choice.encrypt ? await exportEncrypted(payload, choice.passphrase) : exportPlain(payload);
-    triggerJsonDownload(fileJson, `${profile.residence.lastName || "divrebound"}.divrebound.json`);
+    triggerJsonDownload(fileJson, `${current.residence.lastName || "divrebound"}.divrebound.json`);
   });
 
   const loadInput = container.querySelector(".sidebar-load-input");
@@ -177,8 +129,8 @@ export function renderSidebar(container) {
   loadInput.addEventListener("change", async () => {
     const file = loadInput.files[0];
     if (!file) return;
-    const fileJson = JSON.parse(await file.text());
     try {
+      const fileJson = JSON.parse(await file.text());
       let payload;
       if (isEncryptedFile(fileJson)) {
         const passphrase = await openPassphraseModal("import");
@@ -190,15 +142,14 @@ export function renderSidebar(container) {
       } else {
         payload = importPlain(fileJson);
       }
-      for (const profile of payload.investorProfiles) await profileRepo.put(profile);
+      for (const p of payload.investorProfiles) await profileRepo.put(p);
       for (const reclaimCase of payload.reclaimCases) await caseRepo.put(reclaimCase);
       // Ältere Dateien (vor dem Wertpapierbestand Schweiz) haben keine Transaktionen.
       for (const transaction of payload.transactions ?? []) await transactionRepo.put(transaction);
-      const profile = payload.investorProfiles[0];
-      setState({ currentProfile: profile, cases: payload.reclaimCases, currentCase: null });
-      navigate("#/profile");
+      setState({ currentProfile: payload.investorProfiles[0], cases: payload.reclaimCases, currentCase: null });
+      navigate("#/home");
     } catch (err) {
-      await openInfoModal("Import fehlgeschlagen", "Die Passphrase ist falsch, oder die Datei ist beschädigt.");
+      await openInfoModal("Laden fehlgeschlagen", "Die Passphrase ist falsch, oder die Datei ist beschädigt.");
     }
     loadInput.value = "";
   });
@@ -206,5 +157,7 @@ export function renderSidebar(container) {
 
 export function mountSidebar(container) {
   renderSidebar(container);
+  // Auch beim Seitenwechsel neu zeichnen: aktiver Link und aktueller Schritt hängen am Hash
+  window.addEventListener("hashchange", () => renderSidebar(container));
   return subscribe(() => renderSidebar(container));
 }

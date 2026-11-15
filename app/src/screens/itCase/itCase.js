@@ -23,7 +23,7 @@ export function mount(container, params) {
   if (!reclaimCase || reclaimCase.targetCountry !== "IT" || !profile) {
     container.innerHTML = `
       <div class="content-header"><h1 class="content-title">DivRebound Italien</h1></div>
-      <div class="info-banner"><span class="icon">ℹ</span><div>Dieser Fall wurde nicht gefunden.</div></div>`;
+      <div class="info-banner"><span class="icon">ℹ</span><div>Dieser Antrag wurde nicht gefunden.</div></div>`;
     return;
   }
   // Fälle aus älteren Exporten bzw. vor Einführung einzelner Felder ergänzen.

@@ -11,6 +11,7 @@ import * as step4 from "./step4Portal.js";
 import * as step5 from "./step5TaxOffice.js";
 import * as step6 from "./step6Finish.js";
 import * as step7 from "./step7Refund.js";
+import * as stepData from "./stepData.js";
 
 const STEP_MODULES = {
   1: (container, reclaimCase) => step1.mount(container, reclaimCase),
@@ -20,6 +21,7 @@ const STEP_MODULES = {
   5: (container, reclaimCase) => step5.mount(container, reclaimCase),
   6: (container, reclaimCase) => step6.mount(container, reclaimCase),
   7: (container, reclaimCase) => step7.mount(container, reclaimCase),
+  8: (container, reclaimCase) => stepData.mount(container, reclaimCase),
 };
 
 /**
@@ -33,7 +35,7 @@ export function mount(container, params) {
   if (!reclaimCase || reclaimCase.targetCountry !== "CH" || !currentProfile) {
     container.innerHTML = `
       <div class="content-header"><h1 class="content-title">DivRebound Schweiz</h1></div>
-      <div class="info-banner"><span class="icon">ℹ</span><div>Dieser Fall wurde nicht gefunden.</div></div>`;
+      <div class="info-banner"><span class="icon">ℹ</span><div>Dieser Antrag wurde nicht gefunden.</div></div>`;
     return;
   }
   // Fälle aus älteren Exporten bzw. vor Einführung einzelner Felder ergänzen.

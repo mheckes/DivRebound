@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DivRebound Ablauf – Mockup</title>
+<style>
+  /* Schriften aus der App (selbst gehostet), kein Abruf bei Google */
+  @font-face{font-family:"DM Sans";font-weight:300 700;font-display:swap;src:url("../app/src/style/fonts/dm-sans-latin.woff2") format("woff2");}
+  @font-face{font-family:"DM Serif Display";font-weight:400;font-display:swap;src:url("../app/src/style/fonts/dm-serif-display-normal-latin.woff2") format("woff2");}
+  @font-face{font-family:"JetBrains Mono";font-weight:400 700;font-display:swap;src:url("../app/src/style/fonts/jetbrains-mono-latin.woff2") format("woff2");}
+
+  /* Tokens 1:1 aus app/src/style/tokens.css */
+  :root{
+    --navy:#0f2240; --navy-mid:#1a3a6b; --navy-light:#e8eef7;
+    --cyan:#00b4d8; --cyan-dark:#007a9e; --cyan-light:#e0f7fc;
+    --bg:#f2f4f7; --surface:#fff; --charcoal:#111827; --muted:#6b7c93; --stone:#aab4c4; --divider:#d8dfe8;
+    --success:#059669; --success-bg:#d1fae5; --danger:#a8433a; --danger-tint:#f7e9e7;
+    --warn:#9a6700; --warn-bg:#fff4d6;
+    --font-display:"DM Serif Display", Georgia, serif;
+    --font-body:"DM Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono:"JetBrains Mono", "Courier New", monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--charcoal);font-family:var(--font-body);font-size:13.5px;line-height:1.45;}
+  button,input,select{font-family:inherit;font-size:inherit;}
+  .mono{font-family:var(--font-mono);}
+  .num{text-align:right;}
+
+  /* ---------- Mockup-Leiste ---------- */
+  .mock-bar{background:#fff7e0;border-bottom:1px solid #f0d48a;padding:8px 16px;font-size:12px;color:#6b5200;display:flex;gap:14px;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:20;}
+  .mock-bar b{color:#4a3800;}
+  .mock-toggle{display:inline-flex;border:1px solid #e0c060;border-radius:8px;overflow:hidden;}
+  .mock-toggle button{border:0;background:#fffdf5;padding:5px 10px;font-size:12px;color:#6b5200;cursor:pointer;}
+  .mock-toggle button + button{border-left:1px solid #e0c060;}
+  .mock-toggle button.on{background:#f0d48a;color:#4a3800;font-weight:600;}
+  .mock-bar label{display:inline-flex;gap:6px;align-items:center;cursor:pointer;margin-left:auto;}
+
+  /* ---------- Neuerungen ---------- */
+  .neu{display:none;margin:0 0 12px;padding:8px 12px;border:1px dashed var(--cyan-dark);background:var(--cyan-light);border-radius:8px;font-size:12px;color:#064a5e;max-width:760px;}
+  .neu b{font-size:10px;letter-spacing:.08em;background:var(--cyan-dark);color:#fff;border-radius:4px;padding:1px 6px;margin-right:6px;}
+  body.show-neu .neu{display:block;}
+  .sidebar .neu{background:rgba(0,180,216,.14);color:#bfeefa;border-color:rgba(0,180,216,.6);margin:0;}
+
+  /* ---------- Shell ---------- */
+  .shell{display:flex;min-height:calc(100vh - 38px);}
+  .sidebar{width:250px;flex-shrink:0;background:var(--navy);color:#fff;padding:24px 16px 20px;display:flex;flex-direction:column;gap:18px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-logo{width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,.13);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .brand-beta{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);border:1px solid rgba(0,180,216,.55);background:rgba(0,180,216,.12);border-radius:4px;padding:1px 6px;}
+  .wordmark{line-height:1.1;margin-bottom:3px;font-family:var(--font-display);font-size:22px;letter-spacing:-.015em;}
+  .side-link{display:block;padding:7px 10px;border-radius:8px;color:#dbe5f3;cursor:pointer;font-weight:500;}
+  .side-link:hover,.side-link.on{background:rgba(255,255,255,.09);color:#fff;}
+  .side-title{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--stone);padding:0 10px;margin-bottom:4px;}
+  .side-case{background:rgba(255,255,255,.06);border-radius:10px;padding:10px;}
+  .side-case-name{font-weight:600;padding:0 2px 8px;display:flex;justify-content:space-between;gap:8px;}
+  .side-phase{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--cyan);margin:10px 2px 4px;display:flex;justify-content:space-between;}
+  .side-phase span{color:var(--stone);text-transform:none;letter-spacing:0;}
+  .side-step{display:flex;gap:8px;align-items:center;padding:6px 6px;border-radius:7px;color:#c9d6ea;cursor:pointer;font-size:13px;}
+  .side-step:hover{background:rgba(255,255,255,.07);}
+  .side-step.on{background:rgba(0,180,216,.2);color:#fff;font-weight:600;}
+  .side-num{width:19px;height:19px;border-radius:50%;border:1.5px solid currentColor;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;flex-shrink:0;}
+  .side-step.done .side-num{background:var(--success);border-color:var(--success);color:#fff;}
+  .side-foot{margin-top:auto;font-size:12px;color:var(--stone);display:flex;flex-direction:column;gap:6px;}
+  .side-foot > span{cursor:pointer;padding:0 10px;}
+  .account{align-items:center;gap:10px;background:rgba(255,255,255,.07);border-radius:10px;padding:8px 10px;margin-bottom:4px;}
+  body.is-new .account.home-new,body.is-returning .account.home-returning{display:flex;}
+  .account b{display:block;color:#fff;font-size:13px;}
+  .account small{color:var(--stone);font-size:11px;}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--cyan);color:var(--navy);font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .neu.later{border-color:#c79a2b;background:rgba(240,212,138,.16);color:#f3e2b3;}
+  .neu.later b{background:#c79a2b;color:#231a00;}
+
+  .content{flex:1;padding:24px 32px 60px;min-width:0;}
+  .page{max-width:900px;}
+  .page.wide{max-width:1080px;}
+  h1{font-family:var(--font-display);font-weight:400;font-size:27px;margin:0 0 2px;letter-spacing:-.01em;}
+  .crumb{color:var(--muted);font-size:12.5px;margin-bottom:18px;}
+  .lead{color:#3b4a60;max-width:720px;margin:0 0 18px;font-size:14px;}
+  .screen{display:none;}
+  .screen.on{display:block;}
+
+  .card{background:var(--surface);border:1px solid var(--divider);border-radius:12px;margin-bottom:16px;overflow:hidden;}
+  .card-head{padding:11px 18px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--divider);}
+  .card-head.navy{background:var(--navy);color:#fff;border-bottom:0;}
+  .card-head small{font-weight:400;color:var(--muted);font-size:12px;}
+  .card-head.navy small{color:#b9c8de;}
+  .card-body{padding:16px 18px;}
+
+  .btn{border-radius:9px;padding:9px 16px;font-weight:600;cursor:pointer;border:1px solid transparent;}
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-accent{background:var(--cyan);color:var(--navy);}
+  .btn-secondary{background:#fff;border-color:var(--divider);color:var(--charcoal);}
+  .btn-small{padding:6px 11px;font-size:12.5px;}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;}
+  .step-nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:12px;}
+  .badge{display:inline-block;border-radius:99px;padding:2px 9px;font-size:11.5px;font-weight:600;white-space:nowrap;}
+  .b-ok{background:var(--success-bg);color:#065f46;}
+  .b-warn{background:var(--warn-bg);color:var(--warn);}
+  .b-grey{background:var(--navy-light);color:var(--navy-mid);}
+  .hint{color:var(--muted);font-size:12.5px;}
+
+  /* ---------- Phasen (das Gesamtbild) ---------- */
+  .phases{display:grid;grid-template-columns:repeat(3,1fr) .8fr;gap:0;background:var(--surface);border:1px solid var(--divider);border-radius:12px;margin-bottom:18px;overflow:hidden;}
+  .phase{padding:16px 18px;border-right:1px solid var(--divider);position:relative;}
+  .phase:last-child{border-right:0;background:var(--navy-light);}
+  .phase-n{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+  .phase:last-child .phase-n{background:var(--success);}
+  .phase-title{font-weight:700;font-size:15px;margin:8px 0 2px;}
+  .phase-time{font-family:var(--font-mono);font-size:11.5px;color:var(--cyan-dark);margin-bottom:6px;white-space:nowrap;}
+  .phase p{margin:0;color:#3b4a60;font-size:12.5px;}
+  .phase.now{box-shadow:inset 0 3px 0 var(--cyan);}
+  .phase.past .phase-n{background:var(--success);}
+
+  /* ---------- Startseite ---------- */
+  .countries{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px;}
+  .country{background:var(--surface);border:1px solid var(--divider);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color .15s, transform .15s;}
+  .country:hover{border-color:var(--cyan);transform:translateY(-1px);}
+  .country b{display:block;font-size:15px;margin-bottom:2px;}
+  .country span{color:var(--muted);font-size:12px;}
+  .section-title{font-weight:700;font-size:15px;margin:22px 0 10px;}
+  .case-card{background:var(--surface);border:1px solid var(--divider);border-radius:12px;padding:16px 18px;margin-bottom:12px;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;}
+  .case-card.attn{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-light);}
+  .case-name{font-weight:700;font-size:15.5px;}
+  .case-meta{color:var(--muted);font-size:12.5px;margin-top:2px;}
+  .case-q{margin-top:10px;font-weight:600;}
+  .case-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  .dots{display:flex;gap:5px;margin-top:10px;align-items:center;font-size:11.5px;color:var(--muted);}
+  .dot{width:26px;height:5px;border-radius:3px;background:var(--divider);}
+  .dot.done{background:var(--success);}
+  .dot.now{background:var(--cyan);}
+  .home-new,.home-returning{display:none;}
+  body.is-new .home-new,body.is-returning .home-returning{display:block;}
+
+  /* ---------- Überblick ---------- */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  ul.clean{margin:0;padding-left:18px;}
+  ul.clean li{margin:4px 0;}
+
+  /* ---------- Upload ---------- */
+  .dropzone{border:2px dashed var(--stone);border-radius:12px;padding:22px;text-align:center;background:var(--surface);cursor:pointer;margin-bottom:16px;}
+  .dropzone:hover{border-color:var(--cyan);background:var(--cyan-light);}
+  .dropzone b{display:block;font-size:14.5px;}
+  table{width:100%;border-collapse:collapse;}
+  th{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);text-align:left;padding:9px 12px;border-bottom:1px solid var(--divider);font-weight:600;}
+  th.num{text-align:right;}
+  td{padding:9px 12px;border-bottom:1px solid var(--divider);vertical-align:top;}
+  tr.grp td{background:var(--navy-light);font-weight:700;font-size:12px;color:var(--navy-mid);padding:6px 12px;}
+  tr.warn td{background:#fffaf0;}
+  .row-note{font-size:11.5px;color:var(--warn);margin-top:3px;max-width:330px;}
+  .sub{color:var(--muted);font-size:11px;}
+  .refund{background:var(--navy);color:#fff;margin:14px;border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;}
+  .refund .amt{font-family:var(--font-mono);font-size:24px;font-weight:600;}
+  .refund .eur{color:#b9c8de;font-size:12.5px;}
+  .confirm-bar{background:var(--surface);border:1px solid var(--divider);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;justify-content:space-between;}
+  .confirm-bar label{display:flex;gap:9px;align-items:center;cursor:pointer;font-weight:500;}
+  .empty{padding:26px;text-align:center;color:var(--muted);}
+  .if-up{display:none;}
+  body.uploaded .if-up{display:block;}
+  body.uploaded tr.if-up{display:table-row;}
+  body.uploaded .if-empty{display:none;}
+
+  /* ---------- Angaben ---------- */
+  .field-grid{display:grid;grid-template-columns:150px 1fr;gap:10px 14px;align-items:center;}
+  .field-grid label{font-weight:600;font-size:13px;}
+  .inputs{display:flex;gap:8px;}
+  input.f{border:1px solid var(--divider);border-radius:8px;padding:8px 10px;width:100%;background:#fff;}
+  input.f.filled{background:#f6fbf8;border-color:#b7e4cf;}
+  input.f.need{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-light);}
+  .derived{font-size:12.5px;color:#065f46;background:var(--success-bg);border-radius:8px;padding:8px 10px;}
+
+  /* ---------- Finanzamt ---------- */
+  .timeline{display:flex;padding:16px 18px 14px;}
+  .tl{flex:1;text-align:center;position:relative;font-size:12px;color:var(--muted);}
+  .tl::before{content:"";position:absolute;top:11px;left:-50%;width:100%;height:2px;background:var(--divider);}
+  .tl:first-child::before{display:none;}
+  .tl i{position:relative;z-index:1;width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid var(--divider);display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;font-weight:700;}
+  .tl.done i{background:var(--success);border-color:var(--success);color:#fff;}
+  .tl.done::before,.tl.now::before{background:var(--success);}
+  .tl.now i{border-color:var(--cyan);color:var(--cyan-dark);}
+  .tl.now{color:var(--charcoal);font-weight:600;}
+  .tl div{margin-top:5px;}
+  .doc{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 18px;}
+  .doc b{font-size:14.5px;}
+  .todo{display:flex;gap:10px;padding:5px 0;}
+  .todo i{font-style:normal;width:21px;height:21px;border-radius:50%;background:var(--navy);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+  .wait{background:var(--navy-light);border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;}
+
+  .way{display:none;}
+  .way.on{display:block;}
+  .way-toggle{border-color:var(--divider);}
+  .way-toggle button{background:#fff;color:var(--muted);}
+  .way-toggle button + button{border-left-color:var(--divider);}
+  .way-toggle button.on{background:var(--navy);color:#fff;}
+
+  /* ---------- Flaggen (CSS statt Emoji: Windows zeigt Flaggen-Emoji nicht) ---------- */
+  .flag{display:inline-block;width:22px;height:15px;border-radius:3px;margin-right:8px;vertical-align:-2px;box-shadow:0 0 0 1px rgba(15,34,64,.12);}
+  .flag.dk{background:linear-gradient(#fff,#fff) 0 50%/100% 3px no-repeat,linear-gradient(#fff,#fff) 32% 0/3px 100% no-repeat,#c8102e;}
+  .flag.se{background:linear-gradient(#fecc02,#fecc02) 0 50%/100% 3px no-repeat,linear-gradient(#fecc02,#fecc02) 32% 0/3px 100% no-repeat,#006aa7;}
+  .flag.ch{background:linear-gradient(#fff,#fff) 50% 50%/11px 3px no-repeat,linear-gradient(#fff,#fff) 50% 50%/3px 11px no-repeat,#da291c;}
+  .flag.it{background:linear-gradient(90deg,#009246 33.3%,#fff 33.3% 66.6%,#ce2b37 66.6%);}
+
+  /* ---------- Statistik und Beta ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px;}
+  .stat{background:var(--surface);border:1px solid var(--divider);border-radius:12px;padding:12px 16px;}
+  .stat b{display:block;font-family:var(--font-mono);font-size:18px;}
+  .stat span{color:var(--muted);font-size:12px;}
+  .beta{margin-top:0;background:var(--surface);border:1px solid var(--divider);border-radius:14px;display:grid;grid-template-columns:1.25fr 1fr;overflow:hidden;}
+  .beta-main{padding:18px 20px;border-left:4px solid var(--cyan);}
+  .beta-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan-dark);background:var(--cyan-light);border-radius:99px;padding:3px 10px;}
+  .beta-title{font-family:var(--font-display);font-size:20px;margin:8px 0 4px;}
+  .beta p{margin:0 0 12px;color:#3b4a60;font-size:13px;}
+  .beta-want{background:var(--navy-light);padding:18px 20px;}
+  .beta-want-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--navy-mid);margin-bottom:6px;}
+  .beta-want b{display:block;font-size:14.5px;margin-bottom:4px;}
+  .beta-want p{margin:0;}
+
+  /* ---------- Einreichen ---------- */
+  .page.narrow{max-width:860px;}
+  .page.narrow .neu{max-width:none;}
+  @media (max-width:900px){ .sidebar{display:none;} .content{padding:16px;} .phases,.countries,.stats,.two-col{grid-template-columns:1fr 1fr;} }
+  .tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:-1px;}
+  .tab{padding:8px 13px;border:1px solid var(--divider);border-bottom:0;border-radius:9px 9px 0 0;background:#e9edf3;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted);}
+  .tab.on{background:var(--surface);color:var(--charcoal);}
+  .tab.final{color:var(--success);}
+  .pane{background:var(--surface);border:1px solid var(--divider);border-radius:0 12px 12px 12px;}
+  .crow{display:grid;grid-template-columns:22px 1fr 1fr 34px;gap:10px;align-items:center;padding:9px 16px;border-bottom:1px solid var(--divider);}
+  .crow:last-child{border-bottom:0;}
+  .crow .en{display:block;color:var(--muted);font-size:11.5px;}
+  .crow .val{font-family:var(--font-mono);font-size:12.5px;background:var(--navy-light);border-radius:6px;padding:5px 8px;}
+  .copy{border:1px solid var(--divider);background:#fff;border-radius:6px;cursor:pointer;padding:4px 7px;}
+  .check-row{display:flex;gap:10px;padding:8px 0;align-items:flex-start;cursor:pointer;}
+  .tabpane{display:none;}
+  .tabpane.on{display:block;}
+  .done-banner{display:none;background:var(--success-bg);color:#065f46;border-radius:10px;padding:14px 16px;margin-top:12px;font-weight:600;}
+  body.submitted .done-banner{display:block;}
+  body.submitted #finish-btn{display:none;}
+</style>
+</head>
+<body class="is-new show-neu">
+
+<div class="mock-bar">
+  <b>Mockup · Neuer Ablauf (Beispiel Dänemark)</b>
+  <span>Startseite:</span>
+  <span class="mock-toggle" id="home-toggle">
+    <button data-home="new" class="on">Erster Besuch</button>
+    <button data-home="returning">Rückkehr nach 3 Wochen</button>
+  </span>
+  <span>Alles klickbar, Daten sind erfunden.</span>
+  <label><input type="checkbox" id="neu-toggle" checked> Neuerungen markieren</label>
+</div>
+
+<div class="shell">
+
+  <!-- ================= Seitenleiste ================= -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12L9 17" stroke="white" stroke-width="2.6" stroke-linecap="round"/><path d="M9 17L20 5M20 5L14.9 7.1M20 5L18.4 10.3" stroke="#00B4D8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div><div class="wordmark">DivRebound</div><span class="brand-beta">Beta</span></div>
+    </div>
+    <div>
+      <a class="side-link on" data-go="home" id="side-home">Übersicht</a>
+      <a class="side-link">Mein Profil</a>
+    </div>
+
+    <div id="side-case-wrap" style="display:none;">
+      <div class="side-title">Aktueller Antrag</div>
+      <div class="side-case">
+        <div class="side-case-name"><span class="js-case-name">Dänemark · neu</span></div>
+        <div class="side-step" data-go="overview"><span class="side-num">i</span>So läuft es ab</div>
+        <div class="side-phase">Vorbereiten <span>15 Min.</span></div>
+        <div class="side-step" data-go="upload"><span class="side-num">1</span>Abrechnungen</div>
+        <div class="side-step" data-go="data"><span class="side-num">2</span>Deine Angaben</div>
+        <div class="side-phase">Bestätigen lassen <span>2–3 Wochen</span></div>
+        <div class="side-step" data-go="taxoffice"><span class="side-num">3</span>Deutsches Finanzamt</div>
+        <div class="side-phase">Einreichen <span>10 Min.</span></div>
+        <div class="side-step" data-go="submit"><span class="side-num">4</span>Dänische Steuerbehörde</div>
+      </div>
+    </div>
+
+    <div class="neu"><b>NEU</b>Schritte nach den drei Phasen gruppiert, 4 statt 7. Nur der aktuelle Antrag ist aufgeklappt, leere Länder sind weg.</div>
+
+    <div class="side-foot">
+      <div class="neu later"><b>SPÄTER</b>Mit Login steht hier das Konto mit „Anmelden / Abmelden“. Profil und Anträge liegen dann am Konto, „Sicherung speichern / laden“ entfällt.</div>
+      <div class="account home-new"><span class="avatar">?</span><div><b>Ohne Konto</b><small>Daten nur in diesem Browser</small></div></div>
+      <div class="account home-returning"><span class="avatar">M</span><div><b>Max Mustermann</b><small>Daten nur in diesem Browser</small></div></div>
+      <span>💾 Sicherung speichern / laden</span>
+      <span>💬 Feedback geben</span>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- ================= Startseite ================= -->
+    <section class="screen on" data-screen="home">
+      <div class="page">
+
+        <!-- Erster Besuch -->
+        <div class="home-new">
+          <h1>Hol dir deine Quellensteuer zurück</h1>
+          <div class="crumb">Für Privatanleger mit Wohnsitz in Deutschland</div>
+
+          <div class="neu"><b>NEU</b>Das Gesamtbild steht ganz oben: drei Phasen mit Zeitangabe. Bisher sah man den Ablauf erst in Schritt 4.</div>
+          <div class="phases">
+            <div class="phase"><span class="phase-n">1</span><div class="phase-title">Vorbereiten</div><div class="phase-time">ca. 15 Min.</div><p>Du lädst deine Dividendenabrechnungen hoch, DivRebound füllt das Formular aus.</p></div>
+            <div class="phase"><span class="phase-n">2</span><div class="phase-title">Bestätigen lassen</div><div class="phase-time">2–3 Wochen</div><p>Dein deutsches Finanzamt bestätigt deinen Wohnsitz auf dem Formular, per ELSTER oder Post.</p></div>
+            <div class="phase"><span class="phase-n">3</span><div class="phase-title">Einreichen</div><div class="phase-time">ca. 10 Min.</div><p>Du reichst den Antrag bei der ausländischen Steuerbehörde ein, online oder per Post.</p></div>
+            <div class="phase"><span class="phase-n">€</span><div class="phase-title">Geld erhalten</div><div class="phase-time">einige Monate</div><p>Die Erstattung kommt auf dein Konto.</p></div>
+          </div>
+
+          <div class="section-title">Neuen Antrag starten</div>
+          <div class="neu"><b>NEU</b>Land direkt wählen. Der Dialog mit den Fragen „Privatvermögen?“ und „Wohnsitzland?“ entfällt, beides steht als ein Satz unter der Überschrift.</div>
+          <div class="countries">
+            <div class="country" data-start><b><span class="flag dk"></span>Dänemark</b><span>12 % deiner Dividende zurück</span></div>
+            <div class="country"><b><span class="flag ch"></span>Schweiz</b><span>20 % deiner Dividende zurück</span></div>
+            <div class="country"><b><span class="flag it"></span>Italien</b><span>11 % deiner Dividende zurück</span></div>
+            <div class="country"><b><span class="flag se"></span>Schweden</b><span>15 % deiner Dividende zurück</span></div>
+          </div>
+          <p class="hint">Deine Daten bleiben in diesem Browser und werden nirgendwohin gesendet.</p>
+        </div>
+
+        <!-- Rückkehr -->
+        <div class="home-returning">
+          <h1>Willkommen zurück, Max</h1>
+          <div class="crumb">Übersicht</div>
+
+          <div class="neu"><b>NEU</b>Jeder Antrag zeigt, worauf er wartet, und stellt genau eine Frage. Bisher: Kachel „Letzte Bearbeitung fortsetzen“ unter dem Beta-Banner.</div>
+          <div class="section-title" style="margin-top:6px;">Deine Anträge</div>
+
+          <div class="case-card attn">
+            <div>
+              <div class="case-name"><span class="flag dk"></span>Dänemark 2024–2025</div>
+              <div class="case-meta">162,48 DKK erwartet · Formular erstellt am 24.10.2026</div>
+              <div class="dots"><span class="dot done"></span><span class="dot now"></span><span class="dot"></span><span class="dot"></span> Phase 2 von 3 · wartet auf das Finanzamt</div>
+              <div class="case-q">Ist die gestempelte Bescheinigung vom Finanzamt zurück?</div>
+            </div>
+            <div class="case-actions">
+              <button class="btn btn-secondary btn-small">Noch nicht</button>
+              <button class="btn btn-accent btn-small" data-go="submit" data-returning>Ja, jetzt einreichen →</button>
+            </div>
+          </div>
+
+          <div class="neu"><b>NEU</b>„Erstattung erhalten“ ist kein eigener Schritt mehr, sondern eine Frage an der Karte. Der Status heißt „Eingereicht“ statt „Abgeschlossen“, solange kein Geld da ist.</div>
+          <div class="case-card">
+            <div>
+              <div class="case-name"><span class="flag it"></span>Italien 2023</div>
+              <div class="case-meta">41,20 EUR erwartet · eingereicht am 02.06.2026</div>
+              <div class="dots"><span class="dot done"></span><span class="dot done"></span><span class="dot done"></span><span class="dot now"></span> Eingereicht · wartet auf die Auszahlung</div>
+              <div class="case-q">Ist das Geld angekommen?</div>
+            </div>
+            <div class="case-actions">
+              <button class="btn btn-secondary btn-small">Noch nicht</button>
+              <button class="btn btn-secondary btn-small">Ja, Betrag eintragen</button>
+            </div>
+          </div>
+
+          <div class="section-title">Deine Statistik</div>
+          <div class="stats">
+            <div class="stat"><b>3</b><span>Anträge, davon 2 eingereicht</span></div>
+            <div class="stat"><b>162,48 DKK</b><span>ausstehend (Dänemark)</span></div>
+            <div class="stat"><b>87,40 EUR</b><span>bisher erhalten</span></div>
+            <div class="stat"><b>7 Monate</b><span>Ø Wartezeit bis zur Auszahlung</span></div>
+          </div>
+
+          <div class="section-title">Neuen Antrag starten</div>
+          <div class="countries">
+            <div class="country" data-start><b><span class="flag dk"></span>Dänemark</b><span>12 % deiner Dividende zurück</span></div>
+            <div class="country"><b><span class="flag ch"></span>Schweiz</b><span>20 % deiner Dividende zurück</span></div>
+            <div class="country"><b><span class="flag it"></span>Italien</b><span>11 % deiner Dividende zurück</span></div>
+            <div class="country"><b><span class="flag se"></span>Schweden</b><span>15 % deiner Dividende zurück</span></div>
+          </div>
+
+          <div class="neu" style="margin-top:14px;"><b>NEU</b>Die Sicherung wird begründet statt nur angeboten.</div>
+          <div class="wait">
+            <span>Deine Anträge liegen nur in diesem Browser. Sichere sie als Datei, bevor du das Gerät wechselst oder Browserdaten löschst.</span>
+            <button class="btn btn-secondary btn-small">💾 Sicherung speichern</button>
+          </div>
+        </div>
+
+        <!-- beide Zustände -->
+        <div class="neu" style="margin-top:24px;"><b>NEU</b>Der Beta-Hinweis steht unter dem Inhalt statt als Banner darüber, mit einer klaren Bitte und einem Knopf.</div>
+        <div class="beta">
+          <div class="beta-main">
+            <span class="beta-badge">Beta-Test</span>
+            <div class="beta-title">Danke, dass du DivRebound testest</div>
+            <p>Sag uns, was hakt: ein Fehler, ein unklarer Text, eine fehlende Funktion.</p>
+            <button class="btn btn-accent btn-small">💬 Feedback geben</button>
+          </div>
+          <div class="beta-want">
+            <div class="beta-want-label">Besonders gesucht</div>
+            <b>Abrechnungen anderer Banken</b>
+            <p>Bisher kennt DivRebound nur wenige Layouts. Ein kurzes „hat geklappt“ mit dem Namen deiner Bank hilft schon.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Überblick ================= -->
+    <section class="screen" data-screen="overview">
+      <div class="page">
+        <h1>So läuft es ab</h1>
+        <div class="crumb"><span class="js-case-name">Dänemark · neu</span></div>
+
+        <div class="neu"><b>NEU</b>Ersetzt „Unterlagen prüfen“ mit neun leeren roten Pflichtzeilen. Hier wird nichts eingetippt, nur erklärt. Der Antrag heißt „Dänemark · neu“, bis Abrechnungen da sind.</div>
+
+        <div class="phases">
+          <div class="phase now"><span class="phase-n">1</span><div class="phase-title">Vorbereiten</div><div class="phase-time">ca. 15 Min.</div><p>Du lädst deine Abrechnungen hoch und ergänzt ein paar Angaben.</p></div>
+          <div class="phase"><span class="phase-n">2</span><div class="phase-title">Bestätigen lassen</div><div class="phase-time">2–3 Wochen</div><p>Dein deutsches Finanzamt bestätigt deinen Wohnsitz, per ELSTER oder Post.</p></div>
+          <div class="phase"><span class="phase-n">3</span><div class="phase-title">Einreichen</div><div class="phase-time">ca. 10 Min.</div><p>Du überträgst die Werte ins Online-Formular der dänischen Steuerbehörde SKAT.</p></div>
+          <div class="phase"><span class="phase-n">€</span><div class="phase-title">Geld erhalten</div><div class="phase-time">einige Monate</div><p>Du bekommst 12 % der Bruttodividende zurück.</p></div>
+        </div>
+
+        <div class="two-col">
+          <div class="card"><div class="card-head">Das übernimmt DivRebound</div><div class="card-body"><ul class="clean">
+            <li>Abrechnungen auslesen, Erstattung berechnen</li>
+            <li>Wohnsitzbescheinigung und Anschreiben ausfüllen</li>
+            <li>Spickzettel für das Online-Formular der dänischen Steuerbehörde (SKAT)</li>
+          </ul></div></div>
+          <div class="card"><div class="card-head">Das machst du selbst</div><div class="card-body"><ul class="clean">
+            <li>Unterschreiben und an dein deutsches Finanzamt schicken, per ELSTER oder Post</li>
+            <li>Werte ins dänische Online-Formular kopieren</li>
+            <li>Gestempelte Bescheinigung dort hochladen</li>
+          </ul></div></div>
+        </div>
+
+        <div class="card"><div class="card-head">Leg dir das bereit</div><div class="card-body"><ul class="clean">
+          <li><b>Dividendenabrechnungen</b> deiner dänischen Aktien als PDF, höchstens 3 Jahre alt</li>
+        </ul>
+          <p class="hint home-new" style="margin:10px 0 0;">Beim ersten Antrag fragen wir einmalig ein paar persönliche Angaben ab, zum Beispiel Steuer-ID und IBAN. Sie landen in deinem Profil und sind beim nächsten Antrag schon da.</p>
+          <p class="hint home-returning" style="margin:10px 0 0;">✓ Deine persönlichen Angaben kommen aus deinem Profil. Du musst nichts erneut eintippen.</p>
+        </div></div>
+        <div class="neu"><b>NEU</b>Steuer-ID und IBAN stehen nicht mehr auf der Bereitlegen-Liste. Sie gehören zum Profil und werden nur beim ersten Antrag abgefragt.</div>
+
+        <div class="step-nav"><span></span><button class="btn btn-primary" data-go="upload">Los geht's: Abrechnungen hochladen →</button></div>
+      </div>
+    </section>
+
+    <!-- ================= 1 Abrechnungen ================= -->
+    <section class="screen" data-screen="upload">
+      <div class="page wide">
+        <h1>Abrechnungen hochladen</h1>
+        <div class="crumb"><span class="js-case-name">Dänemark · neu</span> › Vorbereiten › Schritt 1 von 4</div>
+
+        <div class="dropzone" id="dropzone">
+          <b>Dividendenabrechnungen hierher ziehen oder klicken</b>
+          <span class="hint">PDF · mehrere auf einmal · (im Mockup: Klick lädt Beispieldaten)</span>
+        </div>
+
+        <div class="if-empty card"><div class="empty">Noch nichts hochgeladen. Sobald Abrechnungen da sind, siehst du hier deine Erstattung.</div></div>
+
+        <div class="if-up">
+          <div class="neu"><b>NEU</b>Zeilen mit Regelsatz sind schon ausgewählt. Einzeln ansehen muss man nur die markierte Zeile. Spalten „Stück“ und „Satz“ sind weg, der Satz erscheint nur bei Abweichung.</div>
+          <div class="card">
+            <div class="card-head navy">5 Ausschüttungen erkannt <small>4 in Ordnung · 1 bitte ansehen</small></div>
+            <table>
+              <thead><tr><th style="width:30px;"></th><th>Aktie</th><th>Zahltag</th><th class="num">Brutto (DKK)</th><th class="num">Quellensteuer (DKK)</th><th class="num">Erstattung (DKK)</th><th></th></tr></thead>
+              <tbody>
+                <tr class="grp"><td colspan="7">2024</td></tr>
+                <tr><td><input type="checkbox" class="rowc" data-v="38.40" checked></td><td><b>Novo Nordisk</b><div class="sub mono">DK0062498333</div></td><td class="mono">26.03.2024</td><td class="num mono">320,00</td><td class="num mono">86,40</td><td class="num mono">38,40</td><td><span class="badge b-ok">✓</span></td></tr>
+                <tr><td><input type="checkbox" class="rowc" data-v="21.00" checked></td><td><b>Novo Nordisk</b><div class="sub mono">DK0062498333</div></td><td class="mono">20.08.2024</td><td class="num mono">175,00</td><td class="num mono">47,25</td><td class="num mono">21,00</td><td><span class="badge b-ok">✓</span></td></tr>
+                <tr class="grp"><td colspan="7">2025</td></tr>
+                <tr class="warn"><td><input type="checkbox" class="rowc" data-v="37.80" id="warn-check"></td><td><b>Carlsberg</b><div class="sub mono">DK0010181759</div></td><td class="mono">20.03.2025</td><td class="num mono">540,00</td><td class="num mono">118,80</td><td class="num mono">37,80</td><td><span class="badge b-warn">22 % statt 27 %</span><div class="row-note">Weniger einbehalten als üblich. Stimmen die Beträge mit deiner Abrechnung? Dann anhaken.</div></td></tr>
+                <tr><td><input type="checkbox" class="rowc" data-v="8.40" checked></td><td><b>DSV</b><div class="sub mono">DK0060079531</div></td><td class="mono">25.03.2025</td><td class="num mono">70,00</td><td class="num mono">18,90</td><td class="num mono">8,40</td><td><span class="badge b-ok">✓</span></td></tr>
+                <tr><td><input type="checkbox" class="rowc" data-v="56.88" checked></td><td><b>Novo Nordisk</b><div class="sub mono">DK0062498333</div></td><td class="mono">31.03.2025</td><td class="num mono">474,00</td><td class="num mono">127,98</td><td class="num mono">56,88</td><td><span class="badge b-ok">✓</span></td></tr>
+              </tbody>
+            </table>
+            <div class="refund">
+              <div><div style="font-size:12px;color:#b9c8de;">Voraussichtliche Erstattung</div><div class="amt" id="sum-dkk">124,68 DKK</div><div class="eur" id="sum-eur">≈ 16,71 EUR</div></div>
+              <div class="hint" style="color:#b9c8de;max-width:260px;text-align:right;">Einbehalten wurden 27 %, zulässig sind 15 %. Die Differenz bekommst du zurück.</div>
+            </div>
+          </div>
+
+          <div class="neu"><b>NEU</b>Eine Sammelbestätigung statt eines Hakens pro Zeile. Sie bleibt als Schutz vor Lesefehlern.</div>
+          <div class="confirm-bar">
+            <label><input type="checkbox" id="confirm-all"> Ich habe die Beträge mit meinen Abrechnungen verglichen.</label>
+            <button class="btn btn-primary" id="upload-next" data-go="data" disabled>Weiter: Deine Angaben →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 2 Angaben ================= -->
+    <section class="screen" data-screen="data">
+      <div class="page">
+        <h1>Deine Angaben</h1>
+        <div class="crumb"><span class="js-case-name">Dänemark · neu</span> › Vorbereiten › Schritt 2 von 4</div>
+        <p class="lead home-new">Name und Adresse stehen auf deinen Abrechnungen. Es fehlen noch vier Angaben. Sie werden in deinem Profil gespeichert.</p>
+        <p class="lead home-returning">Beim zweiten Antrag ist dieser Schritt nur noch eine kurze Kontrolle: Alles kommt aus deinem Profil.</p>
+
+        <div class="neu"><b>NEU</b>Daten werden nur einmal abgefragt, und erst nach dem Upload. Schon Bekanntes ist grün vorausgefüllt. Bank und BIC kommen aus der IBAN, das Finanzamt wird hier eingetragen statt in Schritt 1.</div>
+
+        <div class="card">
+          <div class="card-head navy">Noch offen <small id="open-count">4 Angaben</small></div>
+          <div class="card-body">
+            <div class="field-grid">
+              <label>Geburtsdatum</label><div class="inputs"><input class="f need" placeholder="TT.MM.JJJJ"></div>
+              <label>Geburtsort</label><div class="inputs"><input class="f need" placeholder="z. B. Köln"></div>
+              <label>Steuer-ID</label><div class="inputs"><input class="f need mono" placeholder="11 Ziffern"></div>
+              <label>IBAN</label><div class="inputs"><input class="f need mono" id="iban" placeholder="DE…"></div>
+              <label></label><div class="derived" id="bank-derived" style="display:none;">✓ Commerzbank AG · BIC COBADEFFXXX · Kontoinhaber Max Mustermann <span class="hint">(aus der IBAN erkannt – ändern)</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">Aus deinen Abrechnungen übernommen <small>bitte kurz prüfen</small></div>
+          <div class="card-body">
+            <div class="field-grid">
+              <label>Name</label><div class="inputs"><input class="f filled" value="Max"><input class="f filled" value="Mustermann"></div>
+              <label>Adresse</label><div class="inputs"><input class="f filled" value="Musterstraße 12"><input class="f filled" value="50667" style="max-width:90px;"><input class="f filled" value="Köln"></div>
+              <label>Ansässig seit</label><div class="inputs"><input class="f filled" value="26.03.2024" style="max-width:150px;"><span class="hint" style="align-self:center;">frühester Zahltag · Wohnsitz besteht weiterhin</span></div>
+              <label>Finanzamt</label><div class="inputs"><input class="f filled" value="Finanzamt Köln-Mitte"><span class="hint" style="align-self:center;white-space:nowrap;">Anschrift ergänzt</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-nav"><button class="btn btn-secondary" data-go="upload">← Zurück</button><button class="btn btn-primary" data-go="taxoffice">Weiter: Formular fürs Finanzamt →</button></div>
+      </div>
+    </section>
+
+    <!-- ================= 3 Finanzamt ================= -->
+    <section class="screen" data-screen="taxoffice">
+      <div class="page">
+        <h1>Vom deutschen Finanzamt bestätigen lassen</h1>
+        <div class="crumb"><span class="js-case-name">Dänemark · neu</span> › Bestätigen lassen › Schritt 3 von 4</div>
+
+        <p class="lead">Dein deutsches Finanzamt bestätigt auf der Wohnsitzbescheinigung, dass du in Deutschland ansässig bist. DivRebound hat sie für dich ausgefüllt.</p>
+
+        <div class="neu"><b>NEU</b>Keine zweite Ablaufdarstellung mehr im Schritt: Wo man steht, zeigt die Seitenleiste. Neu ist der Weg über ELSTER neben dem Postweg.</div>
+
+        <div class="card">
+          <div class="card-head navy">Wohnsitzbescheinigung 02.050 <small>von DivRebound ausgefüllt</small></div>
+          <div class="doc">
+            <div><b>Wohnsitzbescheinigung</b><div class="hint">1 Seite · Steuerjahre 2024, 2025 · ansässig seit 26.03.2024</div></div>
+            <div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-small">👁 Vorschau</button><button class="btn btn-accent btn-small">⬇ PDF herunterladen</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">So kommt sie zu deinem Finanzamt <small>Finanzamt Köln-Mitte</small>
+            <span class="mock-toggle way-toggle" id="way-toggle"><button data-way="elster" class="on">Digital per ELSTER</button><button data-way="post">Per Post</button></span>
+          </div>
+          <div class="card-body way on" data-way-pane="elster">
+            <div class="todo"><i>1</i><span>Bescheinigung ausdrucken, unterschreiben und als PDF einscannen.</span></div>
+            <div class="todo"><i>2</i><span>In ELSTER unter <b>Formulare und Leistungen → Alle Formulare → Anträge und Nachrichten</b> das Formular <b>„Sonstige Nachricht an das Finanzamt“</b> öffnen.</span></div>
+            <div class="todo"><i>3</i><span>Nachrichtentext einfügen, den Scan anhängen und absenden. <button class="btn btn-secondary btn-small" style="margin-left:6px;">⧉ Nachrichtentext kopieren</button></span></div>
+            <div class="todo"><i>4</i><span>Das Finanzamt stempelt und schickt die Bescheinigung zurück, meist nach 2–3 Wochen. Sie kommt per Post oder ins ELSTER-Postfach.</span></div>
+            <p class="hint" style="margin:10px 0 0;">Du brauchst ein ELSTER-Konto. Kein Anschreiben nötig, der Text steht in der Nachricht.</p>
+          </div>
+          <div class="card-body way" data-way-pane="post">
+            <div class="todo"><i>1</i><span>Bescheinigung und Anschreiben ausdrucken, die Bescheinigung unterschreiben. <button class="btn btn-secondary btn-small" style="margin-left:6px;">⬇ Anschreiben als PDF</button></span></div>
+            <div class="todo"><i>2</i><span>Beides per Post an dein Finanzamt schicken.</span></div>
+            <div class="todo"><i>3</i><span>Das Finanzamt stempelt und schickt die Bescheinigung per Post zurück, meist nach 2–3 Wochen.</span></div>
+          </div>
+        </div>
+
+        <div class="neu"><b>NEU</b>Eine klare Pause mit einem Knopf für den Wiedereinstieg. Dieselbe Frage steht dann auf der Startseite.</div>
+        <div class="wait">
+          <span><b>Hier ist Pause.</b> Komm zurück, wenn die gestempelte Bescheinigung da ist. Dein Stand ist in diesem Browser gespeichert.</span>
+          <div style="display:flex;gap:8px;flex-shrink:0;"><button class="btn btn-secondary btn-small">💾 Sicherung</button><button class="btn btn-primary btn-small" data-go="submit">Bescheinigung ist zurück →</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 4 Einreichen ================= -->
+    <section class="screen" data-screen="submit">
+      <div class="page narrow">
+        <h1>Bei der dänischen Steuerbehörde einreichen</h1>
+        <div class="crumb"><span class="js-case-name">Dänemark · neu</span> › Einreichen › Schritt 4 von 4</div>
+
+        <div class="card">
+          <div class="doc">
+            <div><b>Online-Formular der dänischen Steuerbehörde (SKAT) öffnen</b><div class="hint">Es öffnet sich in einem zweiten Fenster. Kein Login nötig. Halte den Scan der gestempelten Bescheinigung bereit.</div></div>
+            <button class="btn btn-accent btn-small" id="open-portal" style="white-space:nowrap;">Formular daneben öffnen ↗</button>
+          </div>
+        </div>
+
+        <div class="neu"><b>NEU</b>Der Spickzettel nutzt im geteilten Bildschirm die ganze Fensterbreite, die Seitenleiste klappt dann weg. Der Knopf öffnet das SKAT-Formular als eigenes Fenster auf der rechten Bildschirmhälfte. Der Abschluss ist der letzte Reiter statt eines eigenen Schritts.</div>
+
+        <div class="section-title" style="margin-top:4px;">Spickzettel für das dänische SKAT-Formular</div>
+        <div class="tabs" id="tabs">
+          <div class="tab on" data-tab="p1">1 · Antragsteller</div>
+          <div class="tab" data-tab="px">2 · Bank</div>
+          <div class="tab" data-tab="px">3 · Aktien</div>
+          <div class="tab" data-tab="px">4 · Upload</div>
+          <div class="tab" data-tab="px">5 · Prüfen</div>
+          <div class="tab final" data-tab="fin">✓ Absenden</div>
+        </div>
+        <div class="pane">
+          <div class="tabpane on" data-pane="p1">
+            <div class="crow"><input type="checkbox"><div>First name<span class="en">Vorname</span></div><div class="val">Max</div><button class="copy">⧉</button></div>
+            <div class="crow"><input type="checkbox"><div>Last name<span class="en">Nachname</span></div><div class="val">Mustermann</div><button class="copy">⧉</button></div>
+            <div class="crow"><input type="checkbox"><div>Address<span class="en">Straße und Hausnummer</span></div><div class="val">Musterstraße 12</div><button class="copy">⧉</button></div>
+            <div class="crow"><input type="checkbox"><div>Postal code and city<span class="en">PLZ und Ort</span></div><div class="val">50667 Köln</div><button class="copy">⧉</button></div>
+            <div class="crow"><input type="checkbox"><div>Tax identification number<span class="en">Steuer-ID</span></div><div class="val">86 095 742 719</div><button class="copy">⧉</button></div>
+          </div>
+          <div class="tabpane" data-pane="px"><div class="empty">Weitere Seiten wie bisher: Werte in der Reihenfolge des SKAT-Formulars.</div></div>
+          <div class="tabpane" data-pane="fin">
+            <div class="card-body">
+              <div class="todo"><i>1</i><span>Auf der letzten Seite des SKAT-Formulars auf <b>„Send“</b> klicken.</span></div>
+              <div class="todo"><i>2</i><span>Die Bestätigungsseite als PDF speichern oder ausdrucken. Sie ist dein Nachweis, falls SKAT nachfragt.</span></div>
+              <button class="btn btn-primary" id="finish-btn" style="margin-top:12px;">✓ Antrag ist eingereicht</button>
+              <div class="done-banner">✓ Eingereicht am 14.11.2026. SKAT prüft jetzt, die Auszahlung dauert meist einige Monate. Auf der Übersicht fragen wir dich, ob das Geld da ist.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-nav"><button class="btn btn-secondary" data-go="taxoffice">← Zurück</button><button class="btn btn-secondary" data-go="home" data-returning>Zur Übersicht</button></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const ORDER = ["upload", "data", "taxoffice", "submit"];
+  const fmt = (n) => n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  function setHome(mode) {
+    document.body.classList.toggle("is-new", mode === "new");
+    document.body.classList.toggle("is-returning", mode === "returning");
+    $$("#home-toggle button").forEach((b) => b.classList.toggle("on", b.dataset.home === mode));
+  }
+
+  function setCaseName() {
+    const up = document.body.classList.contains("uploaded");
+    $$(".js-case-name").forEach((el) => (el.textContent = up ? "Dänemark 2024–2025" : "Dänemark · neu"));
+  }
+
+  function go(screen) {
+    $$(".screen").forEach((s) => s.classList.toggle("on", s.dataset.screen === screen));
+    $("#side-home").classList.toggle("on", screen === "home");
+    $("#side-case-wrap").style.display = screen === "home" ? "none" : "block";
+    const idx = ORDER.indexOf(screen);
+    $$(".side-step").forEach((el) => {
+      const i = ORDER.indexOf(el.dataset.go);
+      el.classList.toggle("on", el.dataset.go === screen);
+      el.classList.toggle("done", i > -1 && idx > -1 && i < idx);
+      const num = $(".side-num", el);
+      if (i > -1) num.textContent = i < idx ? "✓" : i + 1;
+    });
+    window.scrollTo(0, 0);
+  }
+
+  function setUploaded(on) {
+    document.body.classList.toggle("uploaded", on);
+    setCaseName();
+  }
+
+  function updateSum() {
+    const total = $$(".rowc").filter((c) => c.checked).reduce((s, c) => s + Number(c.dataset.v), 0);
+    $("#sum-dkk").textContent = `${fmt(total)} DKK`;
+    $("#sum-eur").textContent = `≈ ${fmt(total / 7.46)} EUR`;
+  }
+
+  $$("[data-go]").forEach((el) =>
+    el.addEventListener("click", () => {
+      if (el.hasAttribute("data-returning")) {
+        setUploaded(true);
+        setHome("returning");
+      }
+      go(el.dataset.go);
+    })
+  );
+  $$("[data-start]").forEach((el) =>
+    el.addEventListener("click", () => {
+      setUploaded(false);
+      go("overview");
+    })
+  );
+  $$("#home-toggle button").forEach((b) =>
+    b.addEventListener("click", () => {
+      setHome(b.dataset.home);
+      go("home");
+    })
+  );
+  $("#neu-toggle").addEventListener("change", (e) => document.body.classList.toggle("show-neu", e.target.checked));
+
+  $("#dropzone").addEventListener("click", () => setUploaded(true));
+  $$(".rowc").forEach((c) => c.addEventListener("change", updateSum));
+  $("#confirm-all").addEventListener("change", (e) => ($("#upload-next").disabled = !e.target.checked));
+
+  $("#iban").addEventListener("input", (e) => {
+    $("#bank-derived").style.display = e.target.value.replace(/\s/g, "").length >= 6 ? "block" : "none";
+  });
+  $$("input.need").forEach((inp) =>
+    inp.addEventListener("input", () => {
+      inp.classList.toggle("need", !inp.value.trim());
+      inp.classList.toggle("filled", Boolean(inp.value.trim()));
+      const open = $$("input.need").length;
+      $("#open-count").textContent = open ? `${open} ${open === 1 ? "Angabe" : "Angaben"}` : "alles vollständig ✓";
+    })
+  );
+
+  $$("#tabs .tab").forEach((t) =>
+    t.addEventListener("click", () => {
+      $$("#tabs .tab").forEach((x) => x.classList.toggle("on", x === t));
+      $$(".tabpane").forEach((p) => p.classList.toggle("on", p.dataset.pane === t.dataset.tab));
+    })
+  );
+  $$(".copy").forEach((b) =>
+    b.addEventListener("click", () => {
+      $("input", b.closest(".crow")).checked = true;
+      b.textContent = "✓";
+      setTimeout(() => (b.textContent = "⧉"), 900);
+    })
+  );
+  $$("#way-toggle button").forEach((b) =>
+    b.addEventListener("click", () => {
+      $$("#way-toggle button").forEach((x) => x.classList.toggle("on", x === b));
+      $$(".way").forEach((p) => p.classList.toggle("on", p.dataset.wayPane === b.dataset.way));
+    })
+  );
+  // Portal als eigenes Fenster auf der rechten Bildschirmhälfte
+  $("#open-portal").addEventListener("click", () => {
+    const w = Math.round(screen.availWidth / 2);
+    window.open("https://udbytterefusion.skat.dk/SelfService/submission/submit/Skattestyrelsen", "skat", `popup,width=${w},height=${screen.availHeight},left=${w},top=0`);
+  });
+  $("#finish-btn").addEventListener("click", () => document.body.classList.add("submitted"));
+</script>
+</body>
+</html>

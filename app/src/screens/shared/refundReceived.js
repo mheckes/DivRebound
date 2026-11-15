@@ -44,7 +44,7 @@ export function refundReceivedHtml(reclaimCase, { headerHtml, navHtml, expected 
     <div class="ch-page">
     ${headerHtml}
     <p class="ch-lead"><b>Optional:</b> Halte fest, ob und wann die Erstattung angekommen ist und wie hoch sie war. Die Angaben fließen in deine Statistik ein.</p>
-    ${submitted ? "" : `<div class="info-banner"><span class="icon">ℹ</span><div>Dieser DivRebound ist noch nicht als eingereicht markiert. Du kannst die Angaben trotzdem schon eintragen.</div></div>`}
+    ${submitted ? "" : `<div class="info-banner"><span class="icon">ℹ</span><div>Dieser Antrag ist noch nicht als eingereicht markiert. Du kannst die Angaben trotzdem schon eintragen.</div></div>`}
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Erstattung</span><span class="ch-head-sub">optional</span></div>
@@ -68,7 +68,7 @@ export function refundReceivedHtml(reclaimCase, { headerHtml, navHtml, expected 
 
     ${pausePanelHtml(reclaimCase, r.received ? "done" : "payout")}
 
-    ${navHtml}
+    <div class="ch-step-nav"><a class="btn-secondary" href="#/home">← Zur Übersicht</a><span></span></div>
     </div>`;
 }
 

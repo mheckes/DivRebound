@@ -22,7 +22,7 @@ export function mount(container, params) {
   if (!reclaimCase || reclaimCase.targetCountry !== "SE" || !profile) {
     container.innerHTML = `
       <div class="content-header"><h1 class="content-title">DivRebound Schweden</h1></div>
-      <div class="info-banner"><span class="icon">ℹ</span><div>Dieser Fall wurde nicht gefunden.</div></div>`;
+      <div class="info-banner"><span class="icon">ℹ</span><div>Dieser Antrag wurde nicht gefunden.</div></div>`;
     return;
   }
   reclaimCase.se = { ...createSwedishCaseData(), ...reclaimCase.se };

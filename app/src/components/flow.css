@@ -1,0 +1,167 @@
+/* Bausteine des Ablaufs (components/flow.js): Phasen, Flaggen, Wege zum
+   Finanzamt, Pause - nach Mock Up Ablauf 11-2026. */
+
+/* ---------- Phasen ---------- */
+#divrebound-app .phases {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) 0.85fr;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+#divrebound-app .phase {
+  padding: 16px 18px;
+  border-right: 1px solid var(--divider);
+}
+#divrebound-app .phase:last-child {
+  border-right: 0;
+  background: var(--navy-light);
+}
+#divrebound-app .phase-n {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+#divrebound-app .phase-money .phase-n,
+#divrebound-app .phase.past .phase-n {
+  background: var(--success);
+}
+#divrebound-app .phase.now {
+  box-shadow: inset 0 3px 0 var(--cyan);
+}
+#divrebound-app .phase-title {
+  font-weight: 700;
+  font-size: 15px;
+  margin: 8px 0 2px;
+}
+#divrebound-app .phase-time {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--cyan-dark);
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+#divrebound-app .phase p {
+  margin: 0;
+  color: #3b4a60;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+/* ---------- Flaggen (CSS statt Emoji: Windows zeigt Flaggen-Emoji nicht) ---------- */
+#divrebound-app .flag {
+  display: inline-block;
+  width: 22px;
+  height: 15px;
+  border-radius: 3px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  box-shadow: 0 0 0 1px rgba(15, 34, 64, 0.12);
+  flex-shrink: 0;
+}
+#divrebound-app .flag-dk {
+  background: linear-gradient(#fff, #fff) 0 50% / 100% 3px no-repeat, linear-gradient(#fff, #fff) 32% 0 / 3px 100% no-repeat, #c8102e;
+}
+#divrebound-app .flag-se {
+  background: linear-gradient(#fecc02, #fecc02) 0 50% / 100% 3px no-repeat, linear-gradient(#fecc02, #fecc02) 32% 0 / 3px 100% no-repeat, #006aa7;
+}
+#divrebound-app .flag-ch {
+  background: linear-gradient(#fff, #fff) 50% 50% / 11px 3px no-repeat, linear-gradient(#fff, #fff) 50% 50% / 3px 11px no-repeat, #da291c;
+}
+#divrebound-app .flag-it {
+  background: linear-gradient(90deg, #009246 33.3%, #fff 33.3% 66.6%, #ce2b37 66.6%);
+}
+
+/* ---------- Wege zum Finanzamt ---------- */
+#divrebound-app .way {
+  display: none;
+}
+#divrebound-app .way.on {
+  display: block;
+}
+#divrebound-app .way-toggle {
+  display: inline-flex;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-left: auto;
+}
+#divrebound-app .way-toggle button {
+  border: 0;
+  background: #fff;
+  color: var(--muted);
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+#divrebound-app .way-toggle button + button {
+  border-left: 1px solid var(--divider);
+}
+#divrebound-app .way-toggle button.on {
+  background: var(--navy);
+  color: #fff;
+}
+#divrebound-app .way-letter {
+  display: inline-flex;
+  gap: 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+#divrebound-app .way-warning {
+  background: #fff4d6;
+  color: #7a5200;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  margin-bottom: 10px;
+}
+
+/* ---------- Pause ---------- */
+#divrebound-app .wait-box {
+  background: var(--navy-light);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 4px;
+}
+#divrebound-app .wait-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  #divrebound-app .phases {
+    grid-template-columns: 1fr 1fr;
+  }
+  #divrebound-app .phase:nth-child(2) {
+    border-right: 0;
+  }
+  #divrebound-app .phase:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--divider);
+  }
+  #divrebound-app .wait-box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+#divrebound-app a.btn-secondary {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}

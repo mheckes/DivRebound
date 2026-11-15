@@ -15,11 +15,11 @@ import * as caseRepo from "../../db/caseRepo.js";
 import { PROFILE_FIELDS } from "../../util/profileFields.js";
 import { hasInvalidInput } from "../../util/autosave.js";
 import {
-  PROFILE_ITEM, profileRow, isItemFilled, bindChecklistAutosave, AUTOSAVE_ROW,
+  PROFILE_ITEM, isItemFilled, profileCardsHtml, bindChecklistAutosave,
 } from "../../components/checklist.js";
 import { showToast } from "../../components/toast.js";
 import { DK_STEPS, dkStepRoute } from "../../config/caseSteps.js";
-import { feedbackLinkHtml } from "../../components/feedbackModal.js";
+import { stepHeader } from "./dkShared.js";
 
 // Pflichtangaben der Wohnsitzbescheinigung 02.050 (fillResidencyCertificate.js)
 // Bankdaten braucht das SKAT-Formular auf Seite 5 (Name of bank, account holder, BIC, IBAN)
@@ -50,7 +50,7 @@ export async function mount(container) {
   if (!profile || !reclaimCase) {
     container.innerHTML = `
       <div class="content-header"><h1 class="content-title">Fehlende Angaben</h1></div>
-      <div class="info-banner"><span class="icon">⚠</span><div>Kein Fall ausgewählt. Bitte über die Seitenleiste einen Fall auswählen.</div></div>`;
+      <div class="info-banner"><span class="icon">⚠</span><div>Kein Antrag ausgewählt.</div></div>`;
     return;
   }
 
@@ -66,21 +66,19 @@ export async function mount(container) {
 }
 
 function render(container, reclaimCase, profile) {
-  const missing = REQUIRED.filter((k) => !isItemFilled(profile, PROFILE_ITEM[k]));
   const period = reclaimCase.residencePeriod;
   const ongoing = !period.until;
   const derived = !period.fromEdited && Boolean(earliestPaymentDate(reclaimCase.distributions));
 
   container.innerHTML = `
     <div class="ch-page">
-    <div class="content-header">
-      <h1 class="content-title">Fehlende Angaben</h1>
-      <div class="content-breadcrumb">Dänemark <b>›</b> ${escapeHtml(caseLabel(reclaimCase))} <b>›</b> 3 von ${DK_STEPS.length}${feedbackLinkHtml()}</div>
-    </div>
-    <p class="ch-lead">Folgende Daten werden für die weitere Bearbeitung noch benötigt.</p>
+    ${stepHeader(reclaimCase, 3)}
+    <p class="ch-lead">Diese Angaben kommen in die Wohnsitzbescheinigung und ins dänische Online-Formular. Sie werden in deinem Profil gespeichert und sind beim nächsten Antrag schon da.</p>
+
+    ${profileCardsHtml(profile, REQUIRED, ["taxOffice"])}
 
     <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Aus den Abrechnungen abgeleitet – bitte bestätigen</span></div>
+      <div class="card-head"><span class="card-title">Aus deinen Abrechnungen abgeleitet</span><span class="ch-head-sub">bitte kurz prüfen</span></div>
       <div class="card-body">
         <div class="md-period-title">Zeitraum der Ansässigkeit</div>
         <div class="field-hint" style="margin-bottom:12px;">„Von“ ist der früheste Zahltag deiner Ausschüttungen. Die Wohnsitzbescheinigung muss alle Zahltage abdecken.</div>
@@ -97,15 +95,6 @@ function render(container, reclaimCase, profile) {
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Bitte noch ergänzen</span><span class="count-pill">${missing.length ? `${missing.length} offen` : "nichts offen"}</span></div>
-      ${
-        missing.length
-          ? missing.map((k) => profileRow(profile, PROFILE_ITEM[k])).join("") + AUTOSAVE_ROW
-          : `<div class="card-body"><div class="md-all-done">✓ Alle übrigen Angaben sind vollständig. Sie stammen aus deinen persönlichen Daten – <a href="#" data-go-checklist>ansehen oder ändern</a>.</div></div>`
-      }
     </div>
 
     <div class="ch-step-nav">

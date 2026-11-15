@@ -50,7 +50,7 @@ function infoSvg() {
 export function mount(container, reclaimCase, profile) {
   const corridor = corridors.DK;
   const portalBox = {
-    title: "SKAT-Formular",
+    title: "Online-Formular der dänischen Steuerbehörde (SKAT)",
     sub: "kein Login und keine MitID nötig",
     docTitle: "„Refusion af udbytteskat / Claim for refund of Danish dividend tax“",
     text: "Öffne das Formular in einem zweiten Fenster und ordne es neben dieser Seite an. Halte die vom Finanzamt bestätigte Wohnsitzbescheinigung bereit, du lädst sie auf Seite 4 hoch.",
@@ -67,7 +67,7 @@ export function mount(container, reclaimCase, profile) {
     container.innerHTML = `
       <div class="ch-page">
       ${stepHeader(reclaimCase, 5)}
-      <div class="info-banner"><span class="icon">ℹ</span><div>Für diesen Fall ist noch keine Ausschüttung bestätigt – bitte zuerst Schritt 2 abschließen.</div></div>
+      <div class="info-banner"><span class="icon">ℹ</span><div>Für diesen Antrag ist noch keine Ausschüttung ausgewählt. Bitte zuerst Abrechnungen hochladen.</div></div>
       ${stepNavHtml(5)}
       </div>`;
     bindStepNav(container, reclaimCase, 5);
@@ -211,7 +211,7 @@ export function mount(container, reclaimCase, profile) {
         <div class="done-icon">✓</div>
         <div>
           <div class="done-title">Geschafft!</div>
-          <div class="done-sub">Dein Antrag ist vollständig ausgefüllt. Jetzt bei SKAT ausdrucken oder als PDF speichern, auf „Send“ klicken und den DivRebound in Schritt 6 abschließen.</div>
+          <div class="done-sub">Dein Antrag ist vollständig ausgefüllt. Jetzt bei SKAT ausdrucken oder als PDF speichern, weiter mit „Antrag absenden“.</div>
         </div>
       </div>`;
   }
@@ -351,7 +351,7 @@ export function mount(container, reclaimCase, profile) {
       <section class="cheat-section">
       <div class="cheat-section-head">
         <div>
-          <div class="cheat-section-title">Spickzettel</div>
+          <div class="cheat-section-title">Spickzettel für das dänische SKAT-Formular</div>
           <div class="cheat-section-sub">Werte Reiter für Reiter ins SKAT-Formular übertragen. Die Reiter folgen den Seiten des Formulars.</div>
         </div>
         <div class="progress-wrap">

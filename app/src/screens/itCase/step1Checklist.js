@@ -1,61 +1,29 @@
-// Italien, Schritt 1 "Unterlagen prüfen" - gleicher Baustein wie Dänemark und
-// Schweiz (components/checklist.js). Profilfelder direkt bearbeitbar und
-// automatisch gespeichert.
+// Italien, Überblick "So läuft es ab" (#/it/:caseId/1) - gemeinsamer Baustein
+// screens/shared/overview.js. REQUIRED_ITEMS: Pflichtangaben für das Formular
+// „Form A“, abgefragt im Schritt "Deine Angaben" (step3MissingData.js).
 
-import {
-  PROFILE_ITEM, profileRow, optionalProfileRow, textRow, updateChecklistSummary, bindChecklistAutosave, AUTOSAVE_ROW,
-} from "../../components/checklist.js";
-import { isRefundable } from "../../lib/italy.js";
+import { renderOverview } from "../shared/overview.js";
 import { stepHeader, stepNavHtml, bindStepNav } from "./itShared.js";
 
-// Pflichtangaben für Form A (lib/fillFormA.js)
 export const REQUIRED_ITEMS = ["name", "address", "birthDate", "birthPlace", "tin", "taxNumber", "taxOffice", "bankName", "bank", "bic"];
 
 export function mount(container, reclaimCase, profile) {
-  const found = reclaimCase.distributions.filter((d) => isRefundable(d)).length;
-
-  container.innerHTML = `
-    <div class="ch-page">
-    ${stepHeader(reclaimCase, 1)}
-    <p class="ch-lead">Die Erstattung der italienischen Quellensteuer läuft komplett auf Papier. DivRebound füllt für jedes italienische Unternehmen das offizielle Formular „Form A“ aus. Dein Finanzamt bestätigt es, danach schickst du es per Post nach Italien.</p>
-
-    <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Checkliste</span><span class="count-pill" data-summary></span></div>
-
-      <div class="ch-check-group">Formular</div>
-      ${textRow("ok", "Form A", "DivRebound füllt das Papierformular der „Agenzia delle Entrate“ für dich aus.")}
-
-      <div class="ch-check-group">Persönliche Daten</div>
-      ${REQUIRED_ITEMS.map((k) => profileRow(profile, PROFILE_ITEM[k])).join("")}
-      ${optionalProfileRow(profile, PROFILE_ITEM.bankAddress)}
-      ${AUTOSAVE_ROW}
-
-      <div class="ch-check-group">Aus deinen Dividendenabrechnungen</div>
-      ${
-        found
-          ? textRow("ok", "Dividendenabrechnungen", `${found} Ausschüttung${found === 1 ? "" : "en"} erfasst.`, `<span class="badge badge-extracted">Schritt 2</span>`)
-          : textRow("later", "Dividendenabrechnungen", "Je eine pro Ausschüttung einer italienischen Aktie (ISIN beginnt mit IT), Zahltag höchstens 48 Monate zurück.", `<span class="badge badge-extracted">Schritt 2</span>`)
-      }
-    </div>
-
-    <div class="ch-two-col">
-      <div class="card"><div class="card-head"><span class="card-title">Das übernimmt DivRebound</span></div><div class="card-body"><ul class="ch-list">
-        <li>Abrechnungen auslesen, Steuersatz prüfen</li>
-        <li>Formular „Form A“ ausfüllen (eines pro Unternehmen)</li>
-        <li>Anschreiben ans Finanzamt</li>
-        <li>Begleitschreiben nach Italien (Englisch)</li>
-      </ul></div></div>
-      <div class="card"><div class="card-head"><span class="card-title">Das machst du selbst</span></div><div class="card-body"><ul class="ch-list">
-        <li>Formular „Form A“ ausdrucken und zweimal unterschreiben</li>
-        <li>Per Post ans Finanzamt schicken</li>
-        <li>Bestätigtes Formular „Form A“ mit Kopien der Abrechnungen nach Italien senden</li>
-      </ul></div></div>
-    </div>
-
-    ${stepNavHtml(1)}
-    </div>`;
-
-  updateChecklistSummary(container);
+  renderOverview(container, profile, {
+    country: "IT",
+    headerHtml: stepHeader(reclaimCase, 1),
+    navHtml: stepNavHtml(1, { nextLabel: "Los geht's: Abrechnungen hochladen" }),
+    does: [
+      "Abrechnungen auslesen, Steuersatz prüfen",
+      "Formular „Form A“ ausfüllen (eines pro Unternehmen)",
+      "Anschreiben ans Finanzamt",
+      "Begleitschreiben nach Italien (Englisch)",
+    ],
+    youDo: [
+      "Formular „Form A“ ausdrucken und zweimal unterschreiben",
+      "An dein deutsches Finanzamt schicken",
+      "Bestätigtes Formular mit Kopien der Abrechnungen per Post nach Italien senden",
+    ],
+    prepare: ["<b>Dividendenabrechnungen</b> deiner italienischen Aktien als PDF (ISIN beginnt mit IT), Zahltag höchstens 48 Monate zurück"],
+  });
   bindStepNav(container, reclaimCase, 1);
-  return bindChecklistAutosave(container);
 }

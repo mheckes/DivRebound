@@ -8,27 +8,19 @@ import { getState } from "../../store/store.js";
 import { PROFILE_FIELDS } from "../../util/profileFields.js";
 import { hasInvalidInput } from "../../util/autosave.js";
 import {
-  PROFILE_ITEM, profileRow, optionalProfileRow, isItemFilled, bindChecklistAutosave, AUTOSAVE_ROW,
+  PROFILE_ITEM, profileRow, optionalProfileRow, isItemFilled, profileCardsHtml, bindChecklistAutosave, AUTOSAVE_ROW,
 } from "../../components/checklist.js";
 import { REQUIRED_ITEMS } from "./step1Checklist.js";
 import { stepHeader, stepNavHtml, bindStepNav, goToStep } from "./seShared.js";
 
 function render(container, reclaimCase, profile) {
-  const missing = REQUIRED_ITEMS.filter((k) => !isItemFilled(profile, PROFILE_ITEM[k]));
 
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 3)}
-    <p class="ch-lead">Hier steht nur noch, was nach dem Einlesen deiner Dividendenabrechnungen offen ist.</p>
+    <p class="ch-lead">Diese Angaben kommen ins Formular. Sie werden in deinem Profil gespeichert und sind beim nächsten Antrag schon da.</p>
 
-    <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Bitte noch ergänzen</span><span class="count-pill">${missing.length ? `${missing.length} offen` : "nichts offen"}</span></div>
-      ${
-        missing.length
-          ? missing.map((k) => profileRow(profile, PROFILE_ITEM[k])).join("") + AUTOSAVE_ROW
-          : `<div class="card-body"><div class="md-all-done">✓ Alle Pflichtangaben für das Formular „SKV 3740“ sind vollständig. Sie stammen aus deinen persönlichen Daten – <a href="#" data-go-checklist>ansehen oder ändern</a>.</div></div>`
-      }
-    </div>
+    ${profileCardsHtml(profile, REQUIRED_ITEMS)}
 
     <div class="card">
       <div class="card-head"><span class="card-title">Optional</span><span class="ch-head-sub">blockiert nicht – Weiter geht auch ohne</span></div>

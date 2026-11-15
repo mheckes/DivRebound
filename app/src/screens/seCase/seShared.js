@@ -9,7 +9,8 @@ import { statusTimelineHtml, bindStatusTimeline, timelineTitle } from "../../com
 import { refundReceived } from "../../util/caseProgress.js";
 import { formatNumberDe } from "../../util/format.js";
 import { isEligible, formsFor, yearsOf, totalRefund, corridor } from "../../lib/sweden.js";
-import { feedbackLinkHtml } from "../../components/feedbackModal.js";
+import { caseName } from "../../util/caseName.js";
+import * as frame from "../shared/stepFrame.js";
 
 export { corridor };
 // Nur zur Anzeige einer groben EUR-Näherung - keine externe FX-Anbindung im MVP
@@ -19,10 +20,7 @@ export function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 }
 
-export function caseLabel(reclaimCase) {
-  const d = new Date(reclaimCase.createdAt);
-  return `DivRebound ${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
-}
+export const caseLabel = caseName;
 
 export const formatSekDe = (value) => `${formatNumberDe(value ?? 0)} SEK`;
 export const approxEur = (sek) => `≈ ${formatNumberDe(sek / APPROX_EUR_SEK_RATE)} EUR`;
@@ -52,21 +50,12 @@ export function yearRangeLabel(years) {
 }
 
 export function stepHeader(reclaimCase, n) {
-  const step = SE_STEPS.find((s) => s.n === n);
-  return `
-    <div class="content-header">
-      <h1 class="content-title">${esc(step.title)}</h1>
-      <div class="content-breadcrumb">Schweden <b>›</b> ${esc(caseLabel(reclaimCase))} <b>›</b> ${n} von ${SE_STEPS.length}${feedbackLinkHtml()}</div>
-    </div>`;
+  return frame.stepHeaderHtml(SE_STEPS, reclaimCase, n);
 }
 
-export function stepNavHtml(n, { nextDisabled = false } = {}) {
-  const next = SE_STEPS.find((s) => s.n === n + 1);
-  return `
-    <div class="ch-step-nav">
-      ${n > 1 ? `<button class="btn-secondary" data-step-back type="button">← Zurück</button>` : "<span></span>"}
-      ${next ? `<button class="btn-primary" data-step-next type="button" ${nextDisabled ? "disabled" : ""}>Weiter: ${esc(next.title)} →</button>` : ""}
-    </div>`;
+/** @param {{ nextDisabled?: boolean, nextLabel?: string }} [options] */
+export function stepNavHtml(n, options) {
+  return frame.stepNavHtml(SE_STEPS, n, options);
 }
 
 export async function markStepDone(reclaimCase, n) {
@@ -82,10 +71,9 @@ export function goToStep(reclaimCase, n) {
 }
 
 export function bindStepNav(container, reclaimCase, n) {
-  container.querySelector("[data-step-back]")?.addEventListener("click", () => goToStep(reclaimCase, n - 1));
-  container.querySelector("[data-step-next]")?.addEventListener("click", async () => {
-    await markStepDone(reclaimCase, n);
-    goToStep(reclaimCase, n + 1);
+  frame.bindStepNav(container, SE_STEPS, n, {
+    go: (target) => navigate(seStepRoute(reclaimCase.caseId, target)),
+    markDone: (step) => markStepDone(reclaimCase, step),
   });
 }
 

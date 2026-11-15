@@ -177,7 +177,7 @@ const UPLOAD_STATUS = {
   voucher: '<span class="badge badge-confirmed">Tax Voucher zugeordnet</span>',
   statement: '<span class="badge badge-confirmed">Dividendenabrechnung übernommen</span>',
   duplicate: '<span class="badge badge-extracted">bereits erfasst – übersprungen</span>',
-  trade: '<span class="badge badge-dupe">Wertpapierabrechnung – bitte in Schritt 2 erfassen</span>',
+  trade: '<span class="badge badge-dupe">Wertpapierabrechnung – bitte im Wertpapierbestand erfassen</span>',
   notSwiss: '<span class="badge badge-danger">keine Schweizer Aktie</span>',
   unknown: '<span class="badge badge-danger">nicht erkannt</span>',
   error: '<span class="badge badge-danger">Fehler beim Lesen</span>',
@@ -273,7 +273,7 @@ function render(container, reclaimCase) {
     <details class="help-disclosure">
       <summary>Warum mehrere Tax Voucher für eine Dividende? Was ist der Stichtag?</summary>
       <div class="help-disclosure-body">
-        <p>Manche Banken stellen für eine Dividende mehrere Voucher aus (z.B. 20 und 5 Stück). Entscheidend ist, dass die <b>Summe</b> dem Bestand am Stichtag entspricht. Weicht sie ab, fehlt entweder ein Voucher oder eine Kauf-/Verkaufsabrechnung in Schritt 2.</p>
+        <p>Manche Banken stellen für eine Dividende mehrere Voucher aus (z.B. 20 und 5 Stück). Entscheidend ist, dass die <b>Summe</b> dem Bestand am Stichtag entspricht. Weicht sie ab, fehlt entweder ein Voucher oder eine Kauf-/Verkaufsabrechnung im Wertpapierbestand.</p>
         <p><b>Stichtag:</b> Anspruch hat, wer die Aktie am Ende des Handelstags vor dem Ex-Tag hält. DivRebound benötigt den Stichtag nur, um den Bestand an diesem Tag zu berechnen. Er wird aus der Dividendenabrechnung übernommen oder geschätzt und nur dann zur Prüfung angezeigt, wenn du kurz vor der Fälligkeit gekauft oder verkauft hast.</p>
       </div>
     </details>
@@ -292,7 +292,7 @@ function distributionRow(d, result, isinNames) {
   let check = '<span class="badge badge-extracted">Angaben fehlen</span>';
   if (barred) check = '<span class="badge badge-danger">verjährt</span>';
   else if (!incomplete && result) {
-    if (result.oversold) check = '<span class="badge badge-danger">Käufe fehlen (Schritt 2)</span>';
+    if (result.oversold) check = '<span class="badge badge-danger">Käufe fehlen (Wertpapierbestand)</span>';
     else if (!d.vouchers.length) check = '<span class="badge badge-warn">Tax Voucher fehlt</span>';
     else if (result.voucherMatches) check = `<span class="badge badge-confirmed">${d.vouchers.length > 1 ? `${d.vouchers.map((v) => v.quantity).join(" + ")} = ` : ""}${sum} ✓</span>`;
     else check = `<span class="badge badge-danger">Voucher ${sum} ≠ Bestand ${result.heldQuantity}</span>`;

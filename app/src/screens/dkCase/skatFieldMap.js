@@ -225,7 +225,7 @@ const page4Rows = [
       const doc = (reclaimCase.generatedDocuments ?? []).find((d) => d.type === "residency_certificate");
       return doc
         ? val(doc.fileName, doc.fileName)
-        : val("Noch nicht erzeugt – siehe Schritt 4", "", true);
+        : val("Noch nicht erzeugt – siehe „Deutsches Finanzamt“", "", true);
     },
   },
   {
@@ -455,7 +455,7 @@ export function buildSharePages(distributions, corridor, residenceCountryCode) {
       {
         id: `${id}-doc`,
         labelEn: "Documentation for dividend received and tax withheld",
-        hint: "Hier die Dividendenabrechnung dieser Ausschüttung hochladen (dieselbe Datei wie in Schritt 2)",
+        hint: "Hier die Dividendenabrechnung dieser Ausschüttung hochladen (dieselbe Datei wie beim Hochladen der Abrechnungen)",
         noCopy: true,
         resolve: () => val(statementName),
       },

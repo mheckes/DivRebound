@@ -11,7 +11,7 @@ import * as profileRepo from "../../db/profileRepo.js";
 import { PROFILE_FIELDS } from "../../util/profileFields.js";
 import { hasInvalidInput } from "../../util/autosave.js";
 import {
-  PROFILE_ITEM, profileRow, optionalProfileRow, checklistRow, isItemFilled, bindChecklistAutosave, AUTOSAVE_ROW,
+  PROFILE_ITEM, profileRow, optionalProfileRow, checklistRow, isItemFilled, profileCardsHtml, bindChecklistAutosave, AUTOSAVE_ROW,
 } from "../../components/checklist.js";
 import { showToast } from "../../components/toast.js";
 import { groupByIssuer, issuerDetails, isEligible } from "../../lib/italy.js";
@@ -42,22 +42,14 @@ function issuerRow(group, profile) {
 }
 
 function render(container, reclaimCase, profile) {
-  const missing = REQUIRED_ITEMS.filter((k) => !isItemFilled(profile, PROFILE_ITEM[k]));
   const groups = groupByIssuer(reclaimCase.distributions.filter((d) => isEligible(d)));
 
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 3)}
-    <p class="ch-lead">Hier steht nur noch, was nach dem Einlesen deiner Dividendenabrechnungen offen ist.</p>
+    <p class="ch-lead">Diese Angaben kommen ins Formular. Sie werden in deinem Profil gespeichert und sind beim nächsten Antrag schon da.</p>
 
-    <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Bitte noch ergänzen</span><span class="count-pill">${missing.length ? `${missing.length} offen` : "nichts offen"}</span></div>
-      ${
-        missing.length
-          ? missing.map((k) => profileRow(profile, PROFILE_ITEM[k])).join("") + AUTOSAVE_ROW
-          : `<div class="card-body"><div class="md-all-done">✓ Alle Pflichtangaben für das Formular „Form A“ sind vollständig. Sie stammen aus deinen persönlichen Daten – <a href="#" data-go-checklist>ansehen oder ändern</a>.</div></div>`
-      }
-    </div>
+    ${profileCardsHtml(profile, REQUIRED_ITEMS)}
 
     <div class="card">
       <div class="card-head"><span class="card-title">Optional</span><span class="ch-head-sub">blockiert nicht – Weiter geht auch ohne</span></div>

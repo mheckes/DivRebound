@@ -17,6 +17,7 @@ import "./screens/shared/dividendUpload.css";
 import "./screens/shared/refundReceived.css";
 import "./components/statusTimeline.css";
 import "./components/smallScreenNotice.css";
+import "./components/flow.css";
 
 import * as pdfjsLib from "pdfjs-dist";
 // Muss vor dem ersten parseDividendCertificate()-Aufruf gesetzt sein, sonst
@@ -135,7 +136,7 @@ async function bootstrap() {
 
   // Der Nutzer-Flow soll bei jedem (Neu-)Laden der App immer mit der
   // Startseite beginnen, auch ohne vorhandenes Profil (Profil+erster Fall
-  // werden über den Popup-Dialog in components/newCaseWizard.js angelegt,
+  // werden über die Länderkacheln der Startseite angelegt (util/startCase.js),
   // ausgelöst von der "Neuer DivRebound"-Kachel auf der Startseite) - bewusst
   // unabhängig vom aktuellen location.hash, nicht nur wenn dieser leer ist.
   window.location.hash = "#/home";

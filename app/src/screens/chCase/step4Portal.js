@@ -72,7 +72,7 @@ function row(reclaimCase, id, label, value, { hint, assumption } = {}) {
     return `
       <div class="row">
         <input type="checkbox" disabled>
-        <div class="row-label">${esc(label)}<span class="en">fehlt – <a href="#" data-go-step="1">in Schritt 1 ergänzen</a></span></div>
+        <div class="row-label">${esc(label)}<span class="en">fehlt – <a href="#" data-go-step="8">in „Deine Angaben“ ergänzen</a></span></div>
         <span class="badge badge-danger">fehlt</span>
         <span></span>
       </div>`;
@@ -155,9 +155,9 @@ function renderAssets(reclaimCase, results, years) {
   const mismatch = results.filter((r) => r.voucherMatches === false || r.oversold);
   if (mismatch.length) warnings.push("Bei mindestens einer Dividende passen Tax Voucher und Bestand nicht zusammen.");
   let html = warnings.length
-    ? `<div class="ch-pane-warning">⚠ ${warnings.join(" ")} <a href="#" data-go-step="3">Schritt 3 prüfen</a></div>`
+    ? `<div class="ch-pane-warning">⚠ ${warnings.join(" ")} <a href="#" data-go-step="3">Dividenden &amp; Tax Voucher prüfen</a></div>`
     : "";
-  if (results.length === 0) return html + `<div class="ch-pane-empty">Noch keine vollständigen Dividenden erfasst – bitte zuerst Schritt 3 abschließen.</div>`;
+  if (results.length === 0) return html + `<div class="ch-pane-empty">Noch keine vollständigen Dividenden erfasst – bitte zuerst Dividenden und Tax Voucher erfassen.</div>`;
   html += `<div class="ch-pane-note ch-pane-note-top">Jede Zeile ist ein Formular <b>„Neuer Vermögenswert – Wertpapier“</b> im Portal. Valoren-Nr., Name, Sitz und Titelart füllt das Portal nach der ISIN selbst aus. Der Betrag rechts sollte dem <b>„Berechneten Rückerstattungs-Betrag“</b> entsprechen.</div>`;
 
   let total = 0;
@@ -205,7 +205,7 @@ function renderReview(results, years) {
         <span class="pc-result" data-plausi-result></span>
       </div>
     </div>
-    <div class="ch-pane-note">Stimmt alles? Dann im Portal auf <b>„Erstellen“</b> klicken und den Antrag als PDF speichern – weiter mit <a href="#" data-go-step="5">Schritt 5: Formular &amp; Finanzamt</a>.</div>`;
+    <div class="ch-pane-note">Stimmt alles? Dann im Portal auf <b>„Erstellen“</b> klicken und den Antrag als PDF speichern – weiter mit <a href="#" data-go-step="5">„Deutsches Finanzamt“</a>.</div>`;
 }
 
 function render(container, reclaimCase) {
@@ -241,7 +241,7 @@ function render(container, reclaimCase) {
     <section class="cheat-section">
     <div class="cheat-section-head">
       <div>
-        <div class="cheat-section-title">Spickzettel</div>
+        <div class="cheat-section-title">Spickzettel für das ePortal der Schweizer Steuerverwaltung</div>
         <div class="cheat-section-sub">Werte Reiter für Reiter ins ePortal übertragen. Die Reiter folgen der Reihenfolge im Portal.</div>
       </div>
     </div>

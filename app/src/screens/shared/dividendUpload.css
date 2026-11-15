@@ -80,3 +80,16 @@
 #divrebound-app .du-help .du-help-body b {
   color: var(--charcoal);
 }
+
+/* Sammelbestätigung statt Haken pro Zeile */
+#divrebound-app .du-confirm-all {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+#divrebound-app .du-confirm-all input {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}

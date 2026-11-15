@@ -102,14 +102,19 @@ export function mountDividendUpload(container, reclaimCase, options) {
 
       const candidate = { ...result.distribution, sourceFile: file.name, distributionId: crypto.randomUUID() };
       if (isDuplicateDistribution(candidate, reclaimCase.distributions)) {
-        issues.push({ kind: "rejected", fileName: file.name, reason: "Bereits in diesem Fall erfasst (gleiche ISIN, Zahltag und Betrag).", isin: candidate.isin });
+        issues.push({ kind: "rejected", fileName: file.name, reason: "Bereits in diesem Antrag erfasst (gleiche ISIN, Zahltag und Betrag).", isin: candidate.isin });
         continue;
       }
       if (isDuplicateDistribution(candidate, otherDistributions)) {
-        issues.push({ kind: "dupe", fileName: file.name, reason: "Gleiche ISIN, Zahltag und Betrag bereits in einem anderen Fall erfasst. Bitte prüfen, ob diese Abrechnung schon eingereicht wurde.", isin: candidate.isin });
+        issues.push({ kind: "dupe", fileName: file.name, reason: "Gleiche ISIN, Zahltag und Betrag bereits in einem anderen Antrag erfasst. Bitte prüfen, ob diese Abrechnung schon eingereicht wurde.", isin: candidate.isin });
         candidate.isDuplicateOfOtherCase = true;
       }
+      // Regelfall (voller Quellensteuersatz, kein Verdacht auf Doppelantrag) ist
+      // gleich ausgewählt - einzeln ansehen muss der Nutzer nur Auffälliges.
+      if (!candidate.isDuplicateOfOtherCase && kindOf(candidate).kind === "ok") candidate.extractionConfidence = "user_confirmed";
       reclaimCase.distributions.push(candidate);
+      // Neue Abrechnungen: Sammelbestätigung ("Beträge verglichen") erneut einholen
+      reclaimCase.amountsChecked = false;
     }
 
     if (profileChanged) {
@@ -133,7 +138,7 @@ export function mountDividendUpload(container, reclaimCase, options) {
         <summary>
           <svg class="icon chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
           <span class="issues-icon">⚠</span>
-          <span>${issues.length} Hinweis(e) zu deinen Dateien</span>
+          <span>${issues.length} ${issues.length === 1 ? "Hinweis" : "Hinweise"} zu deinen Dateien</span>
           <span class="issues-sub">${rejected} nicht übernommen · ${issues.length - rejected} ggf. bereits beantragt</span>
         </summary>
         <div class="issues-body">
@@ -155,9 +160,9 @@ export function mountDividendUpload(container, reclaimCase, options) {
     let badge;
     if (!refundable) badge = `<span class="badge badge-extracted">${c.kind === "expired" ? "verjährt" : c.kind === "invalid" ? "Werte fehlen" : "nichts zu erstatten"}</span>`;
     else if (d.isDuplicateOfOtherCase) badge = `<span class="badge badge-dupe">⚠ bereits beantragt?</span>`;
-    else if (confirmed) badge = `<span class="badge badge-confirmed">bestätigt</span>`;
+    else if (confirmed) badge = `<span class="badge badge-confirmed">✓ wird beantragt</span>`;
     else if (c.kind !== "ok") badge = `<span class="badge du-badge-warn">⚠ Satz prüfen</span>`;
-    else badge = `<span class="badge badge-extracted">automatisch erkannt</span>`;
+    else badge = `<span class="badge badge-extracted">nicht ausgewählt</span>`;
 
     const notes = [c.kind === "partial" && confirmed ? R.partialConfirmed : R[c.kind]];
     if (c.rateMismatch) notes.push(`Ausgewiesen sind ${formatNumberDe(d.withholdingRatePercent, 0)} %, der Betrag entspricht aber ${pct(c.effectiveRate)} – maßgeblich ist der Betrag.`);
@@ -281,8 +286,11 @@ export function mountDividendUpload(container, reclaimCase, options) {
       </details>
 
       <div class="bottom-bar">
-        <div class="progress-text"><b>${eligible.length}</b> von <b>${refundable.length}</b> Ausschüttungen bestätigt <span style="opacity:.75;">— nicht ausgewählte Ausschüttungen werden vorerst nicht eingereicht.</span></div>
-        <button class="next-btn" id="next-btn" type="button" ${eligible.length ? "" : "disabled"}>Weiter →</button>
+        <label class="progress-text du-confirm-all">
+          <input type="checkbox" id="amounts-checked" ${reclaimCase.amountsChecked ? "checked" : ""} ${eligible.length ? "" : "disabled"}>
+          <span><b>${eligible.length}</b> von <b>${refundable.length}</b> Ausschüttungen ausgewählt. Ich habe die Beträge mit meinen Abrechnungen verglichen.</span>
+        </label>
+        <button class="next-btn" id="next-btn" type="button" ${eligible.length && reclaimCase.amountsChecked ? "" : "disabled"}>Weiter: Deine Angaben →</button>
       </div>`;
 
     attachListeners();
@@ -343,6 +351,11 @@ export function mountDividendUpload(container, reclaimCase, options) {
       });
     });
 
+    container.querySelector("#amounts-checked").addEventListener("change", async (e) => {
+      reclaimCase.amountsChecked = e.target.checked;
+      await options.save(reclaimCase);
+      container.querySelector("#next-btn").disabled = !e.target.checked;
+    });
     container.querySelector("#next-btn").addEventListener("click", () => options.onNext());
   }
 

@@ -36,12 +36,10 @@ function render(container, reclaimCase, transactions) {
     ${stepHeader(reclaimCase, 6)}
     <p class="ch-lead">Der vom deutschen Finanzamt bestätigte Antrag wird im ePortal hochgeladen. Erst danach prüft die Eidgenössische Steuerverwaltung deinen Antrag und überweist die Erstattung.</p>
 
-    ${statusTimelineHtml({ title: timelineTitle(reclaimCase, total), steps: CH_TIMELINE, doneCount: chTimelineDone(reclaimCase) })}
-
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Bestätigten Antrag hochladen</span></div>
       <div class="card-body">
-        ${UPLOAD_CHECKS.map(([id, text]) => `<label class="ch-step-row"><input type="checkbox" data-upload-check="${id}" ${checks.has(id) ? "checked" : ""} ${completed ? "disabled" : ""}><span>${text}</span></label>`).join("")}
+        ${UPLOAD_CHECKS.map(([, text], i) => `<div class="ch-next"><span class="ch-next-num">${i + 1}</span><span>${text}</span></div>`).join("")}
         <div class="ch-inline-actions">
           <a class="btn-accent btn-small" href="${corridor.onlinePortalUrl}" target="_blank" rel="noopener">ePortal öffnen ↗</a>
         </div>
@@ -49,27 +47,29 @@ function render(container, reclaimCase, transactions) {
     </div>
 
     <div class="card">
-      <div class="card-head head-navy"><span class="card-title">DivRebound abschließen</span></div>
+      <div class="card-head head-navy"><span class="card-title">Antrag einreichen</span></div>
       <div class="card-body">
         ${
           completed
             ? `<div class="done-banner ch-done-banner">
                 <div class="done-icon">✓</div>
                 <div>
-                  <div class="done-title">DivRebound abgeschlossen</div>
+                  <div class="done-title">Antrag eingereicht</div>
                   <div class="done-sub">Hochgeladen am ${esc(formatDateDe(reclaimCase.ch.completedAt.slice(0, 10)))}. Die Eidgenössische Steuerverwaltung prüft jetzt deinen Antrag. Die Auszahlung dauert erfahrungsgemäß einige Wochen.</div>
                 </div>
               </div>
-              <p class="ch-text">Wenn die Erstattung da ist, kannst du sie in Schritt 7 festhalten (optional).</p>`
-            : `<button class="btn-primary" data-action="finish" ${allChecked ? "" : "disabled"} type="button">✓ Eingereicht – DivRebound abschließen</button>
-              ${allChecked ? "" : `<div class="field-hint" style="margin-top:6px;">Bitte zuerst alle Punkte oben abhaken.</div>`}`
+              <p class="ch-text">Auf der Übersicht fragen wir dich, ob das Geld da ist.</p>`
+            : `<button class="btn-primary" data-action="finish" type="button">✓ Antrag ist eingereicht</button>`
         }
       </div>
     </div>
 
     ${completed ? pausePanelHtml(reclaimCase, "payout") : ""}
 
-    ${stepNavHtml(6)}
+    <div class="ch-step-nav">
+      <button class="btn-secondary" data-step-back type="button">← Zurück</button>
+      <a class="btn-secondary" href="#/home">Zur Übersicht</a>
+    </div>
     </div>`;
 
   bindStepNav(container, reclaimCase, 6);

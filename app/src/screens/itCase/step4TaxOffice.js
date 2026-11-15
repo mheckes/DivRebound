@@ -3,6 +3,7 @@
 // Vorschau und PDF, wer unterschreibt wo, Anschreiben, nächste Schritte,
 // "Bearbeitung pausiert". Ein Form A je Unternehmen (lib/italy.js formsFor).
 
+import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, waitHtml } from "../../components/flow.js";
 import { getState } from "../../store/store.js";
 import { fillFormA, fillAllFormsA, formAFileName } from "../../lib/fillFormA.js";
 import { buildTaxOfficeLetter } from "../../lib/buildTaxOfficeLetter.js";
@@ -56,8 +57,6 @@ function render(container, reclaimCase) {
     ${stepHeader(reclaimCase, 4)}
     <p class="ch-lead">DivRebound hat für jedes Unternehmen ein Formular „Form A“ ausgefüllt. Drucke alle Seiten aus, unterschreibe zweimal und sende die Formulare mit dem Anschreiben an dein Finanzamt. Das Finanzamt bestätigt auf Seite 5 deine Ansässigkeit.</p>
 
-    ${timelineHtml(reclaimCase)}
-
     ${
       forms.length
         ? `
@@ -78,43 +77,25 @@ function render(container, reclaimCase) {
       }
       <div class="doc-status" id="download-status"></div>
     </div>`
-        : `<div class="info-banner"><span class="icon">ℹ</span><div>Noch keine bestätigten Ausschüttungen. Bitte in <a href="#" data-go-step="2">Schritt 2</a> mindestens eine Ausschüttung bestätigen.</div></div>`
+        : `<div class="info-banner"><span class="icon">ℹ</span><div>Noch keine Ausschüttung ausgewählt. Bitte zuerst <a href="#" data-go-step="2">Abrechnungen hochladen</a>.</div></div>`
     }
 
-    <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Anschreiben an das Finanzamt</span><span class="ch-head-sub">${esc(taxOffice.name || "Finanzamt fehlt")}</span></div>
-      <div class="doc-item">
-        <div>
-          <div class="doc-title">Anschreiben an das Finanzamt</div>
-          <div class="doc-sub">Bitte um Bestätigung der Ansässigkeit auf den beigefügten Formularen (Formular „Form A“, Seite 5), mit Steuer-ID und Steuernummer.</div>
-          <div class="doc-file">${esc(letterFileName(profile, years))}</div>
-        </div>
-        <div class="doc-actions">
-          <button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Vorschau</button>
-          <button class="btn-accent btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ PDF</button>
-        </div>
-      </div>
-      ${taxOfficeComplete ? "" : `<div class="doc-status field-hint">Bitte zuerst die Anschrift des Finanzamts in <a href="#" data-go-step="1">Schritt 1</a> ergänzen.</div>`}
-    </div>
+    ${taxOfficeWaysHtml(profile, {
+      signText: "Formulare ausdrucken und auf Seite 3 und Seite 5 unterschreiben",
+      confirmText: "Das Finanzamt bestätigt auf Seite 5 und schickt die Formulare zurück",
+      originalRequired: true,
+      letterButtonsHtml: `<button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Anschreiben</button><button class="btn-accent btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ PDF</button>${taxOfficeComplete ? "" : ` <a href="#" data-go-step="3">Anschrift des Finanzamts ergänzen</a>`}`,
+    })}
 
-    <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Nächste Schritte</span></div>
-      <div class="card-body">
-        <div class="ch-next"><span class="ch-next-num">1</span><span>Formulare ausdrucken, auf Seite 3 und Seite 5 unterschreiben.</span></div>
-        <div class="ch-next"><span class="ch-next-num">2</span><span>Formulare und Anschreiben per Post an das Finanzamt senden.</span></div>
-        <div class="ch-next"><span class="ch-next-num">3</span><span>Das Finanzamt bestätigt auf Seite 5 und schickt die Formulare zurück.</span></div>
-        <div class="ch-next"><span class="ch-next-num">4</span><span>Danach geht es weiter mit <a href="#" data-go-step="5">Schritt 5: Versand nach Italien</a>.</span></div>
-      </div>
-    </div>
+    ${waitHtml("Komm zurück, wenn die bestätigten Formulare da sind. Dein Stand ist in diesem Browser gespeichert.", "Formulare sind zurück")}
 
-    ${pausePanelHtml(reclaimCase, "taxOffice")}
-
-    ${stepNavHtml(4)}
+    <div class="ch-step-nav"><button class="btn-secondary" data-step-back type="button">← Zurück</button><span></span></div>
     </div>`;
 
   bindStepNav(container, reclaimCase, 4);
   bindTimeline(container, reclaimCase, () => render(container, reclaimCase));
   bindPausePanel(container, reclaimCase);
+  bindTaxOfficeWays(container, () => elsterMessageText(getState().currentProfile, { reference: "Formular „Form A“ zur Erstattung italienischer Quellensteuer auf Dividenden (Art. 10 DBA Deutschland–Italien), Bestätigung auf Seite 5", originalRequired: true }));
   container.querySelectorAll("[data-go-step]").forEach((a) =>
     a.addEventListener("click", (e) => {
       e.preventDefault();

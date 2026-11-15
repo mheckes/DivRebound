@@ -7,6 +7,7 @@
 // (wiederholten nur Schritt 2 und 3). Danach wartet der Fall auf die
 // Bestätigung durch das Finanzamt (Medienbruch).
 
+import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, waitHtml } from "../../components/flow.js";
 import { getState, setState } from "../../store/store.js";
 import { goToStep, markStepDone, stepHeader } from "./dkShared.js";
 import * as caseRepo from "../../db/caseRepo.js";
@@ -119,7 +120,7 @@ function render(container) {
   if (!reclaimCase || !profile) {
     container.innerHTML = `
       <div class="content-header"><h1 class="content-title">Formular &amp; Finanzamt</h1></div>
-      <div class="info-banner"><span class="icon">ℹ</span><div>Kein Fall ausgewählt.</div></div>`;
+      <div class="info-banner"><span class="icon">ℹ</span><div>Kein Antrag ausgewählt.</div></div>`;
     return;
   }
 
@@ -140,9 +141,7 @@ function render(container) {
   container.innerHTML = `
     ${stepHeader(reclaimCase, 4)}
 
-    <p class="ch-lead">Die Wohnsitzbescheinigung (Formular „02.050“) muss vom deutschen Finanzamt bestätigt werden. DivRebound hat das Formular für dich ausgefüllt.</p>
-
-    ${dkTimelineHtml(reclaimCase)}
+    <p class="ch-lead">Dein deutsches Finanzamt bestätigt auf der Wohnsitzbescheinigung (Formular „02.050“), dass du in Deutschland ansässig bist. DivRebound hat sie für dich ausgefüllt.</p>
 
     <div class="card">
       <div class="card-head head-navy">
@@ -163,50 +162,24 @@ function render(container) {
       <div class="doc-status" id="download-status">${initialStatusHtml}</div>
     </div>
 
-    <div class="card">
-      <div class="card-head head-navy">
-        <span class="card-title">Anschreiben an das Finanzamt</span>
-        <span class="ch-head-sub">${esc(normalizeTaxOffice(residence.taxOffice).name || "Finanzamt fehlt")}</span>
-      </div>
-      <div class="doc-item">
-        <div>
-          <div class="doc-title">Anschreiben an das Finanzamt</div>
-          <div class="doc-sub">Bitte um Bestätigung der Ansässigkeit auf der beigefügten Wohnsitzbescheinigung, mit Steuer-ID.</div>
-          <div class="doc-file">${esc(letterFileName(profile, reclaimCase))}</div>
-        </div>
-        <div class="doc-actions">
-          <button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Vorschau</button>
-          <button class="btn-accent btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ PDF</button>
-        </div>
-      </div>
-      ${taxOfficeComplete ? "" : `<div class="doc-status field-hint">Bitte zuerst die Anschrift des Finanzamts in <a href="#" data-go-step="1">Schritt 1</a> ergänzen.</div>`}
-    </div>
+    ${taxOfficeWaysHtml(profile, {
+      signText: "Wohnsitzbescheinigung ausdrucken und unterschreiben",
+      confirmText: "Das Finanzamt stempelt die Bescheinigung und schickt sie zurück",
+      originalRequired: false,
+      letterButtonsHtml: `<button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Anschreiben</button><button class="btn-accent btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ PDF</button>${taxOfficeComplete ? "" : ` <a href="#" data-go-step="3">Anschrift des Finanzamts ergänzen</a>`}`,
+    })}
 
-    <div class="card">
-      <div class="card-head head-navy">
-        <span class="card-title">Nächste Schritte</span>
-      </div>
-      <div class="card-body">
-        <div class="step-row"><span class="step-num">1</span><span>Wohnsitzbescheinigung ausdrucken, unterschreiben und mit dem Anschreiben per Post an das Finanzamt senden.</span></div>
-        <div class="step-row"><span class="step-num">2</span><span>Das Finanzamt bestätigt (Stempel und Unterschrift) und schickt die Bescheinigung zurück.</span></div>
-        <div class="step-row"><span class="step-num">3</span><span>Danach geht es weiter mit <a href="#" data-go-step="5">Schritt 5: SKAT-Portal ausfüllen</a> – dort lädst du die bestätigte Bescheinigung hoch.</span></div>
-      </div>
-    </div>
+    ${waitHtml("Komm zurück, wenn die gestempelte Bescheinigung da ist. Dein Stand ist in diesem Browser gespeichert.", "Bescheinigung ist zurück")}
 
-    ${pausePanelHtml(reclaimCase, "taxOffice")}
-
-    <div class="ch-step-nav">
-      <button class="btn-secondary" data-action="back" type="button">← Zurück</button>
-      <button class="btn-primary" data-action="next" type="button">Weiter: SKAT-Portal ausfüllen →</button>
-    </div>
+    <div class="ch-step-nav"><button class="btn-secondary" data-step-back type="button">← Zurück</button><span></span></div>
   `;
 
   attachListeners(container, reclaimCase);
 }
 
 function attachListeners(container, reclaimCase) {
-  container.querySelector('[data-action="back"]').addEventListener("click", () => goToStep(reclaimCase, 3));
-  container.querySelector('[data-action="next"]').addEventListener("click", async () => {
+  container.querySelector("[data-step-back]").addEventListener("click", () => goToStep(reclaimCase, 3));
+  container.querySelector("[data-step-next]").addEventListener("click", async () => {
     await markStepDone(reclaimCase, 4);
     goToStep(reclaimCase, 5);
   });
@@ -239,6 +212,7 @@ function attachListeners(container, reclaimCase) {
   });
 
   bindPausePanel(container, reclaimCase);
+  bindTaxOfficeWays(container, () => elsterMessageText(getState().currentProfile, { reference: "Wohnsitzbescheinigung (Formular „02.050“) zur Erstattung dänischer Quellensteuer", originalRequired: false }));
 }
 
 async function handleDownload(container, btn) {

@@ -46,8 +46,6 @@ function render(container, reclaimCase) {
     ${stepHeader(reclaimCase, 5)}
     <p class="ch-lead">Sobald das Finanzamt das Formular bestätigt zurückgeschickt hat, gehen sie zusammen mit Kopien deiner Abrechnungen und dem Begleitschreiben an die schwedische Steuerbehörde Skatteverket.</p>
 
-    ${timelineHtml(reclaimCase)}
-
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Begleitschreiben (Englisch)</span><span class="ch-head-sub">an Skatteverket</span></div>
       <div class="doc-item">
@@ -66,7 +64,7 @@ function render(container, reclaimCase) {
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Das kommt in den Umschlag</span><span class="ch-head-sub">${forms.length} ${forms.length === 1 ? "Formular" : "Formulare"} · ${eligible.length} Abrechnung${eligible.length === 1 ? "" : "en"}</span></div>
       <div class="card-body">
-        ${items.map(([id, text]) => `<label class="ch-step-row"><input type="checkbox" data-envelope="${id}" ${checks.has(id) ? "checked" : ""} ${mailed ? "disabled" : ""}><span>${text}</span></label>`).join("")}
+        <ul class="ch-list">${items.map(([, text]) => `<li>${text}</li>`).join("")}</ul>
       </div>
     </div>
 
@@ -81,21 +79,20 @@ function render(container, reclaimCase) {
     </div>
 
     <div class="card">
-      <div class="card-head head-navy"><span class="card-title">DivRebound abschließen</span></div>
+      <div class="card-head head-navy"><span class="card-title">Antrag einreichen</span></div>
       <div class="card-body">
         ${
           mailed
             ? `<div class="done-banner ch-done-banner">
                 <div class="done-icon">✓</div>
                 <div>
-                  <div class="done-title">DivRebound abgeschlossen</div>
+                  <div class="done-title">Antrag eingereicht</div>
                   <div class="done-sub">Am ${esc(formatDateDe(reclaimCase.se.mailedAt.slice(0, 10)))} nach Schweden versendet · erwartete Erstattung ${formatSekDe(total)} (${approxEur(total)})</div>
                 </div>
               </div>
-              <p class="ch-text">Wenn die Erstattung da ist, kannst du sie in Schritt 6 festhalten (optional).</p>`
-            : `<p class="ch-text">Wenn der Umschlag unterwegs ist, ist dein DivRebound abgeschlossen. Die Erstattung kannst du später in Schritt 6 eintragen.</p>
-              <button class="btn-primary" data-action="mark-mailed" ${allChecked ? "" : "disabled"} type="button">✓ Als versendet markieren</button>
-              ${allChecked ? "" : `<div class="field-hint" style="margin-top:6px;">Bitte zuerst die Punkte oben abhaken.</div>`}`
+              <p class="ch-text">Auf der Übersicht fragen wir dich, ob das Geld da ist.</p>`
+            : `<p class="ch-text">Sobald der Umschlag unterwegs ist, gilt dein Antrag als eingereicht.</p>
+              <button class="btn-primary" data-action="mark-mailed" type="button">✓ Umschlag ist unterwegs</button>`
         }
       </div>
     </div>
@@ -104,7 +101,10 @@ function render(container, reclaimCase) {
 
     ${mailed ? pausePanelHtml(reclaimCase, "payout") : ""}
 
-    ${stepNavHtml(5)}
+    <div class="ch-step-nav">
+      <button class="btn-secondary" data-step-back type="button">← Zurück</button>
+      <a class="btn-secondary" href="#/home">Zur Übersicht</a>
+    </div>
     </div>`;
 
   bindStepNav(container, reclaimCase, 5);

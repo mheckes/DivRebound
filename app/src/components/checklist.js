@@ -122,3 +122,33 @@ export function bindChecklistAutosave(container, onSaved) {
     },
   });
 }
+
+/**
+ * Schritt "Deine Angaben": oben, was für das Formular noch fehlt, darunter
+ * alles, was schon im Profil steht - dort direkt änderbar. Die Aufteilung
+ * gilt für den Moment des Renderns; danach ändern sich nur die Zustände.
+ * @param {object} profile
+ * @param {string[]} required - Schlüssel aus PROFILE_ITEM, Pflicht für das Formular
+ * @param {string[]} [others] - weitere Angaben, die nur angezeigt werden, wenn sie ausgefüllt sind
+ */
+export function profileCardsHtml(profile, required, others = []) {
+  const missing = required.filter((k) => !isItemFilled(profile, PROFILE_ITEM[k]));
+  // Freiwillige Angaben, die noch leer sind: grau statt rot, blockieren nicht
+  const optionalOpen = others.filter((k) => !isItemFilled(profile, PROFILE_ITEM[k]));
+  const filled = [...required, ...others].filter((k) => isItemFilled(profile, PROFILE_ITEM[k]));
+  return `
+    <div class="card">
+      <div class="card-head head-navy"><span class="card-title">Noch offen</span><span class="count-pill">${missing.length ? `${missing.length} ${missing.length === 1 ? "Angabe" : "Angaben"}` : "nichts offen"}</span></div>
+      ${missing.length ? missing.map((k) => profileRow(profile, PROFILE_ITEM[k])).join("") : `<div class="card-body"><div class="md-all-done">✓ Alle Pflichtangaben für das Formular sind vollständig.</div></div>`}
+      ${optionalOpen.length ? `<div class="ch-check-group">Freiwillig</div>` + optionalOpen.map((k) => optionalProfileRow(profile, PROFILE_ITEM[k])).join("") : ""}
+      ${missing.length || optionalOpen.length ? `<div class="ch-autosave-row autosave-note">Wird automatisch in deinem Profil gespeichert.</div>` : ""}
+    </div>
+    ${
+      filled.length
+        ? `<div class="card">
+            <div class="card-head"><span class="card-title">Aus deinem Profil</span><span class="ch-head-sub">bitte kurz prüfen, zum Ändern ins Feld klicken</span></div>
+            ${filled.map((k) => profileRow(profile, PROFILE_ITEM[k])).join("")}
+          </div>`
+        : ""
+    }`;
+}

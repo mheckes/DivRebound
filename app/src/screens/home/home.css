@@ -163,3 +163,215 @@
     font-size: 22px;
   }
 }
+
+/* ───────── Neue Startseite (Mock Up Ablauf 11-2026) ───────── */
+#divrebound-app .home-page {
+  max-width: 940px;
+}
+#divrebound-app .home-section {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15px;
+  margin: 24px 0 10px;
+}
+#divrebound-app .home-countries {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 10px;
+}
+#divrebound-app .home-country {
+  text-align: left;
+  font-family: var(--font-body);
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+#divrebound-app .home-country:hover,
+#divrebound-app .home-country:focus-visible {
+  border-color: var(--cyan);
+  transform: translateY(-1px);
+  outline: none;
+}
+#divrebound-app .home-country b {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  margin-bottom: 3px;
+  color: var(--charcoal);
+}
+#divrebound-app .home-country span:not(.flag) {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+#divrebound-app .case-card {
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: center;
+}
+#divrebound-app .case-card.attn {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px var(--cyan-light);
+}
+#divrebound-app .case-name {
+  font-weight: 700;
+  font-size: 15.5px;
+  display: flex;
+  align-items: center;
+}
+#divrebound-app .case-meta {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin-top: 2px;
+}
+#divrebound-app .case-dots {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+  align-items: center;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+#divrebound-app .case-dots span:last-child {
+  margin-left: 4px;
+}
+#divrebound-app .case-dot {
+  width: 26px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--divider);
+}
+#divrebound-app .case-dot.done {
+  background: var(--success);
+}
+#divrebound-app .case-dot.now {
+  background: var(--cyan);
+}
+#divrebound-app .case-q {
+  margin-top: 10px;
+  font-weight: 600;
+}
+#divrebound-app .case-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+}
+#divrebound-app .case-delete {
+  border: 0;
+  background: none;
+  color: var(--stone);
+  font-family: var(--font-body);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px;
+}
+#divrebound-app .case-delete:hover {
+  color: var(--danger);
+  text-decoration: underline;
+}
+
+#divrebound-app .home-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+#divrebound-app .home-stat {
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+#divrebound-app .home-stat b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 18px;
+}
+#divrebound-app .home-stat span {
+  color: var(--muted);
+  font-size: 12px;
+}
+#divrebound-app .home-backup {
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+#divrebound-app .beta-card {
+  margin-top: 26px;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 14px;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  overflow: hidden;
+}
+#divrebound-app .beta-main {
+  padding: 18px 20px;
+  border-left: 4px solid var(--cyan);
+}
+#divrebound-app .beta-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cyan-dark);
+  background: var(--cyan-light);
+  border-radius: 99px;
+  padding: 3px 10px;
+}
+#divrebound-app .beta-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 20px;
+  margin: 8px 0 4px;
+}
+#divrebound-app .beta-card p {
+  margin: 0 0 12px;
+  color: #3b4a60;
+  font-size: 13px;
+}
+#divrebound-app .beta-want {
+  background: var(--navy-light);
+  padding: 18px 20px;
+}
+#divrebound-app .beta-want-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--navy-mid);
+  margin-bottom: 6px;
+}
+#divrebound-app .beta-want b {
+  display: block;
+  font-size: 14.5px;
+  margin-bottom: 4px;
+}
+#divrebound-app .beta-want p {
+  margin: 0;
+}
+@media (max-width: 900px) {
+  #divrebound-app .home-countries,
+  #divrebound-app .home-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  #divrebound-app .case-card,
+  #divrebound-app .beta-card {
+    grid-template-columns: 1fr;
+  }
+  #divrebound-app .case-actions {
+    justify-content: flex-start;
+  }
+}
