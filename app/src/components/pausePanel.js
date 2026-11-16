@@ -13,6 +13,7 @@ import * as caseRepo from "../db/caseRepo.js";
 import * as transactionRepo from "../db/transactionRepo.js";
 import { exportEncrypted, exportPlain, triggerJsonDownload } from "../crypto/exportImport.js";
 import { openExportOptionsModal } from "./modal.js";
+import { pauseHtml } from "./flow.js";
 
 const COUNTRY_FILE = { DK: "Daenemark", CH: "Schweiz", IT: "Italien", SE: "Schweden" };
 const AUTHORITY = { DK: "SKAT", CH: "die Eidgenössische Steuerverwaltung", IT: "die Agenzia delle Entrate", SE: "Skatteverket" };
@@ -27,17 +28,18 @@ const NOTES = {
         : `Jetzt ist ${AUTHORITY[c.targetCountry]} am Zug – die Auszahlung dauert meist mehrere Monate.`,
   },
   // letzter Schritt, Erstattung eingetragen: Endstand aufbewahren
-  done: { label: "Abgeschlossen", text: () => "Erstattung erhalten. Bearbeitungsstand speichern, um alles aufzubewahren." },
+  done: { label: "Abgeschlossen", text: () => "Erstattung erhalten. Sichere den Endstand, um alles aufzubewahren." },
 };
 
-/** @param {"taxOffice"|"payout"|"done"} kind */
+/** @param {"taxOffice"|"payout"|"done"} kind - gleiche Pause-Komponente wie im Finanzamt-Schritt */
 export function pausePanelHtml(reclaimCase, kind) {
   const note = NOTES[kind];
-  return `
-    <div class="pause-note">
-      <span class="pause-note-text"><b>${note.label}:</b> ${note.text(reclaimCase)}</span>
-      <button class="btn-secondary btn-small" data-action="save-state" type="button">💾 Bearbeitungsstand speichern</button>
-    </div>`;
+  return pauseHtml({
+    icon: kind === "done" ? "✓" : "❚❚",
+    title: `${note.label}.`,
+    text: note.text(reclaimCase),
+    actionsHtml: `<button class="btn-secondary btn-small" data-action="save-state" type="button">💾 Sicherung speichern</button>`,
+  });
 }
 
 export function bindPausePanel(container, reclaimCase) {

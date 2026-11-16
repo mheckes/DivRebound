@@ -47,14 +47,11 @@ import * as dkCase from "./screens/dkCase/dkCase.js";
 import * as itCase from "./screens/itCase/itCase.js";
 import * as seCase from "./screens/seCase/seCase.js";
 
-import { websiteHome } from "./config/siteLinks.js";
-
 const app = document.getElementById("divrebound-app");
 app.innerHTML = `
   <div class="app-shell">
     <div class="sidebar" id="sidebar-root"></div>
     <div class="content">
-      <a class="site-bridge-btn" href="${websiteHome}">← Zur Website</a>
       <div id="content-root"></div>
     </div>
   </div>

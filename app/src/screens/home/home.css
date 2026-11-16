@@ -174,9 +174,115 @@
   font-size: 15px;
   margin: 24px 0 10px;
 }
+/* Kopf: Begrüßung links, großer "+ Neuer Antrag" rechts */
+#divrebound-app .home-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+#divrebound-app .home-new-btn {
+  padding: 12px 20px;
+  font-size: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(15, 34, 64, 0.18);
+  white-space: nowrap;
+}
+/* Länderwahl im Dialog */
+#divrebound-app .dr-modal.dr-modal-wide {
+  width: min(640px, 92vw);
+  max-width: none;
+}
+#divrebound-app .picker-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+#divrebound-app .picker-head .dr-modal-title {
+  margin: 0;
+}
+#divrebound-app .picker-close {
+  border: 0;
+  background: none;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+}
+#divrebound-app .dr-modal .home-country {
+  background: var(--bg);
+}
+#divrebound-app .dr-modal .home-country:hover {
+  background: var(--surface);
+}
+#divrebound-app .follow-up-text {
+  width: 100%;
+  margin: 4px 0 14px;
+  border: 1px solid var(--divider);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: var(--t-hint);
+  line-height: 1.5;
+  resize: vertical;
+  background: var(--bg);
+}
+#divrebound-app .btn-link {
+  border: 0;
+  background: none;
+  padding: 2px 0;
+  color: var(--cyan-dark);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Gruppen der Antragsliste: Du bist dran / Wartet / Abgeschlossen (eingeklappt) */
+#divrebound-app .home-group {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 16px 0 8px;
+}
+#divrebound-app .home-group-count {
+  display: inline-block;
+  min-width: 18px;
+  padding: 0 6px;
+  margin-left: 4px;
+  border-radius: 99px;
+  background: var(--divider);
+  color: var(--charcoal);
+  text-align: center;
+  letter-spacing: 0;
+}
+#divrebound-app .home-group-fold > summary {
+  cursor: pointer;
+  list-style: none;
+}
+#divrebound-app .home-group-fold > summary::-webkit-details-marker {
+  display: none;
+}
+#divrebound-app .home-group-fold > summary::before {
+  content: "▸";
+  display: inline-block;
+  width: 14px;
+  transition: transform 0.15s;
+}
+#divrebound-app .home-group-fold[open] > summary::before {
+  transform: rotate(90deg);
+}
+#divrebound-app .home-group-fold > summary:hover {
+  color: var(--charcoal);
+}
+
 #divrebound-app .home-countries {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 12px;
   margin-bottom: 10px;
 }
@@ -208,103 +314,197 @@
   font-size: 12px;
 }
 
+/* Antragskarte (Stand 2.1): zwei Zeilen, ganze Karte klickbar */
 #divrebound-app .case-card {
   background: var(--surface);
   border: 1px solid var(--divider);
   border-radius: 12px;
-  padding: 16px 18px;
-  margin-bottom: 12px;
+  padding: 14px 18px;
+  margin-bottom: 10px;
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 14px;
+  gap: 6px 16px;
   align-items: center;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+#divrebound-app .case-card:hover,
+#divrebound-app .case-card:focus-visible {
+  border-color: var(--navy);
+  box-shadow: 0 4px 14px rgba(15, 34, 64, 0.08);
+  outline: none;
 }
 #divrebound-app .case-card.attn {
   border-color: var(--cyan);
   box-shadow: 0 0 0 3px var(--cyan-light);
 }
+#divrebound-app .case-card.late {
+  border-color: #e9c46a;
+  box-shadow: 0 0 0 3px #fff4d6;
+}
+#divrebound-app .case-top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
 #divrebound-app .case-name {
   font-weight: 700;
-  font-size: 15.5px;
+  font-size: var(--t-title);
   display: flex;
   align-items: center;
+  align-self: center;
 }
 #divrebound-app .case-meta {
   color: var(--muted);
-  font-size: 12.5px;
-  margin-top: 2px;
+  font-size: var(--t-hint);
 }
-#divrebound-app .case-dots {
-  display: flex;
-  gap: 5px;
-  margin-top: 10px;
-  align-items: center;
-  font-size: 11.5px;
-  color: var(--muted);
-}
-#divrebound-app .case-dots span:last-child {
-  margin-left: 4px;
-}
-#divrebound-app .case-dot {
-  width: 26px;
-  height: 5px;
-  border-radius: 3px;
-  background: var(--divider);
-}
-#divrebound-app .case-dot.done {
-  background: var(--success);
-}
-#divrebound-app .case-dot.now {
-  background: var(--cyan);
-}
-#divrebound-app .case-q {
-  margin-top: 10px;
+#divrebound-app .case-meta b {
+  color: var(--charcoal);
   font-weight: 600;
 }
-#divrebound-app .case-actions {
+#divrebound-app .case-tools {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
   align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
 }
-#divrebound-app .case-delete {
-  border: 0;
-  background: none;
-  color: var(--stone);
-  font-family: var(--font-body);
-  font-size: 12px;
+#divrebound-app .case-trash {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
   cursor: pointer;
-  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
-#divrebound-app .case-delete:hover {
+#divrebound-app .case-trash:hover,
+#divrebound-app .case-trash:focus-visible {
+  background: var(--danger-tint);
+  border-color: #e7c3be;
   color: var(--danger);
-  text-decoration: underline;
+  outline: none;
+}
+/* Wartezeit statt Ja/Nein-Frage */
+#divrebound-app .case-wait {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--divider);
+}
+#divrebound-app .wait-info {
+  color: var(--muted);
+  font-size: var(--t-hint);
+}
+#divrebound-app .wait-info b {
+  color: var(--charcoal);
+  font-size: var(--t-body);
+  font-weight: 600;
+}
+#divrebound-app .case-card.late .case-wait {
+  border-top-color: #f0d48a;
+}
+#divrebound-app .case-card.late .wait-info,
+#divrebound-app .case-card.late .wait-info b {
+  color: #8a5a00;
+}
+#divrebound-app .wait-info a {
+  color: #8a5a00;
+  font-weight: 600;
+  margin-left: 4px;
 }
 
-#divrebound-app .home-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+/* Schrittleiste: ✓ Vorbereiten — ● Bestätigen lassen — ○ Einreichen — ○ Geld erhalten */
+#divrebound-app .case-steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 0;
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  font-size: 12px;
+  color: var(--stone);
 }
-#divrebound-app .home-stat {
+#divrebound-app .case-steps li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+#divrebound-app .case-steps li + li::before {
+  content: "";
+  width: 22px;
+  height: 2px;
+  margin: 0 6px;
+  border-radius: 1px;
+  background: var(--divider);
+}
+#divrebound-app .case-steps li.done + li::before {
+  background: var(--success);
+}
+#divrebound-app .case-step-mark {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--divider);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--surface);
+}
+#divrebound-app .case-steps li.done {
+  color: var(--success);
+}
+#divrebound-app .case-steps li.done .case-step-mark {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+#divrebound-app .case-steps li.now {
+  color: var(--charcoal);
+  font-weight: 700;
+}
+#divrebound-app .case-steps li.now .case-step-mark {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  color: #fff;
+  box-shadow: 0 0 0 3px var(--cyan-light);
+}
+/* Statistik als eine Zeile, darunter der Hinweis zur Sicherung */
+#divrebound-app .home-statline {
+  display: flex;
+  gap: 8px 22px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding: 12px 16px;
   background: var(--surface);
   border: 1px solid var(--divider);
   border-radius: 12px;
-  padding: 12px 16px;
-}
-#divrebound-app .home-stat b {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 18px;
-}
-#divrebound-app .home-stat span {
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--t-hint);
+}
+#divrebound-app .home-statline b {
+  font-family: var(--font-mono);
+  color: var(--charcoal);
+  font-size: var(--t-body);
 }
 #divrebound-app .home-backup {
-  margin-top: 4px;
-  font-size: 13px;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: var(--t-hint);
 }
 
 #divrebound-app .beta-card {
@@ -363,15 +563,20 @@
   margin: 0;
 }
 @media (max-width: 900px) {
-  #divrebound-app .home-countries,
-  #divrebound-app .home-stats {
+  #divrebound-app .home-countries {
     grid-template-columns: 1fr 1fr;
   }
-  #divrebound-app .case-card,
   #divrebound-app .beta-card {
     grid-template-columns: 1fr;
   }
-  #divrebound-app .case-actions {
-    justify-content: flex-start;
+  #divrebound-app .home-head {
+    flex-wrap: wrap;
+  }
+  /* Schrittleiste bricht um: ohne Verbindungslinien, sonst hängt eine am Zeilenanfang */
+  #divrebound-app .case-steps {
+    gap: 6px 14px;
+  }
+  #divrebound-app .case-steps li + li::before {
+    display: none;
   }
 }

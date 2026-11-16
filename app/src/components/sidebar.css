@@ -355,27 +355,148 @@
   background: rgba(255, 255, 255, 0.09);
   color: #fff;
 }
-#divrebound-app .side-case {
-  background: rgba(255, 255, 255, 0.06);
+/* Logo führt zur Übersicht */
+#divrebound-app .sidebar-brand {
+  cursor: pointer;
   border-radius: 10px;
-  padding: 10px 8px;
+  padding: 4px;
+  margin: -4px;
+}
+#divrebound-app .sidebar-brand:hover,
+#divrebound-app .sidebar-brand:focus-visible {
+  background: rgba(255, 255, 255, 0.07);
+  outline: none;
+}
+
+/* Antragsblock (Stand 2.1): kein Kasten, Ziffern = Phasen, Unterschritte mit Punkt */
+#divrebound-app .side-case {
+  gap: 2px;
+}
+#divrebound-app .side-case-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 10px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 #divrebound-app .side-case-name {
-  font-weight: 600;
-  font-size: 13.5px;
-  padding: 0 4px 8px;
+  font-weight: 700;
+  font-size: 13px;
   display: flex;
   align-items: center;
 }
-#divrebound-app .side-phase {
-  font-size: 10px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--cyan);
-  margin: 10px 4px 4px;
+#divrebound-app .side-case-name .flag {
+  height: 11px;
+  margin-right: 7px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
 }
-#divrebound-app .side-case .nav-step {
-  white-space: normal;
+#divrebound-app .side-info {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  color: #dbe5f3;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+#divrebound-app .side-info:hover,
+#divrebound-app .side-info.on {
+  background: #fff;
+  color: var(--navy);
+  border-color: #fff;
+}
+#divrebound-app .side-phase-block {
+  margin-bottom: 4px;
+}
+#divrebound-app .side-phase-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 8px;
+  font-weight: 700;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+#divrebound-app .side-phase-n {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+#divrebound-app .side-phase-block.now .side-phase-head,
+#divrebound-app .side-phase-block.done .side-phase-head {
+  color: #fff;
+}
+#divrebound-app .side-phase-block.now .side-phase-n {
+  background: #fff;
+  color: var(--navy);
+}
+#divrebound-app .side-phase-block.done .side-phase-n {
+  background: var(--success);
+}
+#divrebound-app .side-sub {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 18px;
+  padding: 5px 8px 5px 18px;
+  border-left: 1.5px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 13px;
+  cursor: pointer;
+}
+#divrebound-app .side-sub::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  margin-left: -22px;
+  flex-shrink: 0;
+}
+#divrebound-app .side-sub:hover {
+  color: #fff;
+}
+#divrebound-app .side-sub.done::before {
+  background: var(--success);
+}
+#divrebound-app .side-sub.on {
+  color: #fff;
+  font-weight: 700;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  border-radius: 0 7px 7px 0;
+}
+#divrebound-app .side-sub.on::before {
+  background: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.3);
+}
+#divrebound-app .side-money[data-nav] {
+  cursor: pointer;
+}
+#divrebound-app .side-money[data-nav]:hover .side-phase-head {
+  color: #fff;
+}
+#divrebound-app .side-money.locked .side-phase-head {
+  color: rgba(255, 255, 255, 0.32);
+}
+#divrebound-app .side-money.locked .side-phase-n {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.45);
+}
+#divrebound-app .sidebar-website {
+  color: rgba(255, 255, 255, 0.75) !important;
 }
 #divrebound-app .sidebar-bottom {
   margin-top: auto;

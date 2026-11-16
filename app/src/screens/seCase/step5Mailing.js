@@ -4,6 +4,7 @@
 // Statistik); die erhaltene Erstattung folgt optional in Schritt 6.
 // Dazu ein englisches Begleitschreiben (lib/buildSwedenCoverLetter.js).
 
+import { signNowHtml } from "../../components/flow.js";
 import { corridor, esc, saveCase, caseSummary, formatSekDe, approxEur, stepHeader, stepNavHtml, bindStepNav, timelineHtml, bindTimeline, downloadBlob } from "./seShared.js";
 import { getState } from "../../store/store.js";
 import { buildSwedenCoverLetter, swedenCoverLetterFileName } from "../../lib/buildSwedenCoverLetter.js";
@@ -44,6 +45,7 @@ function render(container, reclaimCase) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 5)}
+    ${signNowHtml(reclaimCase, "das Formular unten auf Seite 1 (Feld „Sökandens signatur“)")}
     <p class="ch-lead">Sobald das Finanzamt das Formular bestätigt zurückgeschickt hat, gehen sie zusammen mit Kopien deiner Abrechnungen und dem Begleitschreiben an die schwedische Steuerbehörde Skatteverket.</p>
 
     <div class="card">

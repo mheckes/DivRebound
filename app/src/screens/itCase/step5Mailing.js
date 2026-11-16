@@ -3,6 +3,7 @@
 // Pescara. "Als versendet markieren" schließt den DivRebound ab (zählt für die
 // Statistik); die erhaltene Erstattung folgt optional in Schritt 6.
 
+import { signNowHtml } from "../../components/flow.js";
 import { getState } from "../../store/store.js";
 import { corridors } from "../../config/corridors.js";
 import { buildItalyCoverLetter, italyCoverLetterFileName } from "../../lib/buildItalyCoverLetter.js";
@@ -43,6 +44,7 @@ function render(container, reclaimCase) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 5)}
+    ${signNowHtml(reclaimCase, "jedes Formular auf Seite 3 und Seite 5")}
     <p class="ch-lead">Sobald das Finanzamt die Formulare bestätigt zurückgeschickt hat, gehen sie zusammen mit Kopien deiner Abrechnungen und dem Begleitschreiben per Post an die italienische Steuerbehörde.</p>
 
     <div class="card">

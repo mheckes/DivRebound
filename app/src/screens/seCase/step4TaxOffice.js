@@ -3,7 +3,7 @@
 // unterschreibt, Anschreiben ans Finanzamt, nächste Schritte, "Bearbeitung
 // pausiert". Alle Unternehmen stehen in einer Tabelle (lib/sweden.js formsFor).
 
-import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, waitHtml } from "../../components/flow.js";
+import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, taxOfficePauseHtml, bindTaxOfficePause } from "../../components/flow.js";
 import { getState } from "../../store/store.js";
 import { fillSkv3740, fillAllSkv3740, skv3740FileName } from "../../lib/fillSkv3740.js";
 import { buildTaxOfficeLetter } from "../../lib/buildTaxOfficeLetter.js";
@@ -48,7 +48,7 @@ function render(container, reclaimCase) {
           </div>
           <div class="doc-actions">
             <button class="btn-secondary btn-small" data-form-preview="${i}" type="button">👁 Vorschau</button>
-            <button class="btn-accent btn-small" data-form-download="${i}" type="button">⬇ PDF</button>
+            <button class="btn-primary" data-form-download="${i}" type="button">⬇ Herunterladen</button>
           </div>
         </div>`;
     })
@@ -57,13 +57,13 @@ function render(container, reclaimCase) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 4)}
-    <p class="ch-lead">DivRebound hat das Formular „SKV 3740“ ausgefüllt. Drucke es aus (Seite 1 und 2, am besten doppelseitig), unterschreibe unten auf Seite 1 und sende es mit dem Anschreiben an dein Finanzamt. Das Finanzamt bestätigt unten auf Seite 2, dass du in Deutschland ansässig bist.</p>
+    <p class="ch-lead">Dein Finanzamt bestätigt auf Seite 2 des Formulars „SKV 3740“, dass du in Deutschland wohnst.</p>
 
     ${
       forms.length
         ? `
     <div class="card">
-      <div class="card-head head-navy"><span class="card-title">SKV 3740</span><span class="ch-head-sub">${forms.length} ${forms.length === 1 ? "Formular" : "Formulare"} · je 2 Seiten · ${eligible.length} ${eligible.length === 1 ? "Ausschüttung" : "Ausschüttungen"} · ${formatSekDe(total)}</span></div>
+      <div class="card-head head-navy"><span class="card-title">Formular herunterladen</span><span class="ch-head-sub">${forms.length} ${forms.length === 1 ? "Formular" : "Formulare"} · je 2 Seiten · ${eligible.length} ${eligible.length === 1 ? "Ausschüttung" : "Ausschüttungen"} · ${formatSekDe(total)}</span></div>
       ${formRows}
       ${
         forms.length > 1
@@ -73,7 +73,7 @@ function render(container, reclaimCase) {
                 <div class="doc-sub">zum Ausdrucken · ${forms.length * 2} Seiten</div>
                 <div class="doc-file">${esc(allFormsFileName(profile, years))}</div>
               </div>
-              <div class="doc-actions"><button class="btn-accent btn-small" data-form-download="all" type="button">⬇ PDF</button></div>
+              <div class="doc-actions"><button class="btn-primary" data-form-download="all" type="button">⬇ Herunterladen</button></div>
             </div>`
           : ""
       }
@@ -82,14 +82,13 @@ function render(container, reclaimCase) {
         : `<div class="info-banner"><span class="icon">ℹ</span><div>Noch keine Ausschüttung ausgewählt. Bitte zuerst <a href="#" data-go-step="2">Abrechnungen hochladen</a>.</div></div>`
     }
 
-    ${taxOfficeWaysHtml(profile, {
+    ${taxOfficeWaysHtml(profile, reclaimCase, {
       signText: "Formular ausdrucken und unten auf Seite 1 unterschreiben (Feld „Sökandens signatur“)",
       confirmText: "Das Finanzamt bestätigt unten auf Seite 2 (Stempel, Unterschrift und Anschrift) und schickt das Formular zurück",
-      originalRequired: true,
       letterButtonsHtml: `<button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Anschreiben</button><button class="btn-accent btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ PDF</button>${taxOfficeComplete ? "" : ` <a href="#" data-go-step="3">Anschrift des Finanzamts ergänzen</a>`}`,
     })}
 
-    ${waitHtml("Komm zurück, wenn das bestätigte Formular da ist. Dein Stand ist in diesem Browser gespeichert.", "Formular ist zurück")}
+    ${taxOfficePauseHtml(reclaimCase, "Formular ist zurück")}
 
     <div class="ch-step-nav"><button class="btn-secondary" data-step-back type="button">← Zurück</button><span></span></div>
     </div>`;
@@ -97,7 +96,8 @@ function render(container, reclaimCase) {
   bindStepNav(container, reclaimCase, 4);
   bindTimeline(container, reclaimCase, () => render(container, reclaimCase));
   bindPausePanel(container, reclaimCase);
-  bindTaxOfficeWays(container, () => elsterMessageText(getState().currentProfile, { reference: "Formular „SKV 3740“ zur Erstattung schwedischer Quellensteuer auf Dividenden (Art. 10 DBA Deutschland–Schweden), Bestätigung der Ansässigkeit unten auf Seite 2", originalRequired: true }));
+  bindTaxOfficeWays(container, () => elsterMessageText(getState().currentProfile, { reference: "Formular „SKV 3740“ zur Erstattung schwedischer Quellensteuer auf Dividenden (Art. 10 DBA Deutschland–Schweden), Bestätigung der Ansässigkeit unten auf Seite 2", originalRequired: true }), reclaimCase);
+  bindTaxOfficePause(container, reclaimCase, () => render(container, reclaimCase));
   container.querySelectorAll("[data-go-step]").forEach((a) =>
     a.addEventListener("click", (e) => {
       e.preventDefault();

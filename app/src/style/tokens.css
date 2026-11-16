@@ -60,6 +60,11 @@
   --danger: #a8433a;
   --danger-tint: #f7e9e7;
 
+  /* Typo-Skala (Stand 2.1): Text, Hinweis (grau), Kartentitel (fett) */
+  --t-body: 14px;
+  --t-hint: 12.5px;
+  --t-title: 15px;
+
   --font-display: "DM Serif Display", Georgia, "Times New Roman", serif;
   --font-body: "DM Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", "Courier New", monospace;

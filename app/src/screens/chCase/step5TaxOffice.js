@@ -4,7 +4,7 @@
 // erzeugt das ePortal das Formular (Antrag DIP-0085) - DivRebound liefert das
 // Anschreiben und merkt sich den Status.
 
-import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, waitHtml } from "../../components/flow.js";
+import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, taxOfficePauseHtml, bindTaxOfficePause } from "../../components/flow.js";
 import { getState } from "../../store/store.js";
 import { navigate } from "../../router/router.js";
 import { buildTaxOfficeLetter } from "../../lib/buildTaxOfficeLetter.js";
@@ -76,7 +76,7 @@ function render(container, reclaimCase, transactions) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 5)}
-    <p class="ch-lead">Dein deutsches Finanzamt bestätigt auf dem Antrag aus dem ePortal, dass du in Deutschland ansässig bist.</p>
+    <p class="ch-lead">Dein Finanzamt bestätigt auf dem Antrag aus dem ePortal, dass du in Deutschland wohnst.</p>
 
     <div class="card">
       <div class="card-head head-navy"><span class="card-title">Formular</span><span class="ch-head-sub">wird im ePortal erzeugt</span></div>
@@ -85,14 +85,13 @@ function render(container, reclaimCase, transactions) {
       </div>
     </div>
 
-    ${taxOfficeWaysHtml(profile, {
+    ${taxOfficeWaysHtml(profile, reclaimCase, {
       signText: "Antrag ausdrucken, auf Seite 1 unter „Rechtsgültige Unterschrift“ Ort und Datum eintragen und unterschreiben",
       confirmText: "Das Finanzamt bestätigt auf Seite 1 (Stempel und Unterschrift) und schickt den Antrag zurück",
-      originalRequired: false,
       letterButtonsHtml: `<button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Anschreiben</button><button class="btn-accent btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ PDF</button>${taxOfficeComplete ? "" : ` <a href="#" data-go-step="8">Anschrift des Finanzamts ergänzen</a>`}`,
     })}
 
-    ${waitHtml("Komm zurück, wenn der bestätigte Antrag da ist. Dein Stand ist in diesem Browser gespeichert.", "Antrag ist zurück")}
+    ${taxOfficePauseHtml(reclaimCase, "Antrag ist zurück")}
 
     <div class="ch-step-nav"><button class="btn-secondary" data-step-back type="button">← Zurück</button><span></span></div>
     </div>`;
@@ -135,5 +134,6 @@ function render(container, reclaimCase, transactions) {
   );
 
   bindPausePanel(container, reclaimCase);
-  bindTaxOfficeWays(container, () => elsterMessageText(getState().currentProfile, { reference: "Antrag auf Rückerstattung der schweizerischen Verrechnungssteuer", originalRequired: false }));
+  bindTaxOfficeWays(container, () => elsterMessageText(getState().currentProfile, { reference: "Antrag auf Rückerstattung der schweizerischen Verrechnungssteuer", originalRequired: false }), reclaimCase);
+  bindTaxOfficePause(container, reclaimCase, () => render(container, reclaimCase, transactions));
 }

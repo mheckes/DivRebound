@@ -1,4 +1,4 @@
-// Seitenleiste: Logo mit Beta-Tag, Übersicht, Profil und - sobald ein Antrag
+// Seitenleiste: Logo mit Beta-Tag (Klick = Übersicht), Übersicht, Profil und - sobald ein Antrag
 // geöffnet ist - dessen Schritte, gruppiert nach den drei Phasen
 // (config/caseSteps.js). Alle Anträge stehen auf der Startseite, nicht hier.
 // Unten das Konto-Feld: heute "Daten nur in diesem Browser" mit Sicherung als
@@ -19,8 +19,10 @@ import {
 } from "../crypto/exportImport.js";
 import { openPassphraseModal, openExportOptionsModal, openInfoModal } from "./modal.js";
 import { legalLinks } from "../config/siteLinks.js";
-import { stepFromHash, stepOf, displayNumber, PHASES, PHASE_ORDER } from "../config/caseSteps.js";
+import { stepFromHash, stepOf, phaseNumber, PHASES, PHASE_ORDER } from "../config/caseSteps.js";
 import { stepsFor, stepRoute, isStepDone } from "../util/caseNav.js";
+import { isSubmitted, refundReceived } from "../util/caseProgress.js";
+import { websiteHome } from "../config/siteLinks.js";
 import { caseName } from "../util/caseName.js";
 import { flagHtml } from "./flow.js";
 
@@ -28,31 +30,53 @@ function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 }
 
+// Antragsblock (Stand 2.1): Ziffern nur für die Phasen 1-3 und "€ Geld
+// erhalten", wie in der Phasenleiste; Unterschritte mit Punkt. "So läuft es
+// ab" ist das (i) neben dem Namen. "Geld erhalten" ist erst nach dem
+// Einreichen anklickbar und hat keinen Unterschritt.
 function renderCase(reclaimCase) {
   const steps = stepsFor(reclaimCase);
   const hashStep = stepOf(steps, stepFromHash(window.location.hash, reclaimCase.targetCountry.toLowerCase()));
   // Folgeseiten (parent) markieren die Zeile ihres Schritts
   const currentN = hashStep?.parent ?? hashStep?.n ?? 0;
-  const row = (s) => {
-    const children = steps.filter((c) => c.parent === s.n);
-    const done = isStepDone(reclaimCase, s) && children.every((c) => isStepDone(reclaimCase, c));
-    const cls = s.n === currentN ? "current" : done ? "done" : "";
-    const num = s.intro ? "i" : displayNumber(steps, s.n);
-    return `<div class="nav-step nav-step-numbered ${cls}" data-nav="${stepRoute(reclaimCase, s.n)}"><span class="nav-step-num">${cls === "done" ? "✓" : num}</span>${esc(s.title)}</div>`;
-  };
   const visible = steps.filter((s) => !s.hidden && !s.parent);
+  const stepDone = (s) => isStepDone(reclaimCase, s) && steps.filter((c) => c.parent === s.n).every((c) => isStepDone(reclaimCase, c));
+  const row = (s) => {
+    const cls = s.n === currentN ? "on" : stepDone(s) ? "done" : "";
+    return `<div class="side-sub ${cls}" data-nav="${stepRoute(reclaimCase, s.n)}">${esc(s.title)}</div>`;
+  };
+  const intro = visible.find((s) => s.intro);
+  const refund = steps.find((s) => s.optional);
+  const submitted = isSubmitted(reclaimCase);
+  const received = refundReceived(reclaimCase).received;
+
+  const phases = PHASE_ORDER.map((phase) => {
+    const ofPhase = visible.filter((s) => s.phase === phase);
+    if (!ofPhase.length) return "";
+    const done = ofPhase.every(stepDone);
+    const now = ofPhase.some((s) => s.n === currentN);
+    return `
+      <div class="side-phase-block ${done ? "done" : now ? "now" : ""}">
+        <div class="side-phase-head"><span class="side-phase-n">${done ? "✓" : phaseNumber(phase)}</span>${esc(PHASES[phase].title)}</div>
+        ${ofPhase.map(row).join("")}
+      </div>`;
+  }).join("");
+
+  const moneyCls = received ? "done" : refund && refund.n === currentN ? "now" : submitted ? "" : "locked";
+  const money = refund
+    ? `<div class="side-phase-block side-money ${moneyCls}" ${submitted ? `data-nav="${stepRoute(reclaimCase, refund.n)}"` : 'title="Erst nach dem Einreichen"'}>
+         <div class="side-phase-head"><span class="side-phase-n">${received ? "✓" : "€"}</span>Geld erhalten</div>
+       </div>`
+    : "";
+
   return `
-    <div class="sidebar-section">
-      <div class="sidebar-section-title">Aktueller Antrag</div>
-      <div class="side-case">
-        <div class="side-case-name">${flagHtml(reclaimCase.targetCountry)}${esc(caseName(reclaimCase))}</div>
-        ${visible.filter((s) => s.intro).map(row).join("")}
-        ${PHASE_ORDER.map((phase) => {
-          const ofPhase = visible.filter((s) => s.phase === phase);
-          if (!ofPhase.length) return "";
-          return `<div class="side-phase">${esc(PHASES[phase].title)}</div>${ofPhase.map(row).join("")}`;
-        }).join("")}
+    <div class="sidebar-section side-case">
+      <div class="side-case-head">
+        <span class="side-case-name">${flagHtml(reclaimCase.targetCountry)}${esc(caseName(reclaimCase))}</span>
+        ${intro ? `<button class="side-info ${intro.n === currentN ? "on" : ""}" data-nav="${stepRoute(reclaimCase, intro.n)}" title="So läuft es ab" type="button">i</button>` : ""}
       </div>
+      ${phases}
+      ${money}
     </div>`;
 }
 
@@ -66,7 +90,7 @@ export function renderSidebar(container) {
   const link = (route, label) => `<a class="sidebar-link ${hash === route ? "active" : ""}" data-nav="${route}">${label}</a>`;
 
   container.innerHTML = `
-    <div class="sidebar-brand">
+    <div class="sidebar-brand" data-nav="#/home" title="Zur Übersicht" role="link" tabindex="0">
       <div style="width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,0.13);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path d="M4 12L9 17" stroke="white" stroke-width="2.6" stroke-linecap="round"/>
@@ -101,12 +125,16 @@ export function renderSidebar(container) {
       <button class="sidebar-btn sidebar-feedback" type="button" data-feedback="sidebar">💬 Feedback geben</button>
       <nav class="sidebar-foot" aria-label="Rechtliches">
         ${legalLinks.map((l) => `<a href="${l.href}">${l.title}</a>`).join("")}
+        <a class="sidebar-website" href="${websiteHome}">divrebound.com ↗</a>
       </nav>
     </div>
   `;
 
   container.querySelectorAll("[data-nav]").forEach((el) => {
     el.addEventListener("click", () => navigate(el.dataset.nav));
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") navigate(el.dataset.nav);
+    });
   });
 
   container.querySelector('[data-action="save"]').addEventListener("click", async () => {

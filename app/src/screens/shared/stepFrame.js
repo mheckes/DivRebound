@@ -1,21 +1,49 @@
 // Kopfzeile und "Zurück / Weiter" eines Schritts, gleich für alle Länder.
 // Die Reihenfolge kommt aus config/caseSteps.js (nicht aus der Routen-Nummer).
+// Seit Stand 2.1: Brotkrume "Schweden 2024 › (2) Bestätigen lassen" (Ziffern
+// nur für Phasen) und rechts der Antragsteller-Chip (wer stellt den Antrag,
+// privat, Wohnsitz) statt eines Häkchens im Überblick.
 
-import { stepOf, stepPosition, neighborStep } from "../../config/caseSteps.js";
+import { stepOf, PHASES, phaseNumber } from "../../config/caseSteps.js";
+import { neighborStep } from "../../config/caseSteps.js";
 import { caseName } from "../../util/caseName.js";
 import { feedbackLinkHtml } from "../../components/feedbackModal.js";
+import { getState } from "../../store/store.js";
 
 function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 }
 
+const COUNTRY_SHORT = { DE: "DE", AT: "AT", CH: "CH" };
+
+/** Wer stellt den Antrag: "Matthias Hecke · Privat · Wohnsitz DE" mit Link zum Profil */
+export function applicantChipHtml(profile) {
+  if (!profile) return "";
+  const r = profile.residence ?? {};
+  const name = [r.firstName, r.lastName].filter(Boolean).join(" ") || "Du";
+  const country = COUNTRY_SHORT[r.country] ?? r.country ?? "DE";
+  return `
+    <span class="applicant-chip" title="Für diese Person wird der Antrag gestellt">
+      <span class="applicant-avatar">${esc(name.slice(0, 1).toUpperCase())}</span>
+      <b>${esc(name)}</b><span class="applicant-meta">· ${profile.heldInPrivateAssets === false ? "Firma" : "Privat"} · Wohnsitz ${esc(country)}</span>
+      <a href="#/profile">ändern</a>
+    </span>`;
+}
+
 export function stepHeaderHtml(steps, reclaimCase, n) {
   const step = stepOf(steps, n);
-  const position = stepPosition(steps, n);
+  const parent = step?.parent ? stepOf(steps, step.parent) : step;
+  const phase = parent?.phase;
+  const crumbPhase = phase
+    ? ` <b>›</b> <span class="crumb-phase"><i>${phaseNumber(phase)}</i>${esc(PHASES[phase].title)}</span>`
+    : "";
   return `
-    <div class="content-header">
-      <h1 class="content-title">${esc(step.heading ?? step.title)}</h1>
-      <div class="content-breadcrumb">${esc(caseName(reclaimCase))}${position ? ` <b>›</b> ${esc(position).replace(" › ", " <b>›</b> ")}` : ""}${feedbackLinkHtml()}</div>
+    <div class="content-header step-head">
+      <div>
+        <h1 class="content-title">${esc(step.heading ?? step.title)}</h1>
+        <div class="content-breadcrumb">${esc(caseName(reclaimCase))}${crumbPhase}${feedbackLinkHtml()}</div>
+      </div>
+      ${applicantChipHtml(getState().currentProfile)}
     </div>`;
 }
 

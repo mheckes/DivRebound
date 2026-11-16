@@ -9,21 +9,13 @@ export const REQUIRED_ITEMS = ["name", "address", "tin", "taxNumber", "taxOffice
 
 export function mount(container, reclaimCase, profile) {
   renderOverview(container, profile, {
+    reclaimCase,
     country: "SE",
     headerHtml: stepHeader(reclaimCase, 1),
     navHtml: stepNavHtml(1, { nextLabel: "Los geht's: Abrechnungen hochladen" }),
-    does: [
-      "Abrechnungen auslesen, Steuersatz prüfen",
-      "Formular „SKV 3740“ ausfüllen",
-      "Anschreiben ans Finanzamt",
-      "Begleitschreiben nach Schweden (Englisch)",
-    ],
-    youDo: [
-      "Formular „SKV 3740“ ausdrucken und unterschreiben",
-      "An dein deutsches Finanzamt schicken",
-      "Bestätigtes Formular mit Kopien der Abrechnungen an die schwedische Steuerbehörde senden",
-    ],
-    prepare: ["<b>Dividendenabrechnungen</b> deiner schwedischen Aktien als PDF (ISIN beginnt mit SE). Frist: fünf Jahre ab Ende des Kalenderjahres der Auszahlung"],
+    does: ["Abrechnungen auslesen", "SKV 3740 ausfüllen", "Anschreiben und Begleitbrief"],
+    youDo: ["Ans Finanzamt schicken", "Formular unterschreiben", "Nach Schweden schicken"],
+    prepare: "Dividendenabrechnungen deiner schwedischen Aktien als PDF, aus den letzten fünf Jahren.",
   });
   bindStepNav(container, reclaimCase, 1);
 }

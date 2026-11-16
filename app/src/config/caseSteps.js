@@ -24,10 +24,10 @@ const INTRO = { n: 1, title: "So läuft es ab", intro: true };
 
 export const DK_STEPS = [
   INTRO,
-  { n: 2, title: "Abrechnungen", heading: "Abrechnungen hochladen", phase: "prepare" },
-  { n: 3, title: "Deine Angaben", phase: "prepare" },
-  { n: 4, title: "Deutsches Finanzamt", heading: "Vom deutschen Finanzamt bestätigen lassen", phase: "confirm" },
-  { n: 5, title: "Dänische Steuerbehörde", heading: "Bei der dänischen Steuerbehörde einreichen", phase: "submit" },
+  { n: 2, title: "Abrechnungen hochladen", phase: "prepare" },
+  { n: 3, title: "Angaben ergänzen", phase: "prepare" },
+  { n: 4, title: "Ans Finanzamt schicken", phase: "confirm" },
+  { n: 5, title: "In Dänemark einreichen", heading: "Bei der dänischen Steuerbehörde einreichen", phase: "submit" },
   { n: 6, title: "Antrag absenden", heading: "Antrag absenden", phase: "submit", parent: 5 },
   { n: 7, title: REFUND_STEP_TITLE, optional: true, hidden: true },
 ];
@@ -37,30 +37,30 @@ export const DK_STEPS = [
 // waren vergeben).
 export const CH_STEPS = [
   INTRO,
-  { n: 2, title: "Wertpapierbestand", heading: "Wertpapierbestand prüfen", phase: "prepare" },
-  { n: 3, title: "Dividenden & Tax Voucher", phase: "prepare" },
-  { n: 8, title: "Deine Angaben", phase: "prepare" },
+  { n: 2, title: "Bestand prüfen", heading: "Wertpapierbestand prüfen", phase: "prepare" },
+  { n: 3, title: "Tax Voucher hochladen", heading: "Dividenden & Tax Voucher", phase: "prepare" },
+  { n: 8, title: "Angaben ergänzen", phase: "prepare" },
   { n: 4, title: "ePortal ausfüllen", phase: "prepare" },
-  { n: 5, title: "Deutsches Finanzamt", heading: "Vom deutschen Finanzamt bestätigen lassen", phase: "confirm" },
-  { n: 6, title: "Schweizer Steuerverwaltung", heading: "Bei der Schweizer Steuerverwaltung einreichen", phase: "submit" },
+  { n: 5, title: "Ans Finanzamt schicken", phase: "confirm" },
+  { n: 6, title: "In der Schweiz einreichen", heading: "Bei der Schweizer Steuerverwaltung einreichen", phase: "submit" },
   { n: 7, title: REFUND_STEP_TITLE, optional: true, hidden: true },
 ];
 
 export const IT_STEPS = [
   INTRO,
-  { n: 2, title: "Abrechnungen", heading: "Abrechnungen hochladen", phase: "prepare" },
-  { n: 3, title: "Deine Angaben", phase: "prepare" },
-  { n: 4, title: "Deutsches Finanzamt", heading: "Vom deutschen Finanzamt bestätigen lassen", phase: "confirm" },
-  { n: 5, title: "Italienische Steuerbehörde", heading: "Bei der italienischen Steuerbehörde einreichen", phase: "submit" },
+  { n: 2, title: "Abrechnungen hochladen", phase: "prepare" },
+  { n: 3, title: "Angaben ergänzen", phase: "prepare" },
+  { n: 4, title: "Ans Finanzamt schicken", phase: "confirm" },
+  { n: 5, title: "In Italien einreichen", heading: "Bei der italienischen Steuerbehörde einreichen", phase: "submit" },
   { n: 6, title: REFUND_STEP_TITLE, optional: true, hidden: true },
 ];
 
 export const SE_STEPS = [
   INTRO,
-  { n: 2, title: "Abrechnungen", heading: "Abrechnungen hochladen", phase: "prepare" },
-  { n: 3, title: "Deine Angaben", phase: "prepare" },
-  { n: 4, title: "Deutsches Finanzamt", heading: "Vom deutschen Finanzamt bestätigen lassen", phase: "confirm" },
-  { n: 5, title: "Schwedische Steuerbehörde", heading: "Bei der schwedischen Steuerbehörde einreichen", phase: "submit" },
+  { n: 2, title: "Abrechnungen hochladen", phase: "prepare" },
+  { n: 3, title: "Angaben ergänzen", phase: "prepare" },
+  { n: 4, title: "Ans Finanzamt schicken", phase: "confirm" },
+  { n: 5, title: "In Schweden einreichen", heading: "Bei der schwedischen Steuerbehörde einreichen", phase: "submit" },
   { n: 6, title: REFUND_STEP_TITLE, optional: true, hidden: true },
 ];
 
@@ -101,9 +101,13 @@ export function neighborStep(steps, n, delta) {
   return i < 0 ? null : walk[i + delta] ?? null;
 }
 
-/** Text für "Schritt x: Titel", z.B. in Verweisen auf einen anderen Schritt */
+/** Verweis auf einen anderen Schritt: „Titel“. Nummern tragen seit Stand 2.1 nur die Phasen. */
 export function stepRef(steps, n) {
   const step = stepOf(steps, n);
-  const num = displayNumber(steps, n);
-  return num ? `Schritt ${num}: ${step.title}` : step?.title ?? "";
+  return step ? `„${step.title}“` : "";
+}
+
+/** Nummer der Phase für den Nutzer: 1, 2, 3 (0 = keine Phase) */
+export function phaseNumber(phase) {
+  return PHASE_ORDER.indexOf(phase) + 1;
 }

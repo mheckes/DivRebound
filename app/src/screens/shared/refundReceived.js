@@ -4,7 +4,7 @@
 // weil die Wartezeit verzinst wird. Fließt in die Statistik auf der
 // Startseite ein (Summe, Wartezeit, Mehrbetrag).
 
-import { formatDateDe } from "../../util/format.js";
+import { formatDateDe, formatNumberDe } from "../../util/format.js";
 import { submittedAt, refundReceived, parseAmount, monthsBetween } from "../../util/caseProgress.js";
 import { showToast } from "../../components/toast.js";
 import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
@@ -57,7 +57,7 @@ export function refundReceivedHtml(reclaimCase, { headerHtml, navHtml, expected 
           r.received
             ? `<div class="ch-received">
                 <div class="field-row"><label class="field-label" for="refund-date">Erhalten am</label><input id="refund-date" class="field-input" type="date" data-refund="date" value="${esc(r.date)}"></div>
-                <div class="field-row"><label class="field-label" for="refund-amount">Betrag (EUR)</label><input id="refund-amount" class="field-input mono" inputmode="decimal" data-refund="amountEur" placeholder="${esc(expected?.eur ? eur(expected.eur).replace(" €", "") : "z.B. 42,80")}" value="${esc(r.amountEur)}"></div>
+                <div class="field-row"><label class="field-label" for="refund-amount">Betrag (EUR)</label><input id="refund-amount" class="field-input mono" inputmode="decimal" data-refund="amountEur" placeholder="${esc(expected?.eur ? eur(expected.eur).replace(" €", "") : "z.B. 42,80")}" value="${esc(parseAmount(r.amountEur) === null ? r.amountEur : formatNumberDe(parseAmount(r.amountEur)))}"></div>
               </div>
               <div class="field-hint">Betrag so, wie er auf deinem Konto eingegangen ist, inklusive etwaiger Verzugszinsen.</div>`
             : ""
@@ -93,7 +93,9 @@ export function bindRefundReceived(container, reclaimCase, { save, rerender }) {
         showToast("Bitte einen Betrag wie 42,80 eingeben");
         return;
       }
-      reclaimCase.refundReceived = { ...refundReceived(reclaimCase), received: true, [key]: input.value.trim() };
+      // Betrag immer deutsch speichern ("40.80" -> "40,80")
+      const value = key === "amountEur" && input.value.trim() ? formatNumberDe(parseAmount(input.value)) : input.value.trim();
+      reclaimCase.refundReceived = { ...refundReceived(reclaimCase), received: true, [key]: value };
       await save(reclaimCase);
       showToast(`✓ ${key === "date" ? "Datum" : "Betrag"} gespeichert`);
       rerender();

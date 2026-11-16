@@ -9,21 +9,13 @@ export const REQUIRED_ITEMS = ["name", "address", "birthDate", "birthPlace", "ti
 
 export function mount(container, reclaimCase, profile) {
   renderOverview(container, profile, {
+    reclaimCase,
     country: "IT",
     headerHtml: stepHeader(reclaimCase, 1),
     navHtml: stepNavHtml(1, { nextLabel: "Los geht's: Abrechnungen hochladen" }),
-    does: [
-      "Abrechnungen auslesen, Steuersatz prüfen",
-      "Formular „Form A“ ausfüllen (eines pro Unternehmen)",
-      "Anschreiben ans Finanzamt",
-      "Begleitschreiben nach Italien (Englisch)",
-    ],
-    youDo: [
-      "Formular „Form A“ ausdrucken und zweimal unterschreiben",
-      "An dein deutsches Finanzamt schicken",
-      "Bestätigtes Formular mit Kopien der Abrechnungen per Post nach Italien senden",
-    ],
-    prepare: ["<b>Dividendenabrechnungen</b> deiner italienischen Aktien als PDF (ISIN beginnt mit IT), Zahltag höchstens 48 Monate zurück"],
+    does: ["Abrechnungen auslesen", "Form A ausfüllen", "Anschreiben und Begleitbrief"],
+    youDo: ["Ans Finanzamt schicken", "Formulare unterschreiben", "Per Post nach Italien"],
+    prepare: "Dividendenabrechnungen deiner italienischen Aktien als PDF, höchstens 48 Monate alt.",
   });
   bindStepNav(container, reclaimCase, 1);
 }

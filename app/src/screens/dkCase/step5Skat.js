@@ -15,8 +15,10 @@
 // sichtbares Kurz-Feedback vorsieht (Kopier-Häkchen-Flash, Zeilen-Highlight) -
 // das würde ein voller Re-Render mitten in der Animation zerstören.
 
+import { signNowHtml } from "../../components/flow.js";
 import * as caseRepo from "../../db/caseRepo.js";
 import { corridors } from "../../config/corridors.js";
+import { formatNumberDe } from "../../util/format.js";
 import { buildSubmissionChunks } from "../../util/chunking.js";
 import { portalBoxHtml, portalSideHtml } from "../../components/portalSide.js";
 import { skatTabs, buildSharePages, shareHelpNote } from "./skatFieldMap.js";
@@ -188,7 +190,7 @@ export function mount(container, reclaimCase, profile) {
           <div class="plausibility-check">
             <div class="pc-label">🔍 Amount of refund (DKK) – Plausibilitäts-Check <span class="en">wird von SKAT automatisch berechnet, nicht von uns eingetragen</span></div>
             <div class="pc-row">
-              <span>Unsere Schätzung: <b>${sp.plausibilityEstimate.toFixed(2)} DKK</b></span>
+              <span>Unsere Schätzung: <b>${formatNumberDe(sp.plausibilityEstimate)} DKK</b></span>
               <span>SKAT zeigt: <input type="text" class="pc-input" data-pc="${sp.distributionId}" placeholder="DKK"></span>
               <span class="pc-result" data-pc-result="${sp.distributionId}"></span>
             </div>
@@ -346,6 +348,7 @@ export function mount(container, reclaimCase, profile) {
     container.innerHTML = `
       <div class="ch-page">
       ${stepHeader(reclaimCase, 5)}
+      ${signNowHtml(reclaimCase, "die gestempelte Wohnsitzbescheinigung")}
       ${portalBoxHtml(portalBox)}
 
       <section class="cheat-section">
@@ -446,7 +449,7 @@ export function mount(container, reclaimCase, profile) {
             result.textContent = "✓ stimmt überein";
             result.className = "pc-result pc-ok";
           } else {
-            result.textContent = `⚠ weicht um ${diff.toFixed(2)} DKK ab`;
+            result.textContent = `⚠ weicht um ${formatNumberDe(diff)} DKK ab`;
             result.className = "pc-result pc-warn";
           }
         });

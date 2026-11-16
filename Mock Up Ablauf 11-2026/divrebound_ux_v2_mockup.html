@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DivRebound UX v2 – Mockup</title>
+<style>
+  /* Schriften aus der App (selbst gehostet), kein Abruf bei Google */
+  @font-face{font-family:"DM Sans";font-weight:300 700;font-display:swap;src:url("../app/src/style/fonts/dm-sans-latin.woff2") format("woff2");}
+  @font-face{font-family:"DM Serif Display";font-weight:400;font-display:swap;src:url("../app/src/style/fonts/dm-serif-display-normal-latin.woff2") format("woff2");}
+  @font-face{font-family:"JetBrains Mono";font-weight:400 700;font-display:swap;src:url("../app/src/style/fonts/jetbrains-mono-latin.woff2") format("woff2");}
+
+  /* Tokens aus app/src/style/tokens.css, dazu die Typo-Skala */
+  :root{
+    --navy:#0f2240; --navy-mid:#1a3a6b; --navy-light:#e8eef7;
+    --cyan:#00b4d8; --cyan-dark:#007a9e; --cyan-light:#e0f7fc;
+    --bg:#f2f4f7; --surface:#fff; --charcoal:#111827; --muted:#6b7c93; --stone:#aab4c4; --divider:#d8dfe8;
+    --success:#059669; --success-bg:#d1fae5; --danger:#a8433a; --danger-tint:#f7e9e7;
+    --warn:#8a5a00; --warn-bg:#fff4d6;
+    --font-display:"DM Serif Display", Georgia, serif;
+    --font-body:"DM Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-mono:"JetBrains Mono", "Courier New", monospace;
+    /* Typo-Skala: nur diese drei Größen im Inhalt (plus Seitentitel) */
+    --t-body:14px; --t-hint:12.5px; --t-title:15px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--charcoal);font-family:var(--font-body);font-size:var(--t-body);line-height:1.5;}
+  button,input,select{font-family:inherit;font-size:inherit;color:inherit;}
+  .mono{font-family:var(--font-mono);}
+
+  /* ---------- Mockup-Leiste ---------- */
+  .mock-bar{background:#fff7e0;border-bottom:1px solid #f0d48a;padding:8px 16px;font-size:12px;color:#6b5200;display:flex;gap:12px;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:30;}
+  .mock-bar b{color:#4a3800;}
+  .mock-toggle{display:inline-flex;border:1px solid #e0c060;border-radius:8px;overflow:hidden;}
+  .mock-toggle button{border:0;background:#fffdf5;padding:5px 10px;font-size:12px;color:#6b5200;cursor:pointer;}
+  .mock-toggle button + button{border-left:1px solid #e0c060;}
+  .mock-toggle button.on{background:#f0d48a;color:#4a3800;font-weight:600;}
+  .mock-bar label{display:inline-flex;gap:6px;align-items:center;cursor:pointer;}
+  .mock-bar .push{margin-left:auto;}
+
+  /* Notizen: was sich gegenüber der App ändert */
+  .neu{display:none;margin:0 0 12px;padding:8px 12px;border:1px dashed var(--cyan-dark);background:var(--cyan-light);border-radius:8px;font-size:12px;color:#064a5e;}
+  .neu b{font-size:10px;letter-spacing:.08em;background:var(--cyan-dark);color:#fff;border-radius:4px;padding:1px 6px;margin-right:6px;}
+  body.show-neu .neu{display:block;}
+  .sidebar .neu{background:rgba(0,180,216,.14);color:#bfeefa;border-color:rgba(0,180,216,.6);margin:0;}
+
+  /* ---------- Flaggen als SVG im echten Seitenverhältnis (Punkt 3) ---------- */
+  .flag{display:inline-block;height:14px;border-radius:2px;margin-right:10px;vertical-align:-2px;flex-shrink:0;background-size:100% 100%;box-shadow:0 0 0 1px rgba(15,34,64,.14);}
+  .flag.se{width:22px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 10'%3E%3Crect width='16' height='10' fill='%23006aa7'/%3E%3Crect x='5' width='2' height='10' fill='%23fecc02'/%3E%3Crect y='4' width='16' height='2' fill='%23fecc02'/%3E%3C/svg%3E");}
+  .flag.dk{width:19px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 37 28'%3E%3Crect width='37' height='28' fill='%23c8102e'/%3E%3Crect x='12' width='4' height='28' fill='%23fff'/%3E%3Crect y='12' width='37' height='4' fill='%23fff'/%3E%3C/svg%3E");}
+  .flag.ch{width:14px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23da291c'/%3E%3Crect x='13' y='6' width='6' height='20' fill='%23fff'/%3E%3Crect x='6' y='13' width='20' height='6' fill='%23fff'/%3E%3C/svg%3E");}
+  .flag.it{width:21px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3Crect width='1' height='2' fill='%23009246'/%3E%3Crect x='1' width='1' height='2' fill='%23fff'/%3E%3Crect x='2' width='1' height='2' fill='%23ce2b37'/%3E%3C/svg%3E");}
+  .sidebar .flag{box-shadow:0 0 0 1px rgba(255,255,255,.35);margin-right:8px;}
+
+  /* ---------- Shell ---------- */
+  .shell{display:flex;min-height:calc(100vh - 38px);}
+  .sidebar{width:250px;flex-shrink:0;background:var(--navy);color:#fff;padding:24px 16px 20px;display:flex;flex-direction:column;gap:20px;}
+  .brand{display:flex;align-items:center;gap:10px;cursor:pointer;border-radius:10px;padding:4px;margin:-4px;}
+  .brand:hover{background:rgba(255,255,255,.07);}
+  .brand-logo{width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,.13);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .wordmark{line-height:1.1;margin-bottom:3px;font-family:var(--font-display);font-size:22px;letter-spacing:-.015em;}
+  .brand-beta{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);border:1px solid rgba(0,180,216,.55);background:rgba(0,180,216,.12);border-radius:4px;padding:1px 6px;}
+  .side-links{display:flex;flex-direction:column;gap:2px;}
+  .side-link{display:block;padding:7px 10px;border-radius:8px;color:#dbe5f3;cursor:pointer;font-weight:600;font-size:13px;}
+  .side-link:hover,.side-link.on{background:rgba(255,255,255,.09);color:#fff;}
+
+  /* Antragsblock: Ziffern = Phasen, Unterschritte als Handlung */
+  .side-case{display:none;}
+  body.on-case .side-case{display:block;}
+  .side-case-head{display:flex;align-items:center;justify-content:space-between;padding:0 10px 10px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:8px;}
+  .side-case-head b{font-size:13px;letter-spacing:.02em;display:flex;align-items:center;}
+  .info-dot{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(255,255,255,.4);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#dbe5f3;cursor:pointer;font-style:normal;}
+  .info-dot.on{background:#fff;color:var(--navy);border-color:#fff;}
+  .sp{margin-bottom:6px;}
+  .sp-head{display:flex;align-items:center;gap:9px;padding:6px 10px;font-weight:700;font-size:13px;color:#fff;}
+  .sp-n{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.14);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+  .sp.done .sp-n{background:var(--success);}
+  .sp.now .sp-n{background:#fff;color:var(--navy);}
+  .sp.later .sp-head{color:rgba(255,255,255,.55);}
+  .sp.locked .sp-head,.sp.locked .ss{color:rgba(255,255,255,.32);cursor:default;}
+  .sp.locked .sp-n{background:rgba(255,255,255,.08);}
+  .ss{display:flex;align-items:center;gap:10px;margin-left:19px;padding:5px 10px 5px 19px;border-left:1.5px solid rgba(255,255,255,.14);color:rgba(255,255,255,.62);cursor:pointer;font-size:13px;}
+  .ss:hover{color:#fff;}
+  .sp.locked .ss:hover{color:rgba(255,255,255,.32);}
+  .ss::before{content:"";width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);margin-left:-23px;flex-shrink:0;}
+  .ss.done::before{background:var(--success);}
+  .ss.on{color:#fff;font-weight:700;background:linear-gradient(90deg,rgba(255,255,255,.1),rgba(255,255,255,0));border-radius:0 7px 7px 0;}
+  .ss.on::before{background:var(--cyan);box-shadow:0 0 0 3px rgba(0,180,216,.3);}
+  .ss small{margin-left:auto;font-size:10.5px;opacity:.8;}
+
+  .side-bottom{margin-top:auto;display:flex;flex-direction:column;gap:8px;}
+  .account{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border-radius:10px;padding:8px 10px;}
+  .account b{display:block;color:#fff;font-size:13px;}
+  .account small{color:var(--stone);font-size:11px;}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--cyan);color:var(--navy);font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .side-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:12.5px;font-weight:600;padding:7px 10px;border-radius:8px;text-align:left;cursor:pointer;}
+  .side-foot{font-size:12px;color:rgba(255,255,255,.5);display:flex;gap:6px 12px;flex-wrap:wrap;padding-top:10px;border-top:1px solid rgba(255,255,255,.12);}
+  .side-foot span{cursor:pointer;}
+  .side-foot span:hover{color:#fff;}
+  .side-foot .web{color:rgba(255,255,255,.75);}
+
+  .content{flex:1;padding:24px 32px 60px;min-width:0;}
+  .page{max-width:900px;}
+  .screen{display:none;}
+  .screen.on{display:block;}
+  .page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px;}
+  h1{font-family:var(--font-display);font-weight:400;font-size:27px;margin:0 0 2px;letter-spacing:-.01em;}
+  .crumb{color:var(--muted);font-size:var(--t-hint);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .crumb .ph{display:inline-flex;align-items:center;gap:6px;color:var(--charcoal);font-weight:600;}
+  .crumb .ph i{font-style:normal;width:18px;height:18px;border-radius:50%;background:var(--navy);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;}
+
+  .card{background:var(--surface);border:1px solid var(--divider);border-radius:12px;margin-bottom:16px;overflow:hidden;}
+  .card-head{padding:12px 18px;font-weight:700;font-size:var(--t-title);display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--divider);}
+  .card-head small{font-weight:400;color:var(--muted);font-size:var(--t-hint);}
+  .card-body{padding:16px 18px;}
+  .hint{color:var(--muted);font-size:var(--t-hint);}
+
+  .btn{border-radius:9px;padding:9px 16px;font-weight:600;cursor:pointer;border:1px solid transparent;font-size:var(--t-body);white-space:nowrap;}
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-primary:hover{background:var(--navy-mid);}
+  .btn-accent{background:var(--cyan);color:var(--navy);}
+  .btn-secondary{background:#fff;border-color:var(--divider);color:var(--charcoal);}
+  .btn-small{padding:6px 12px;font-size:var(--t-hint);}
+  .btn-big{padding:12px 20px;font-size:15px;border-radius:10px;box-shadow:0 4px 14px rgba(15,34,64,.18);}
+  .step-nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:12px;}
+
+  /* ---------- Punkt 2: Startseite mit kompakten Karten ---------- */
+  .group{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:20px 0 8px;display:flex;align-items:center;gap:6px;}
+  .group .cnt{background:var(--divider);color:var(--charcoal);border-radius:99px;padding:0 7px;letter-spacing:0;}
+  summary.group{cursor:pointer;list-style:none;}
+  summary.group::-webkit-details-marker{display:none;}
+  summary.group::before{content:"▸";transition:transform .15s;}
+  details[open] > summary.group::before{transform:rotate(90deg);}
+
+  .case{background:var(--surface);border:1px solid var(--divider);border-radius:12px;padding:14px 18px;margin-bottom:10px;display:grid;grid-template-columns:1fr auto;gap:6px 16px;align-items:center;cursor:pointer;transition:border-color .15s, box-shadow .15s;}
+  .case:hover{border-color:var(--navy);box-shadow:0 4px 14px rgba(15,34,64,.08);}
+  .case.attn{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-light);}
+  .case-top{display:flex;align-items:center;gap:10px;min-width:0;}
+  .case-name{font-weight:700;font-size:var(--t-title);display:flex;align-items:center;}
+  .case-amt{color:var(--muted);font-size:var(--t-hint);}
+  .case-amt b{color:var(--charcoal);font-weight:600;}
+  .case-tools{display:flex;align-items:center;gap:6px;justify-content:flex-end;}
+  .trash{width:32px;height:32px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;}
+  .trash svg{width:17px;height:17px;}
+  .trash:hover{background:var(--danger-tint);border-color:#e7c3be;color:var(--danger);}
+  .case-q{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px;padding-top:10px;border-top:1px dashed var(--divider);font-weight:600;}
+  .case-q div{display:flex;gap:8px;}
+  .wait-info{font-weight:400;color:var(--muted);font-size:var(--t-hint);}
+  .wait-info b{color:var(--charcoal);font-size:var(--t-body);font-weight:600;}
+  .wait-info a{color:var(--warn);font-weight:600;text-decoration:underline;cursor:pointer;margin-left:4px;}
+  .case.late{border-color:#e9c46a;box-shadow:0 0 0 3px var(--warn-bg);}
+  .case.late .case-q{border-top-color:#f0d48a;}
+  .case.late .wait-info{color:var(--warn);}
+  .case.late .wait-info b{color:var(--warn);}
+
+  /* Schrittleiste mit Beschriftung */
+  .steps-bar{display:flex;flex-wrap:wrap;align-items:center;list-style:none;margin:0;padding:0;font-size:12px;color:var(--stone);}
+  .steps-bar li{display:flex;align-items:center;gap:5px;white-space:nowrap;}
+  .steps-bar li + li::before{content:"";width:20px;height:2px;margin:0 6px;border-radius:1px;background:var(--divider);}
+  .steps-bar li.done + li::before{background:var(--success);}
+  .steps-bar i{font-style:normal;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--divider);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:#fff;}
+  .steps-bar li.done{color:var(--success);}
+  .steps-bar li.done i{background:var(--success);border-color:var(--success);color:#fff;}
+  .steps-bar li.now{color:var(--charcoal);font-weight:700;}
+  .steps-bar li.now i{background:var(--cyan);border-color:var(--cyan);color:#fff;box-shadow:0 0 0 3px var(--cyan-light);}
+
+  .statline{display:flex;gap:22px;flex-wrap:wrap;color:var(--muted);font-size:var(--t-hint);margin:22px 0 0;padding:12px 16px;background:var(--surface);border:1px solid var(--divider);border-radius:12px;}
+  .statline b{font-family:var(--font-mono);color:var(--charcoal);font-size:var(--t-body);margin-right:4px;}
+  .backup{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:12px;color:var(--muted);font-size:var(--t-hint);}
+
+  /* Länderwahl als Dialog */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(15,34,64,.45);z-index:40;align-items:flex-start;justify-content:center;padding-top:90px;}
+  .overlay.on{display:flex;}
+  .dialog{background:var(--surface);border-radius:16px;width:min(640px,92vw);box-shadow:0 24px 60px rgba(15,34,64,.35);overflow:hidden;}
+  .dialog-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px 6px;}
+  .dialog-head h2{font-family:var(--font-display);font-weight:400;font-size:22px;margin:0;}
+  .x{border:0;background:none;font-size:22px;color:var(--muted);cursor:pointer;}
+  .dialog-body{padding:10px 22px 22px;}
+  .countries{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+  .country{text-align:left;background:var(--bg);border:1px solid var(--divider);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color .15s, transform .15s;}
+  .country:hover{border-color:var(--cyan);background:#fff;transform:translateY(-1px);}
+  .country b{display:flex;align-items:center;font-size:var(--t-title);margin-bottom:2px;}
+  .country span{color:var(--muted);font-size:var(--t-hint);}
+  .who{display:flex;flex-direction:column;gap:10px;}
+  .who-card{display:flex;align-items:center;gap:12px;text-align:left;background:var(--bg);border:1px solid var(--divider);border-radius:12px;padding:12px 14px;cursor:pointer;}
+  .who-card:hover{border-color:var(--cyan);background:#fff;}
+  .who-card .avatar{width:34px;height:34px;}
+  .who-card b{display:block;}
+  .who-card small{color:var(--muted);font-size:var(--t-hint);}
+  .who-card.add{border-style:dashed;color:var(--cyan-dark);font-weight:600;}
+  .seg{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px;}
+  .seg button{border:1px solid var(--divider);background:#fff;border-radius:9px;padding:8px 14px;cursor:pointer;font-weight:600;}
+  .seg button.on{border-color:var(--navy);background:var(--navy);color:#fff;}
+  .seg button[disabled]{color:var(--stone);background:var(--bg);cursor:not-allowed;font-weight:500;}
+  .seg button small{display:block;font-size:11px;font-weight:500;}
+  .lbl{font-weight:700;font-size:var(--t-hint);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+
+  /* Antragsteller-Chip */
+  .chip{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--divider);border-radius:99px;padding:5px 12px 5px 5px;font-size:var(--t-hint);white-space:nowrap;}
+  .chip .avatar{width:24px;height:24px;font-size:11px;}
+  .chip b{font-weight:700;}
+  .chip a{color:var(--cyan-dark);font-weight:600;cursor:pointer;margin-left:4px;}
+
+  /* ---------- Punkt 5: So läuft es ab (alte Seite, weniger Text) ---------- */
+  .phases{display:grid;grid-template-columns:repeat(3,1fr) .85fr;background:var(--surface);border:1px solid var(--divider);border-radius:12px;margin-bottom:16px;overflow:hidden;}
+  .phase{padding:16px 18px;border-right:1px solid var(--divider);}
+  .phase:last-child{border-right:0;background:var(--navy-light);}
+  .phase.now{box-shadow:inset 0 3px 0 var(--cyan);}
+  .phase-n{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+  .phase:last-child .phase-n{background:var(--success);}
+  .phase-title{font-weight:700;font-size:var(--t-title);margin:8px 0 0;}
+  .phase-time{font-family:var(--font-mono);font-size:11.5px;color:var(--cyan-dark);margin-bottom:6px;}
+  .phase p{margin:0;color:#3b4a60;font-size:var(--t-hint);}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .two-col .card{margin-bottom:16px;}
+  ul.clean{margin:0;padding-left:18px;}
+  ul.clean li{margin:3px 0;}
+
+  /* ---------- Punkt 7: Finanzamt ---------- */
+  .doc{display:flex;justify-content:space-between;align-items:center;gap:14px;}
+  .doc-icon{width:40px;height:48px;border-radius:6px;background:var(--navy-light);color:var(--navy-mid);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;}
+  .doc-main{display:flex;gap:14px;align-items:center;}
+  .doc b{display:block;}
+  .ways{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .way-opt{text-align:left;border:1.5px solid var(--divider);background:#fff;border-radius:12px;padding:12px 14px;cursor:pointer;}
+  .way-opt b{display:flex;justify-content:space-between;align-items:center;}
+  .way-opt small{display:block;color:var(--muted);font-size:var(--t-hint);margin-top:2px;}
+  .way-opt.on{border-color:var(--navy);box-shadow:0 0 0 3px var(--navy-light);}
+  .tag{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--success-bg);color:#065f46;border-radius:4px;padding:1px 6px;}
+  .way{display:none;}
+  .way.on{display:block;}
+  .steps{list-style:none;margin:0;padding:0;counter-reset:s;}
+  .steps > li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;padding:7px 0;}
+  .steps > li::before{content:counter(s);width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+  .steps > li > div{padding-top:2px;flex:1;}
+  .steps .path{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .steps .path b{background:var(--navy-light);color:var(--navy);border-radius:6px;padding:1px 8px;font-weight:600;}
+  .steps .path span{color:var(--stone);}
+  .steps .btn{margin-left:8px;}
+  .elster-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 6px;}
+  .elster-head b{font-size:var(--t-title);}
+  .note-warn{background:var(--warn-bg);color:var(--warn);border-radius:9px;padding:9px 12px;font-size:var(--t-hint);margin-bottom:10px;}
+  /* Die eine Pause-Komponente */
+  .pause{display:flex;align-items:center;gap:14px;background:var(--navy-light);border-radius:12px;padding:14px 18px;}
+  .pause-icon{width:36px;height:36px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+  .pause-text{flex:1;}
+  .pause-text b{display:block;font-size:var(--t-body);}
+  .pause-text span{color:var(--muted);font-size:var(--t-hint);}
+  .pause-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 16px;border-radius:9px;font-size:13px;opacity:0;transition:opacity .2s;z-index:50;pointer-events:none;}
+  .toast.on{opacity:1;}
+
+  @media (max-width:900px){
+    .sidebar{display:none;} .content{padding:16px;}
+    .phases,.ways,.two-col{grid-template-columns:1fr 1fr;}
+    .page-head{flex-direction:column;}
+    .steps-bar li + li::before{display:none;} .steps-bar{gap:6px 14px;}
+  }
+</style>
+</head>
+<body class="show-neu">
+
+<div class="mock-bar">
+  <b>Mockup · UX v2</b>
+  <span class="mock-toggle" id="nav">
+    <button data-go="home" class="on">Startseite</button>
+    <button data-go="intro">So läuft es ab</button>
+    <button data-go="fa">Ans Finanzamt schicken</button>
+  </span>
+  <label><input type="checkbox" id="multi"> mehrere Personen im Profil</label>
+  <label class="push"><input type="checkbox" id="notes" checked> Änderungen markieren</label>
+</div>
+
+<div class="shell">
+  <!-- ================= Seitenleiste ================= -->
+  <aside class="sidebar">
+    <div class="brand" data-go="home" title="Zur Übersicht">
+      <div class="brand-logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12L9 17" stroke="white" stroke-width="2.6" stroke-linecap="round"/><path d="M9 17L20 5M20 5L14.9 7.1M20 5L18.4 10.3" stroke="#00B4D8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div><div class="wordmark">DivRebound</div><span class="brand-beta">Beta</span></div>
+    </div>
+
+    <nav class="side-links">
+      <a class="side-link" data-go="home" id="link-home">Übersicht</a>
+      <a class="side-link">Mein Profil</a>
+      <a class="side-link">Anschreiben Finanzamt</a>
+    </nav>
+
+    <div class="side-case">
+      <div class="side-case-head">
+        <b><span class="flag se"></span>Schweden 2024</b>
+        <i class="info-dot" data-go="intro" id="dot-intro" title="So läuft es ab">i</i>
+      </div>
+      <div class="sp" id="sp1">
+        <div class="sp-head"><span class="sp-n">1</span>Vorbereiten</div>
+        <div class="ss" id="ss-abr">Abrechnungen hochladen</div>
+        <div class="ss" id="ss-ang">Angaben ergänzen</div>
+      </div>
+      <div class="sp" id="sp2">
+        <div class="sp-head"><span class="sp-n">2</span>Bestätigen lassen</div>
+        <div class="ss" data-go="fa" id="ss-fa">Ans Finanzamt schicken</div>
+      </div>
+      <div class="sp later" id="sp3">
+        <div class="sp-head"><span class="sp-n">3</span>Einreichen</div>
+        <div class="ss">In Schweden einreichen</div>
+      </div>
+      <div class="sp locked" id="sp4" title="Erst nach dem Einreichen">
+        <div class="sp-head"><span class="sp-n">€</span>Geld erhalten</div>
+        <div class="ss">Betrag eintragen</div>
+      </div>
+      <div class="neu" style="margin-top:12px;"><b>NEU</b>„€ Geld erhalten“ als vierte Phase, ausgegraut bis zum Einreichen. Unterschritte als Handlung benannt.</div>
+    </div>
+
+    <div class="side-bottom">
+      <div class="account"><span class="avatar">M</span><div><b>Matthias Hecke</b><small>Daten nur in diesem Browser</small></div></div>
+      <button class="side-btn">💾 Sicherung speichern</button>
+      <button class="side-btn">📂 Sicherung laden</button>
+      <button class="side-btn">💬 Feedback geben</button>
+      <div class="side-foot"><span>Über mich</span><span>Impressum</span><span>Datenschutz</span><span class="web">divrebound.com ↗</span></div>
+      <div class="neu"><b>NEU</b>Logo führt zur Übersicht. Die Website steht unten mit ↗, weil sie die App verlässt.</div>
+    </div>
+  </aside>
+
+  <!-- ================= Inhalt ================= -->
+  <main class="content">
+
+    <!-- ---------- Startseite ---------- -->
+    <section class="screen on" id="s-home"><div class="page">
+      <div class="page-head">
+        <div><h1>Willkommen zurück, Matthias</h1><div class="crumb">Übersicht</div></div>
+        <button class="btn btn-primary btn-big" data-open-picker>+ Neuer Antrag</button>
+      </div>
+      <div class="neu"><b>NEU</b>Wieder Karten wie vorher, aber zwei Zeilen statt vier: Name und Betrag, darunter die Schrittleiste. Die ganze Karte ist klickbar, der Button bleibt als sichtbarer Hinweis. Papierkorb immer sichtbar, rot beim Überfahren. Fragen nur bei Karten, die eine Antwort brauchen.</div>
+
+      <div class="group">Du bist dran <span class="cnt">2</span></div>
+      <div class="case" data-go="intro">
+        <div class="case-top"><span class="case-name"><span class="flag se"></span>Schweden 2024</span><span class="case-amt"><b>486,00 SEK</b> erwartet</span></div>
+        <div class="case-tools"><button class="btn btn-primary btn-small">Weiter →</button><button class="trash" title="Antrag löschen" data-del>TRASH</button></div>
+        <ol class="steps-bar"><li class="now"><i>1</i>Vorbereiten</li><li><i>2</i>Bestätigen lassen</li><li><i>3</i>Einreichen</li><li><i>€</i>Geld erhalten</li></ol>
+      </div>
+      <div class="case" data-go="intro">
+        <div class="case-top"><span class="case-name"><span class="flag dk"></span>Dänemark 2025</span><span class="case-amt">angelegt am 16.11.2026</span></div>
+        <div class="case-tools"><button class="btn btn-primary btn-small">Starten →</button><button class="trash" title="Antrag löschen" data-del>TRASH</button></div>
+        <ol class="steps-bar"><li class="now"><i>1</i>Vorbereiten</li><li><i>2</i>Bestätigen lassen</li><li><i>3</i>Einreichen</li><li><i>€</i>Geld erhalten</li></ol>
+      </div>
+
+      <div class="group">Wartet auf Antwort <span class="cnt">3</span></div>
+      <div class="neu"><b>NEU</b>Kein „Noch nicht“ mehr: Solange nichts zurück ist, muss der Nutzer nichts tun. Die Karte zeigt, wie lange es schon dauert und was üblich ist, und hat genau eine Aktion. Dauert es länger als üblich, wird die Zeile gelb und bietet eine Nachfrage beim Finanzamt an.</div>
+      <div class="case attn" data-go="fa">
+        <div class="case-top"><span class="case-name"><span class="flag it"></span>Italien 2023</span><span class="case-amt"><b>41,20 EUR</b> erwartet</span></div>
+        <div class="case-tools"><button class="trash" title="Antrag löschen" data-del>TRASH</button></div>
+        <ol class="steps-bar"><li class="done"><i>✓</i>Vorbereiten</li><li class="now"><i>2</i>Bestätigen lassen</li><li><i>3</i>Einreichen</li><li><i>€</i>Geld erhalten</li></ol>
+        <div class="case-q"><span class="wait-info"><b>Beim Finanzamt seit 12 Tagen</b> · meist 2–3 Wochen</span><div><button class="btn btn-accent btn-small" data-stop data-toast="Weiter zu ③ Einreichen">Bestätigung ist da →</button></div></div>
+      </div>
+      <div class="case attn late">
+        <div class="case-top"><span class="case-name"><span class="flag se"></span>Schweden 2023</span><span class="case-amt"><b>312,00 SEK</b> erwartet</span></div>
+        <div class="case-tools"><button class="trash" title="Antrag löschen" data-del>TRASH</button></div>
+        <ol class="steps-bar"><li class="done"><i>✓</i>Vorbereiten</li><li class="now"><i>2</i>Bestätigen lassen</li><li><i>3</i>Einreichen</li><li><i>€</i>Geld erhalten</li></ol>
+        <div class="case-q"><span class="wait-info"><b>Beim Finanzamt seit 5 Wochen</b> · länger als üblich. <a data-stop data-toast="Öffnet einen fertigen Nachfrage-Text für ELSTER">Beim Finanzamt nachfragen</a></span><div><button class="btn btn-accent btn-small" data-stop data-toast="Weiter zu ③ Einreichen">Bestätigung ist da →</button></div></div>
+      </div>
+      <div class="case attn">
+        <div class="case-top"><span class="case-name"><span class="flag ch"></span>Schweiz 2025</span><span class="case-amt">eingereicht am 10.09.2026</span></div>
+        <div class="case-tools"><button class="trash" title="Antrag löschen" data-del>TRASH</button></div>
+        <ol class="steps-bar"><li class="done"><i>✓</i>Vorbereiten</li><li class="done"><i>✓</i>Bestätigen lassen</li><li class="done"><i>✓</i>Einreichen</li><li class="now"><i>€</i>Geld erhalten</li></ol>
+        <div class="case-q"><span class="wait-info"><b>Eingereicht vor 2 Monaten</b> · meist einige Wochen bis Monate</span><div><button class="btn btn-accent btn-small" data-stop data-toast="Betrag eintragen">Geld ist da →</button></div></div>
+      </div>
+
+      <details>
+        <summary class="group">Abgeschlossen <span class="cnt">2</span></summary>
+        <div class="case">
+          <div class="case-top"><span class="case-name"><span class="flag dk"></span>Dänemark 2024–2025</span><span class="case-amt"><b>40,80 EUR</b> erhalten am 03.11.2026</span></div>
+          <div class="case-tools"><button class="btn btn-secondary btn-small">Ansehen</button><button class="trash" title="Antrag löschen" data-del>TRASH</button></div>
+        </div>
+        <div class="case">
+          <div class="case-top"><span class="case-name"><span class="flag se"></span>Schweden 2022–2023</span><span class="case-amt"><b>1.234,50 EUR</b> erhalten am 20.09.2024</span></div>
+          <div class="case-tools"><button class="btn btn-secondary btn-small">Ansehen</button><button class="trash" title="Antrag löschen" data-del>TRASH</button></div>
+        </div>
+      </details>
+
+      <div class="statline"><span><b>7</b>Anträge</span><span><b>1.275,30 EUR</b>erhalten</span><span><b>6 Monate</b>Ø bis zur Auszahlung</span></div>
+      <div class="backup"><span>Deine Anträge liegen nur in diesem Browser.</span><button class="btn btn-secondary btn-small">💾 Sicherung speichern</button></div>
+    </div></section>
+
+    <!-- ---------- So läuft es ab ---------- -->
+    <section class="screen" id="s-intro"><div class="page">
+      <div class="page-head">
+        <div><h1>So läuft es ab</h1><div class="crumb">Schweden 2024</div></div>
+        <span class="chip"><span class="avatar">M</span><b>Matthias Hecke</b> · Privat · Wohnsitz DE<a data-open-who>ändern</a></span>
+      </div>
+      <div class="neu"><b>NEU</b>Aufbau wie vorher. Gestrichen: Häkchen (jetzt der Chip oben rechts), der Satz zu persönlichen Angaben, lange Listen. Je Liste höchstens drei kurze Punkte, „Leg dir bereit“ ist ein Satz.</div>
+
+      <div class="phases">
+        <div class="phase now"><span class="phase-n">1</span><div class="phase-title">Vorbereiten</div><div class="phase-time">ca. 15 Min.</div><p>Abrechnungen hochladen, ein paar Angaben ergänzen.</p></div>
+        <div class="phase"><span class="phase-n">2</span><div class="phase-title">Bestätigen lassen</div><div class="phase-time">2–3 Wochen</div><p>Dein Finanzamt bestätigt deinen Wohnsitz.</p></div>
+        <div class="phase"><span class="phase-n">3</span><div class="phase-title">Einreichen</div><div class="phase-time">ca. 10 Min.</div><p>Formular per Post nach Schweden.</p></div>
+        <div class="phase"><span class="phase-n">€</span><div class="phase-title">Geld erhalten</div><div class="phase-time">einige Monate</div><p>15 % der Bruttodividende zurück.</p></div>
+      </div>
+
+      <div class="two-col">
+        <div class="card"><div class="card-head">Das übernimmt DivRebound</div><div class="card-body"><ul class="clean"><li>Abrechnungen auslesen</li><li>Formular SKV 3740 ausfüllen</li><li>Anschreiben und Begleitbrief</li></ul></div></div>
+        <div class="card"><div class="card-head">Das machst du selbst</div><div class="card-body"><ul class="clean"><li>Formular unterschreiben</li><li>Ans Finanzamt schicken</li><li>Nach Schweden schicken</li></ul></div></div>
+      </div>
+
+      <div class="card"><div class="card-body"><b>Leg dir bereit:</b> Dividendenabrechnungen deiner schwedischen Aktien als PDF.</div></div>
+
+      <div class="step-nav"><span></span><button class="btn btn-primary" data-toast="Weiter zu ① Abrechnungen hochladen">Los geht's: Abrechnungen hochladen →</button></div>
+    </div></section>
+
+    <!-- ---------- Ans Finanzamt schicken ---------- -->
+    <section class="screen" id="s-fa"><div class="page">
+      <div class="page-head">
+        <div><h1>Ans Finanzamt schicken</h1><div class="crumb">Schweden 2024 <span>›</span> <span class="ph"><i>2</i>Bestätigen lassen</span></div></div>
+        <span class="chip"><span class="avatar">M</span><b>Matthias Hecke</b> · Privat · Wohnsitz DE<a data-open-who>ändern</a></span>
+      </div>
+      <div class="neu"><b>NEU</b>Drei Textgrößen. Der Weg wird vor den Schritten gewählt. ELSTER als Klickpfad: jeder Klick eine Zeile, Schaltflächen als graue Marken. Eine Pause-Komponente für alle Länder.</div>
+
+      <div class="card">
+        <div class="card-head">Dein Formular</div>
+        <div class="card-body doc">
+          <div class="doc-main"><div class="doc-icon">PDF</div><div><b>SKV 3740 · Schweden 2024</b><span class="hint">2 Seiten · 4 Ausschüttungen · 486,00 SEK</span></div></div>
+          <button class="btn btn-secondary btn-small">⬇ Herunterladen</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">So kommt es zu deinem Finanzamt <small>FA München</small></div>
+        <div class="card-body">
+          <div class="ways">
+            <button class="way-opt on" data-way="post"><b>Per Post <span class="tag">empfohlen</span></b><small>Schweden braucht das Original.</small></button>
+            <button class="way-opt" data-way="elster"><b>Digital per ELSTER</b><small>Nur wenn das Finanzamt per Post zurückschickt.</small></button>
+          </div>
+
+          <div class="way on" data-pane="post">
+            <ol class="steps">
+              <li><div>Formular ausdrucken und auf Seite 1 unterschreiben (Feld „Sökandens signatur“).</div></li>
+              <li><div>Formular mit dem Anschreiben an dein Finanzamt schicken.<button class="btn btn-secondary btn-small">⬇ Anschreiben</button></div></li>
+              <li><div>Das Finanzamt bestätigt auf Seite 2 und schickt das Formular zurück.</div></li>
+            </ol>
+          </div>
+          <div class="way" data-pane="elster">
+            <div class="note-warn">Schweden braucht das Original. Bitte das Finanzamt, den Ausdruck per Post zurückzuschicken.</div>
+            <div class="elster-head"><b>Vorher</b></div>
+            <ol class="steps">
+              <li><div>Formular ausdrucken, auf Seite 1 unterschreiben und als PDF einscannen.</div></li>
+            </ol>
+            <div class="elster-head"><b>In ELSTER</b><span class="hint">elster.de</span></div>
+            <ol class="steps" style="counter-reset:s 1;">
+              <li><div>Bei <span class="path"><b>Mein ELSTER</b></span> anmelden.</div></li>
+              <li><div><span class="path"><b>Formulare &amp; Leistungen</b><span>›</span><b>Alle Formulare</b></span></div></li>
+              <li><div><span class="path"><b>Anträge und Nachrichten</b><span>›</span><b>Sonstige Nachricht an das Finanzamt</b></span></div></li>
+              <li><div>Nachrichtentext einfügen.<button class="btn btn-secondary btn-small" data-toast="✓ Nachrichtentext kopiert">⧉ Text kopieren</button></div></li>
+              <li><div>Anhang hochladen: das unterschriebene Formular als PDF.</div></li>
+              <li><div>Absenden.</div></li>
+            </ol>
+            <div class="hint" style="margin-top:6px;">Das Finanzamt bestätigt auf Seite 2 und schickt das Formular zurück.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pause">
+        <div class="pause-icon">❚❚</div>
+        <div class="pause-text" id="pause-text"><b>Abgeschickt? Dann ist hier Pause, meist 2–3 Wochen.</b><span>Wir merken uns das Datum und zeigen dir auf der Übersicht, wie lange es schon dauert.</span></div>
+        <div class="pause-actions" id="pause-actions"><button class="btn btn-primary btn-small" id="sent-btn">✓ Ist abgeschickt</button></div>
+      </div>
+
+      <div class="step-nav"><button class="btn btn-secondary">← Zurück</button><span></span></div>
+    </div></section>
+  </main>
+</div>
+
+<!-- ---------- Neuer Antrag: Land, dann (nur bei mehreren Personen) Für wen? ---------- -->
+<div class="overlay" id="picker">
+  <div class="dialog">
+    <div id="pick-country">
+      <div class="dialog-head"><h2>Für welches Land?</h2><button class="x" data-close>×</button></div>
+      <div class="dialog-body">
+        <div class="countries">
+          <button class="country" data-country><b><span class="flag ch"></span>Schweiz</b><span>20 % deiner Dividende zurück</span></button>
+          <button class="country" data-country><b><span class="flag se"></span>Schweden</b><span>15 % deiner Dividende zurück</span></button>
+          <button class="country" data-country><b><span class="flag dk"></span>Dänemark</b><span>12 % deiner Dividende zurück</span></button>
+          <button class="country" data-country><b><span class="flag it"></span>Italien</b><span>11 % deiner Dividende zurück</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div id="pick-who" style="display:none;">
+      <div class="dialog-head"><h2>Für wen ist der Antrag?</h2><button class="x" data-close>×</button></div>
+      <div class="dialog-body">
+        <div class="who">
+          <button class="who-card" data-start><span class="avatar">M</span><div><b>Matthias Hecke</b><small>Privat · Wohnsitz Deutschland</small></div></button>
+          <button class="who-card" data-start><span class="avatar" style="background:#c7d7ee;">E</span><div><b>Erika Hecke</b><small>Privat · Wohnsitz Deutschland · von dir verwaltet</small></div></button>
+          <button class="who-card add" data-new-person>+ Neue Person</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="pick-person" style="display:none;">
+      <div class="dialog-head"><h2>Neue Person</h2><button class="x" data-close>×</button></div>
+      <div class="dialog-body">
+        <div class="lbl">Wem gehören die Aktien?</div>
+        <div class="seg"><button class="on">Privatperson</button><button disabled>Firma<small>nicht unterstützt</small></button></div>
+        <div class="lbl">Wohnsitz</div>
+        <div class="seg"><button class="on">Deutschland</button><button disabled>Österreich<small>kommt bald</small></button><button disabled>Schweiz<small>kommt bald</small></button></div>
+        <div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" data-start>Weiter →</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const toast = (t) => { const el = $("#toast"); el.textContent = t; el.classList.add("on"); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("on"), 1600); };
+
+  // Papierkorb-Icon (Linien, passt zur Schrift)
+  const TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
+  $$(".trash").forEach((b) => (b.innerHTML = TRASH));
+
+  function go(screen) {
+    $$(".screen").forEach((s) => s.classList.toggle("on", s.id === "s-" + screen));
+    $$("#nav button").forEach((b) => b.classList.toggle("on", b.dataset.go === screen));
+    document.body.classList.toggle("on-case", screen !== "home");
+    $("#link-home").classList.toggle("on", screen === "home");
+    const fa = screen === "fa";
+    $("#dot-intro").classList.toggle("on", screen === "intro");
+    $("#sp1").className = "sp " + (fa ? "done" : "now");
+    $("#sp2").className = "sp " + (fa ? "now" : "later");
+    $("#ss-abr").className = "ss" + (fa ? " done" : "");
+    $("#ss-ang").className = "ss" + (fa ? " done" : "");
+    $("#ss-fa").className = "ss" + (fa ? " on" : "");
+    window.scrollTo(0, 0);
+  }
+  document.addEventListener("click", (e) => {
+    const del = e.target.closest("[data-del]");
+    if (del) { e.stopPropagation(); if (confirm("Antrag wirklich löschen? Das lässt sich nicht rückgängig machen.")) del.closest(".case").remove(); return; }
+    const stop = e.target.closest("[data-stop]");
+    if (stop) { if (stop.dataset.toast) toast(stop.dataset.toast); return; }
+    const toastBtn = e.target.closest("[data-toast]");
+    if (toastBtn) toast(toastBtn.dataset.toast);
+    const g = e.target.closest("[data-go]");
+    if (g) go(g.dataset.go);
+  });
+
+  // Neuer Antrag
+  const picker = $("#picker");
+  const panel = (id) => ["pick-country", "pick-who", "pick-person"].forEach((p) => ($("#" + p).style.display = p === id ? "" : "none"));
+  $$("[data-open-picker]").forEach((b) => b.addEventListener("click", () => { panel("pick-country"); picker.classList.add("on"); }));
+  $$("[data-open-who]").forEach((b) => b.addEventListener("click", () => { panel("pick-who"); picker.classList.add("on"); }));
+  $$("[data-close]").forEach((b) => b.addEventListener("click", () => picker.classList.remove("on")));
+  picker.addEventListener("click", (e) => { if (e.target === picker) picker.classList.remove("on"); });
+  $$("[data-country]").forEach((b) => b.addEventListener("click", () => {
+    if ($("#multi").checked) panel("pick-who");
+    else { picker.classList.remove("on"); go("intro"); }
+  }));
+  $("[data-new-person]").addEventListener("click", () => panel("pick-person"));
+  $$("[data-start]").forEach((b) => b.addEventListener("click", () => { picker.classList.remove("on"); go("intro"); }));
+
+  // Weg zum Finanzamt
+  $$("[data-way]").forEach((b) => b.addEventListener("click", () => {
+    $$("[data-way]").forEach((x) => x.classList.toggle("on", x === b));
+    $$("[data-pane]").forEach((p) => p.classList.toggle("on", p.dataset.pane === b.dataset.way));
+  }));
+
+  // "Ist abgeschickt" merkt sich das Datum für die Wartezeit auf der Übersicht
+  $("#sent-btn").addEventListener("click", () => {
+    $("#pause-text").innerHTML = "<b>Abgeschickt am 16.11.2026 · jetzt ist Pause, meist 2–3 Wochen.</b><span>Wenn das Formular zurück ist, geht es mit ③ Einreichen weiter.</span>";
+    $("#pause-actions").innerHTML = '<button class="btn btn-secondary btn-small">💾 Sicherung</button><button class="btn btn-primary btn-small" data-toast="Weiter zu ③ Einreichen">Bestätigung ist da →</button>';
+  });
+
+  $("#notes").addEventListener("change", (e) => document.body.classList.toggle("show-neu", e.target.checked));
+  go("home");
+</script>
+</body>
+</html>

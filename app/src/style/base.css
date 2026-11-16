@@ -5,7 +5,7 @@
 #divrebound-app .app-shell {
   display: flex;
   min-height: 100vh;
-  background: #fff;
+  background: var(--bg);
 }
 
 #divrebound-app .content {
@@ -17,25 +17,69 @@
 }
 #divrebound-app .content-header {
   margin-bottom: 18px;
-  /* Platz für den "← Zur Website"-Button oben rechts (.site-bridge-btn) */
-  padding-right: 150px;
 }
-/* Übergang App -> Website, gleiche Position wie der App-CTA im Website-Header */
-#divrebound-app .site-bridge-btn {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  font-size: 13.5px;
+/* Kopf eines Antragsschritts: Titel links, Antragsteller-Chip rechts */
+#divrebound-app .content-header.step-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+#divrebound-app .crumb-phase {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--charcoal);
   font-weight: 600;
-  color: var(--navy);
-  border-radius: 10px;
-  padding: 10px 18px;
+}
+#divrebound-app .crumb-phase i {
+  font-style: normal;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+#divrebound-app .applicant-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 99px;
+  padding: 4px 12px 4px 4px;
+  font-size: var(--t-hint);
   white-space: nowrap;
+}
+#divrebound-app .applicant-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
   background: var(--cyan);
+  color: var(--navy);
+  font-weight: 700;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+#divrebound-app .applicant-meta {
+  color: var(--muted);
+}
+#divrebound-app .applicant-chip a {
+  color: var(--cyan-dark);
+  font-weight: 600;
+  margin-left: 4px;
   text-decoration: none;
 }
-#divrebound-app .site-bridge-btn:hover {
-  background: #00a2c4;
+#divrebound-app .applicant-chip a:hover {
+  text-decoration: underline;
 }
 #divrebound-app .content-title {
   font-family: var(--font-display);

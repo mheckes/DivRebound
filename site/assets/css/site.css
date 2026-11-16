@@ -124,13 +124,14 @@ main { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
 .mock-tree-step.done .mock-step-num { background: var(--success); border-color: var(--success); color: #fff; }
 .mock-tree-step.current .mock-step-num { border-color: var(--cyan); color: var(--cyan); }
 .mock-tree-step.done { color: rgba(255,255,255,0.75); }
-.app-mock-main { background: var(--surface); padding: 26px 28px; min-width: 0; }
+/* Wie in der App: hellgraue Arbeitsfläche, weiße Boxen darauf */
+.app-mock-main { background: var(--bg); padding: 26px 28px; min-width: 0; }
 .app-mock-main h4 { font-family: var(--font-display); font-weight: 400; font-size: 20px; margin-bottom: 4px; }
 .breadcrumb { font-size: 12px; color: var(--muted); margin-bottom: 18px; }
-.dropzone { border: 1px dashed var(--divider); border-radius: 12px; padding: 20px; text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+.dropzone { background: var(--surface); border: 1px dashed var(--stone); border-radius: 12px; padding: 20px; text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 22px; }
 .dropzone span { display: block; font-size: 11px; margin-top: 4px; }
 .mock-table-title { font-size: 13px; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.mock-table { border: 1px solid var(--divider); border-radius: 10px; overflow: hidden; margin-bottom: 18px; }
+.mock-table { background: var(--surface); border: 1px solid var(--divider); border-radius: 10px; overflow: hidden; margin-bottom: 18px; }
 .mock-table-head, .mock-table-row { display: grid; grid-template-columns: 1.8fr 1fr 0.6fr 1fr 1fr 1fr 1fr; gap: 8px; padding: 9px 12px; align-items: center; }
 .mock-table-head { background: var(--bg); font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; }
 .mock-table-row { font-size: 12px; border-top: 1px solid var(--divider); }

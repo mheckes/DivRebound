@@ -2,6 +2,7 @@
 // Der vom Finanzamt bestätigte Antrag wird im ePortal hochgeladen. Erst mit
 // "DivRebound abschließen" gilt der Fall als erledigt (zählt für die Statistik).
 
+import { signNowHtml } from "../../components/flow.js";
 import { getState } from "../../store/store.js";
 import { statusTimelineHtml, bindStatusTimeline } from "../../components/statusTimeline.js";
 import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
@@ -34,6 +35,7 @@ function render(container, reclaimCase, transactions) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 6)}
+    ${signNowHtml(reclaimCase, "den bestätigten Antrag auf Seite 1 unter „Rechtsgültige Unterschrift“ (Ort, Datum, Unterschrift)")}
     <p class="ch-lead">Der vom deutschen Finanzamt bestätigte Antrag wird im ePortal hochgeladen. Erst danach prüft die Eidgenössische Steuerverwaltung deinen Antrag und überweist die Erstattung.</p>
 
     <div class="card">

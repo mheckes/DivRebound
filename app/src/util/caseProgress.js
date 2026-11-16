@@ -21,11 +21,12 @@ export function refundReceived(reclaimCase) {
   return { received: false, date: "", amountEur: "" };
 }
 
-/** "1.234,56" / "1234.56" -> 1234.56; leer/ungültig -> null */
+/** "1.234,56" / "1234.56" / "1.234" (Tausenderpunkt) -> Zahl; leer/ungültig -> null */
 export function parseAmount(value) {
-  const s = String(value ?? "").trim();
+  const s = String(value ?? "").trim().replace(/\s|€|EUR/gi, "");
   if (!s) return null;
-  const normalized = s.includes(",") ? s.replace(/\./g, "").replace(",", ".") : s;
+  const thousandsOnly = /^\d{1,3}(\.\d{3})+$/.test(s);
+  const normalized = s.includes(",") || thousandsOnly ? s.replace(/\./g, "").replace(",", ".") : s;
   const n = Number(normalized);
   return Number.isFinite(n) ? n : null;
 }

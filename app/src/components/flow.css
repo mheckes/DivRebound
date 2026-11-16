@@ -57,28 +57,35 @@
   line-height: 1.45;
 }
 
-/* ---------- Flaggen (CSS statt Emoji: Windows zeigt Flaggen-Emoji nicht) ---------- */
+/* ---------- Flaggen als SVG im echten Seitenverhältnis (Windows zeigt
+   Flaggen-Emoji nicht). Breite folgt aus der Höhe: SE 16:10, DK 37:28,
+   CH 1:1, IT 3:2. ---------- */
 #divrebound-app .flag {
   display: inline-block;
-  width: 22px;
-  height: 15px;
-  border-radius: 3px;
-  margin-right: 8px;
+  height: 14px;
+  aspect-ratio: 3 / 2;
+  border-radius: 2px;
+  margin-right: 9px;
   vertical-align: -2px;
-  box-shadow: 0 0 0 1px rgba(15, 34, 64, 0.12);
+  background-size: 100% 100%;
+  box-shadow: 0 0 0 1px rgba(15, 34, 64, 0.14);
   flex-shrink: 0;
 }
-#divrebound-app .flag-dk {
-  background: linear-gradient(#fff, #fff) 0 50% / 100% 3px no-repeat, linear-gradient(#fff, #fff) 32% 0 / 3px 100% no-repeat, #c8102e;
-}
 #divrebound-app .flag-se {
-  background: linear-gradient(#fecc02, #fecc02) 0 50% / 100% 3px no-repeat, linear-gradient(#fecc02, #fecc02) 32% 0 / 3px 100% no-repeat, #006aa7;
+  aspect-ratio: 16 / 10;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 10'%3E%3Crect width='16' height='10' fill='%23006aa7'/%3E%3Crect x='5' width='2' height='10' fill='%23fecc02'/%3E%3Crect y='4' width='16' height='2' fill='%23fecc02'/%3E%3C/svg%3E");
+}
+#divrebound-app .flag-dk {
+  aspect-ratio: 37 / 28;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 37 28'%3E%3Crect width='37' height='28' fill='%23c8102e'/%3E%3Crect x='12' width='4' height='28' fill='%23fff'/%3E%3Crect y='12' width='37' height='4' fill='%23fff'/%3E%3C/svg%3E");
 }
 #divrebound-app .flag-ch {
-  background: linear-gradient(#fff, #fff) 50% 50% / 11px 3px no-repeat, linear-gradient(#fff, #fff) 50% 50% / 3px 11px no-repeat, #da291c;
+  aspect-ratio: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23da291c'/%3E%3Crect x='13' y='6' width='6' height='20' fill='%23fff'/%3E%3Crect x='6' y='13' width='20' height='6' fill='%23fff'/%3E%3C/svg%3E");
 }
 #divrebound-app .flag-it {
-  background: linear-gradient(90deg, #009246 33.3%, #fff 33.3% 66.6%, #ce2b37 66.6%);
+  aspect-ratio: 3 / 2;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3Crect width='1' height='2' fill='%23009246'/%3E%3Crect x='1' width='1' height='2' fill='%23fff'/%3E%3Crect x='2' width='1' height='2' fill='%23ce2b37'/%3E%3C/svg%3E");
 }
 
 /* ---------- Wege zum Finanzamt ---------- */
@@ -88,29 +95,31 @@
 #divrebound-app .way.on {
   display: block;
 }
-#divrebound-app .way-toggle {
-  display: inline-flex;
-  border: 1px solid var(--divider);
-  border-radius: 8px;
-  overflow: hidden;
-  margin-left: auto;
+/* Wegwahl als zwei Kacheln vor den Schritten */
+#divrebound-app .way-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
 }
-#divrebound-app .way-toggle button {
-  border: 0;
+#divrebound-app .way-tile {
+  text-align: left;
+  border: 1.5px solid var(--divider);
   background: #fff;
-  color: var(--muted);
-  padding: 6px 12px;
+  border-radius: 12px;
+  padding: 12px 14px;
   font-family: var(--font-body);
-  font-size: 12.5px;
-  font-weight: 600;
+  font-size: var(--t-body);
+  font-weight: 700;
+  color: var(--charcoal);
   cursor: pointer;
 }
-#divrebound-app .way-toggle button + button {
-  border-left: 1px solid var(--divider);
+#divrebound-app .way-tile:hover {
+  border-color: var(--stone);
 }
-#divrebound-app .way-toggle button.on {
-  background: var(--navy);
-  color: #fff;
+#divrebound-app .way-tile.on {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px var(--navy-light);
 }
 #divrebound-app .way-letter {
   display: inline-flex;
@@ -118,30 +127,121 @@
   margin-left: 6px;
   vertical-align: middle;
 }
-#divrebound-app .way-warning {
-  background: #fff4d6;
-  color: #7a5200;
-  border-radius: 8px;
-  padding: 9px 12px;
-  font-size: 12.5px;
-  margin-bottom: 10px;
+
+/* Nummerierte Schritte innerhalb einer Karte, eine Textgröße */
+#divrebound-app .flow-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: flow;
+  font-size: var(--t-body);
+}
+#divrebound-app .flow-steps > li {
+  counter-increment: flow;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 7px 0;
+}
+#divrebound-app .flow-steps > li::before {
+  content: counter(flow);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+#divrebound-app .flow-steps > li > div {
+  padding-top: 2px;
+}
+#divrebound-app .flow-steps .btn-small {
+  margin-left: 6px;
+}
+#divrebound-app .flow-after {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: var(--t-hint);
+}
+/* Klickpfad in fremden Oberflächen (ELSTER): jede Schaltfläche als Marke */
+#divrebound-app .ui-path {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+#divrebound-app .ui-path b {
+  background: var(--navy-light);
+  color: var(--navy);
+  border-radius: 6px;
+  padding: 1px 8px;
+  font-weight: 600;
+}
+#divrebound-app .ui-path span {
+  color: var(--stone);
 }
 
-/* ---------- Pause ---------- */
-#divrebound-app .wait-box {
+/* Hinweis beim Einreichen nach dem ELSTER-Weg */
+#divrebound-app .sign-now {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: var(--cyan-light);
+  border: 1px solid var(--cyan);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: var(--t-body);
+}
+#divrebound-app .sign-now-icon {
+  font-size: 20px;
+}
+
+/* ---------- Die eine Pause-Komponente ---------- */
+#divrebound-app .pause {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   background: var(--navy-light);
   border-radius: 12px;
   padding: 14px 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 4px;
+  margin: 4px 0 16px;
 }
-#divrebound-app .wait-actions {
+#divrebound-app .pause-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+#divrebound-app .pause-text {
+  flex: 1;
+  min-width: 0;
+}
+#divrebound-app .pause-text b {
+  display: block;
+  font-size: var(--t-body);
+  font-weight: 700;
+}
+#divrebound-app .pause-text span {
+  color: var(--muted);
+  font-size: var(--t-hint);
+}
+#divrebound-app .pause-actions {
   display: flex;
   gap: 8px;
-  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 @media (max-width: 900px) {
@@ -154,9 +254,11 @@
   #divrebound-app .phase:nth-child(-n + 2) {
     border-bottom: 1px solid var(--divider);
   }
-  #divrebound-app .wait-box {
-    flex-direction: column;
-    align-items: flex-start;
+  #divrebound-app .pause {
+    flex-wrap: wrap;
+  }
+  #divrebound-app .way-tiles {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -7,7 +7,7 @@
 // (wiederholten nur Schritt 2 und 3). Danach wartet der Fall auf die
 // Bestätigung durch das Finanzamt (Medienbruch).
 
-import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, waitHtml } from "../../components/flow.js";
+import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, taxOfficePauseHtml, bindTaxOfficePause } from "../../components/flow.js";
 import { getState, setState } from "../../store/store.js";
 import { goToStep, markStepDone, stepHeader } from "./dkShared.js";
 import * as caseRepo from "../../db/caseRepo.js";
@@ -141,11 +141,11 @@ function render(container) {
   container.innerHTML = `
     ${stepHeader(reclaimCase, 4)}
 
-    <p class="ch-lead">Dein deutsches Finanzamt bestätigt auf der Wohnsitzbescheinigung (Formular „02.050“), dass du in Deutschland ansässig bist. DivRebound hat sie für dich ausgefüllt.</p>
+    <p class="ch-lead">Dein Finanzamt bestätigt auf der Wohnsitzbescheinigung (Formular „02.050“), dass du in Deutschland wohnst.</p>
 
     <div class="card">
       <div class="card-head head-navy">
-        <span class="card-title">Formular</span>
+        <span class="card-title">Formular herunterladen</span>
         <span class="ch-head-sub">von DivRebound erzeugt</span>
       </div>
       <div class="doc-item">
@@ -156,20 +156,19 @@ function render(container) {
         </div>
         <div class="doc-actions">
           <button class="btn-secondary btn-small" data-action="preview" type="button">👁 Vorschau</button>
-          <button class="btn-accent btn-small" data-action="download" type="button">⬇ PDF</button>
+          <button class="btn-primary" data-action="download" type="button">⬇ Herunterladen</button>
         </div>
       </div>
       <div class="doc-status" id="download-status">${initialStatusHtml}</div>
     </div>
 
-    ${taxOfficeWaysHtml(profile, {
+    ${taxOfficeWaysHtml(profile, reclaimCase, {
       signText: "Wohnsitzbescheinigung ausdrucken und unterschreiben",
       confirmText: "Das Finanzamt stempelt die Bescheinigung und schickt sie zurück",
-      originalRequired: false,
       letterButtonsHtml: `<button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Anschreiben</button><button class="btn-accent btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ PDF</button>${taxOfficeComplete ? "" : ` <a href="#" data-go-step="3">Anschrift des Finanzamts ergänzen</a>`}`,
     })}
 
-    ${waitHtml("Komm zurück, wenn die gestempelte Bescheinigung da ist. Dein Stand ist in diesem Browser gespeichert.", "Bescheinigung ist zurück")}
+    ${taxOfficePauseHtml(reclaimCase, "Bescheinigung ist zurück")}
 
     <div class="ch-step-nav"><button class="btn-secondary" data-step-back type="button">← Zurück</button><span></span></div>
   `;
@@ -212,7 +211,8 @@ function attachListeners(container, reclaimCase) {
   });
 
   bindPausePanel(container, reclaimCase);
-  bindTaxOfficeWays(container, () => elsterMessageText(getState().currentProfile, { reference: "Wohnsitzbescheinigung (Formular „02.050“) zur Erstattung dänischer Quellensteuer", originalRequired: false }));
+  bindTaxOfficeWays(container, () => elsterMessageText(getState().currentProfile, { reference: "Wohnsitzbescheinigung (Formular „02.050“) zur Erstattung dänischer Quellensteuer", originalRequired: false }), reclaimCase);
+  bindTaxOfficePause(container, reclaimCase, () => render(container));
 }
 
 async function handleDownload(container, btn) {

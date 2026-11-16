@@ -7,20 +7,13 @@ import { stepHeader, stepNavHtml, bindStepNav } from "./dkShared.js";
 
 export function mount(container, reclaimCase, profile) {
   renderOverview(container, profile, {
+    reclaimCase,
     country: "DK",
     headerHtml: stepHeader(reclaimCase, 1),
     navHtml: stepNavHtml(1, { nextLabel: "Los geht's: Abrechnungen hochladen" }),
-    does: [
-      "Abrechnungen auslesen, Erstattung berechnen",
-      "Wohnsitzbescheinigung (Formular „02.050“) und Anschreiben ausfüllen",
-      "Spickzettel für das Online-Formular der dänischen Steuerbehörde (SKAT)",
-    ],
-    youDo: [
-      "Bescheinigung unterschreiben und an dein deutsches Finanzamt schicken, per ELSTER oder Post",
-      "Werte ins dänische Online-Formular kopieren",
-      "Gestempelte Bescheinigung dort hochladen",
-    ],
-    prepare: ["<b>Dividendenabrechnungen</b> deiner dänischen Aktien als PDF (ISIN beginnt mit DK), höchstens 3 Jahre alt"],
+    does: ["Abrechnungen auslesen", "Bescheinigung 02.050 ausfüllen", "Spickzettel für SKAT"],
+    youDo: ["Ans Finanzamt schicken", "Werte zu SKAT kopieren", "Bescheinigung hochladen"],
+    prepare: "Dividendenabrechnungen deiner dänischen Aktien als PDF, höchstens 3 Jahre alt.",
   });
   bindStepNav(container, reclaimCase, 1);
 }
