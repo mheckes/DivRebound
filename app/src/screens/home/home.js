@@ -23,7 +23,7 @@ import { isSubmitted, submittedAt, refundReceived, parseAmount, monthsBetween } 
 import { caseName, COUNTRY_NAMES } from "../../util/caseName.js";
 import { startCase } from "../../util/startCase.js";
 import { isEligible, totalRefund } from "../../lib/withholding.js";
-import { phasesHtml, flagHtml, refundPercent, payoutTime } from "../../components/flow.js";
+import { phasesHtml, flagHtml, refundPercent, payoutTime, TRASH_ICON } from "../../components/flow.js";
 import { openConfirmModal } from "../../components/modal.js";
 import { showToast } from "../../components/toast.js";
 
@@ -112,8 +112,6 @@ function durationDe(days) {
 }
 const daysSince = (iso) => Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / DAY));
 
-// Papierkorb als Linien-Icon (passt zur Schrift, immer sichtbar, rot beim Überfahren)
-const TRASH_ICON = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>`;
 
 /**
  * Karte eines Antrags (Stand 2.1): oben Name und Betrag, rechts ein Knopf und
@@ -169,7 +167,7 @@ function caseCardHtml(reclaimCase, residence) {
       </div>
       <div class="case-tools">
         ${button}
-        <button class="case-trash" data-delete="${reclaimCase.caseId}" title="Antrag löschen" aria-label="Antrag löschen" type="button">${TRASH_ICON}</button>
+        <button class="btn-trash" data-delete="${reclaimCase.caseId}" title="Antrag löschen" aria-label="Antrag löschen" type="button">${TRASH_ICON}</button>
       </div>
       ${phase === "received" ? "" : stepperHtml(phase)}
       ${wait ? `<div class="case-wait">${wait}</div>` : ""}

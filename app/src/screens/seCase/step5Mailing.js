@@ -11,7 +11,7 @@ import { buildSwedenCoverLetter, swedenCoverLetterFileName } from "../../lib/bui
 import { openPdfPreview } from "../../util/pdfPreview.js";
 import { formatDateDe } from "../../util/format.js";
 import { showToast } from "../../components/toast.js";
-import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
+import { bindPausePanel, submitEndHtml, submitNavHtml } from "../../components/pausePanel.js";
 import { deadlineOf, groupByIssuer } from "../../lib/sweden.js";
 
 const ADDRESS = corridor.mailingAddress;
@@ -19,10 +19,9 @@ const EMAIL = corridor.mailingEmail;
 
 function envelopeChecks(formsCount, statements) {
   return [
-    ["forms", `<b>${formsCount === 1 ? "Das Formular „SKV 3740“" : `${formsCount} × Formular „SKV 3740“`}</b> im Original (Seite 1 und 2)`],
-    ["signature", "Deine <b>Unterschrift unten auf Seite 1</b>"],
-    ["certificate", "Die <b>Bestätigung des Finanzamts unten auf Seite 2</b> (Stempel, Unterschrift und Anschrift)"],
-    ["statements", `<b>Kopien der ${statements} Dividendenabrechnung${statements === 1 ? "" : "en"}</b> – sie zeigen die einbehaltene schwedische Steuer und auf wessen Namen ausgezahlt wurde`],
+    ["forms", `<b>${formsCount === 1 ? "Formular „SKV 3740“" : `${formsCount} × Formular „SKV 3740“`}</b> im Original, unten auf Seite 1 unterschrieben`],
+    ["certificate", "mit der <b>Bestätigung des Finanzamts</b> unten auf Seite 2"],
+    ["statements", `<b>Kopien der ${statements} Dividendenabrechnung${statements === 1 ? "" : "en"}</b>`],
     ["letter", "<b>Begleitschreiben</b>, unterschrieben"],
   ];
 }
@@ -36,78 +35,75 @@ function letterDetails(reclaimCase) {
 function render(container, reclaimCase) {
   const profile = getState().currentProfile;
   const { eligible, forms, years, total } = caseSummary(reclaimCase);
-  const checks = new Set(reclaimCase.se.envelopeChecks ?? []);
   const items = envelopeChecks(forms.length, eligible.length);
-  const allChecked = items.every(([id]) => checks.has(id));
   const mailed = Boolean(reclaimCase.se.mailedAt);
   const deadline = eligible.length ? eligible.map(deadlineOf).sort()[0] : null;
+
+  // Stand 2.1: gleicher Aufbau wie "Ans Finanzamt schicken" - Kurzsatz,
+  // Dokument mit Primärbutton, Weg als Kacheln (Post empfohlen / E-Mail),
+  // nummerierte Schritte, "Ist abgeschickt" in der Pause-Komponente.
+  const way = reclaimCase.se.submitWay ?? "post";
+  const tile = (key, label, tag = "") =>
+    `<button type="button" class="way-tile ${way === key ? "on" : ""}" data-submit-way="${key}" aria-pressed="${way === key}">${label}${tag ? `<span class="way-tag">${tag}</span>` : ""}</button>`;
 
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 5)}
     ${signNowHtml(reclaimCase, "das Formular unten auf Seite 1 (Feld „Sökandens signatur“)")}
-    <p class="ch-lead">Sobald das Finanzamt das Formular bestätigt zurückgeschickt hat, gehen sie zusammen mit Kopien deiner Abrechnungen und dem Begleitschreiben an die schwedische Steuerbehörde Skatteverket.</p>
+    <p class="ch-lead">Schick das bestätigte Formular mit Kopien deiner Abrechnungen und dem Begleitschreiben an Skatteverket${deadline ? `, spätestens bis ${esc(formatDateDe(deadline))}` : ""}.</p>
 
     <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Begleitschreiben (Englisch)</span><span class="ch-head-sub">an Skatteverket</span></div>
+      <div class="card-head head-navy"><span class="card-title">Begleitschreiben herunterladen</span><span class="ch-head-sub">Englisch · an Skatteverket</span></div>
       <div class="doc-item">
         <div>
           <div class="doc-title">Begleitschreiben an Skatteverket</div>
-          <div class="doc-sub">Antrag auf Erstattung, Liste der Unternehmen, Anlagen und Bankverbindung – auf Englisch, bitte unterschreiben.</div>
           <div class="doc-file">${esc(swedenCoverLetterFileName(profile, years))}</div>
         </div>
         <div class="doc-actions">
           <button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${forms.length ? "" : "disabled"}>👁 Vorschau</button>
-          <button class="btn-accent btn-small" data-action="letter" type="button" ${forms.length ? "" : "disabled"}>⬇ PDF</button>
+          <button class="btn-primary" data-action="letter" type="button" ${forms.length ? "" : "disabled"}>⬇ Herunterladen</button>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Das kommt in den Umschlag</span><span class="ch-head-sub">${forms.length} ${forms.length === 1 ? "Formular" : "Formulare"} · ${eligible.length} Abrechnung${eligible.length === 1 ? "" : "en"}</span></div>
+      <div class="card-head"><span class="card-title">So kommt es zu Skatteverket</span><span class="ch-head-sub">${forms.length} ${forms.length === 1 ? "Formular" : "Formulare"} · ${eligible.length} Abrechnung${eligible.length === 1 ? "" : "en"}</span></div>
       <div class="card-body">
-        <ul class="ch-list">${items.map(([, text]) => `<li>${text}</li>`).join("")}</ul>
+        <div class="way-tiles">${tile("post", "Per Post", "Empfohlen")}${tile("email", "Per E-Mail")}</div>
+
+        <div class="way ${way === "post" ? "on" : ""}" data-submit-pane="post">
+          <ol class="flow-steps">
+            <li><div>In den Umschlag:<ul class="ch-list se-envelope">${items.map(([, text]) => `<li>${text}</li>`).join("")}</ul></div></li>
+            <li><div>An diese Adresse schicken, am besten als Einschreiben. <button class="btn-secondary btn-small" data-action="copy-address" type="button">⧉ Adresse kopieren</button>
+              <div class="se-address mono">${ADDRESS.map(esc).join("<br>")}</div></div></li>
+          </ol>
+        </div>
+
+        <div class="way ${way === "email" ? "on" : ""}" data-submit-pane="email">
+          <ol class="flow-steps">
+            <li><div>Formular (unterschrieben und gestempelt), Abrechnungen und Begleitschreiben einscannen.</div></li>
+            <li><div>An <span class="mono">${esc(EMAIL)}</span> schicken. <button class="btn-secondary btn-small" data-action="copy-email" type="button">⧉ Adresse kopieren</button></div></li>
+          </ol>
+          <p class="flow-after">Ob ein Scan genügt, entscheidet Skatteverket. Im Zweifel per Post.</p>
+        </div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Adresse</span><span class="ch-head-sub">per Post, Einschreiben empfohlen</span></div>
-      <div class="card-body">
-        <div class="se-address mono">${ADDRESS.map(esc).join("<br>")}</div>
-        <div class="ch-inline-actions"><button class="btn-secondary btn-small" data-action="copy-address" type="button">⧉ Adresse kopieren</button></div>
-        <p class="ch-text" style="margin-top:12px;"><b>Per E-Mail:</b> Im Kopf des Formulars nennt Skatteverket auch die Adresse <span class="mono">${esc(EMAIL)}</span>. Dazu das vollständig unterschriebene und gestempelte Formular und die Abrechnungen einscannen. Ob ein Scan als Nachweis genügt, entscheidet Skatteverket – im Zweifel per Post.</p>
-        <div class="ch-inline-actions"><button class="btn-secondary btn-small" data-action="copy-email" type="button">⧉ E-Mail-Adresse kopieren</button></div>
-      </div>
-    </div>
+    ${submitEndHtml(reclaimCase, {
+      submittedAt: reclaimCase.se.mailedAt,
+      doneSub: `Am ${esc(formatDateDe((reclaimCase.se.mailedAt ?? "").slice(0, 10)))} an Skatteverket · erwartete Erstattung ${formatSekDe(total)} (${approxEur(total)})`,
+    })}
 
-    <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Antrag einreichen</span></div>
-      <div class="card-body">
-        ${
-          mailed
-            ? `<div class="done-banner ch-done-banner">
-                <div class="done-icon">✓</div>
-                <div>
-                  <div class="done-title">Antrag eingereicht</div>
-                  <div class="done-sub">Am ${esc(formatDateDe(reclaimCase.se.mailedAt.slice(0, 10)))} nach Schweden versendet · erwartete Erstattung ${formatSekDe(total)} (${approxEur(total)})</div>
-                </div>
-              </div>
-              <p class="ch-text">Auf der Übersicht fragen wir dich, ob das Geld da ist.</p>`
-            : `<p class="ch-text">Sobald der Umschlag unterwegs ist, gilt dein Antrag als eingereicht.</p>
-              <button class="btn-primary" data-action="mark-mailed" type="button">✓ Umschlag ist unterwegs</button>`
-        }
-      </div>
-    </div>
-
-    <div class="info-banner"><span class="icon">⏳</span><div><b>Frist und Geduld:</b> Der Antrag muss spätestens fünf Jahre nach Ende des Kalenderjahres der Auszahlung bei Skatteverket sein${deadline ? ` – für deine älteste Dividende bis zum ${esc(formatDateDe(deadline))}` : ""}. Die Bearbeitung dauert erfahrungsgemäß mehrere Monate.</div></div>
-
-    ${mailed ? pausePanelHtml(reclaimCase, "payout") : ""}
-
-    <div class="ch-step-nav">
-      <button class="btn-secondary" data-step-back type="button">← Zurück</button>
-      <a class="btn-secondary" href="#/home">Zur Übersicht</a>
-    </div>
+    ${submitNavHtml(mailed)}
     </div>`;
+
+  container.querySelectorAll("[data-submit-way]").forEach((btn) =>
+    btn.addEventListener("click", async () => {
+      reclaimCase.se.submitWay = btn.dataset.submitWay;
+      await saveCase(reclaimCase);
+      render(container, reclaimCase);
+    })
+  );
 
   bindStepNav(container, reclaimCase, 5);
   bindPausePanel(container, reclaimCase);

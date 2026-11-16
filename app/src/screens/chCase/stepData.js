@@ -23,7 +23,7 @@ export async function mount(container, reclaimCase) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 8)}
-    <p class="ch-lead">Diese Angaben trägst du gleich ins ePortal ein. Sie werden in deinem Profil gespeichert und sind beim nächsten Antrag schon da.</p>
+    <p class="ch-lead">Diese Angaben trägst du gleich ins ePortal ein.</p>
     ${profileCardsHtml(profile, REQUIRED)}
     ${stepNavHtml(8)}
     </div>`;

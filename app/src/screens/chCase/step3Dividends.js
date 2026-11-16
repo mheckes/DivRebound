@@ -11,6 +11,7 @@
 // wird er nicht abgefragt; angezeigt wird er nur, wenn er das Ergebnis ändern
 // kann (Kauf/Verkauf kurz vor der Fälligkeit, siehe exDateMatters).
 
+import { TRASH_ICON } from "../../components/flow.js";
 import { getState } from "../../store/store.js";
 import { parseBrokerStatement } from "../../lib/parseBrokerStatement.js";
 import { parseDividendCertificate } from "../../lib/parseDividendCertificate.js";
@@ -222,7 +223,7 @@ function render(container, reclaimCase) {
   container.innerHTML = `
     <div class="ch-page ch-page-wide">
     ${stepHeader(reclaimCase, 3)}
-    <p class="ch-lead">Für jede Dividende braucht das ePortal einen Tax Voucher deiner Bank. Lade die Voucher und – falls vorhanden – die Dividendenabrechnungen hoch. DivRebound ordnet sie zu und prüft, ob die Stückzahlen zu deinem Bestand am Stichtag passen.</p>
+    <p class="ch-lead">Lade die Tax Voucher deiner Bank hoch, einen je Dividende. DivRebound gleicht sie mit deinem Bestand ab.</p>
 
     <div class="dropzone" id="dropzone">
       <input type="file" id="file-input" multiple accept="application/pdf" hidden />
@@ -322,7 +323,7 @@ function distributionRow(d, result, isinNames) {
       <td>${d.vouchers.map((v) => `<span class="ch-chip" title="${esc(v.fileName)}">${v.quantity ?? "?"} Stk.</span>`).join("") || '<span class="ch-sub">–</span>'}</td>
       <td>${check}</td>
       <td class="num mono">${result && !incomplete ? formatChf(result.refund) : "–"}</td>
-      <td><button class="holdings-delete" data-remove-dist="${id}" title="Entfernen" type="button">✕</button></td>
+      <td><button class="btn-trash" data-remove-dist="${id}" title="Entfernen" aria-label="Entfernen" type="button">${TRASH_ICON}</button></td>
     </tr>`;
 }
 

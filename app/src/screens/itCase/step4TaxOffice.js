@@ -3,7 +3,7 @@
 // Vorschau und PDF, wer unterschreibt wo, Anschreiben, nächste Schritte,
 // "Bearbeitung pausiert". Ein Form A je Unternehmen (lib/italy.js formsFor).
 
-import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, taxOfficePauseHtml, bindTaxOfficePause } from "../../components/flow.js";
+import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, taxOfficePauseHtml, taxOfficeNavHtml, bindTaxOfficePause } from "../../components/flow.js";
 import { getState } from "../../store/store.js";
 import { fillFormA, fillAllFormsA, formAFileName } from "../../lib/fillFormA.js";
 import { buildTaxOfficeLetter } from "../../lib/buildTaxOfficeLetter.js";
@@ -83,12 +83,12 @@ function render(container, reclaimCase) {
     ${taxOfficeWaysHtml(profile, reclaimCase, {
       signText: "Formulare ausdrucken und auf Seite 3 und Seite 5 unterschreiben",
       confirmText: "Das Finanzamt bestätigt auf Seite 5 und schickt die Formulare zurück",
-      letterButtonsHtml: `<button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Anschreiben</button><button class="btn-accent btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ PDF</button>${taxOfficeComplete ? "" : ` <a href="#" data-go-step="3">Anschrift des Finanzamts ergänzen</a>`}`,
+      letterButtonsHtml: `<button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Vorschau</button><button class="btn-secondary btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ Herunterladen</button>${taxOfficeComplete ? "" : ` <a href="#" data-go-step="3">Anschrift des Finanzamts ergänzen</a>`}`,
     })}
 
-    ${taxOfficePauseHtml(reclaimCase, "Formulare sind zurück")}
+    ${taxOfficePauseHtml(reclaimCase)}
 
-    <div class="ch-step-nav"><button class="btn-secondary" data-step-back type="button">← Zurück</button><span></span></div>
+    ${taxOfficeNavHtml(reclaimCase, "Formulare sind zurück")}
     </div>`;
 
   bindStepNav(container, reclaimCase, 4);

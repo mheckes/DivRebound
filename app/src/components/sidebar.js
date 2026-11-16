@@ -85,7 +85,6 @@ export function renderSidebar(container) {
   const hash = window.location.hash;
   const profile = state.currentProfile;
   const onCase = /^#\/(dk|ch|it|se)\/[^/]+\/\d$/.test(hash);
-  const hasSwiss = state.cases.some((c) => c.targetCountry === "CH");
   const name = [profile?.residence?.firstName, profile?.residence?.lastName].filter(Boolean).join(" ");
   const link = (route, label) => `<a class="sidebar-link ${hash === route ? "active" : ""}" data-nav="${route}">${label}</a>`;
 
@@ -106,7 +105,6 @@ export function renderSidebar(container) {
     <div class="sidebar-section">
       ${link("#/home", "Übersicht")}
       ${link("#/profile", "Mein Profil")}
-      ${hasSwiss ? link("#/ch/bestand", "Wertpapierbestand Schweiz") : ""}
       ${link("#/anschreiben", "Anschreiben Finanzamt")}
     </div>
 
@@ -124,8 +122,8 @@ export function renderSidebar(container) {
       </div>
       <button class="sidebar-btn sidebar-feedback" type="button" data-feedback="sidebar">💬 Feedback geben</button>
       <nav class="sidebar-foot" aria-label="Rechtliches">
-        ${legalLinks.map((l) => `<a href="${l.href}">${l.title}</a>`).join("")}
         <a class="sidebar-website" href="${websiteHome}">divrebound.com ↗</a>
+        ${legalLinks.map((l) => `<a href="${l.href}">${l.title}</a>`).join("")}
       </nav>
     </div>
   `;

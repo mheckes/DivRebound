@@ -370,25 +370,10 @@
   gap: 6px;
   justify-content: flex-end;
 }
-#divrebound-app .case-trash {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-#divrebound-app .case-trash:hover,
-#divrebound-app .case-trash:focus-visible {
-  background: var(--danger-tint);
-  border-color: #e7c3be;
-  color: var(--danger);
-  outline: none;
+/* Gleich breite Knöpfe ("Weiter", "Starten", "Ansehen"), damit die Spalte ruhig steht */
+#divrebound-app .case-tools .btn-small {
+  min-width: 104px;
+  text-align: center;
 }
 /* Wartezeit statt Ja/Nein-Frage */
 #divrebound-app .case-wait {

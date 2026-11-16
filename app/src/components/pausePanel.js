@@ -42,6 +42,40 @@ export function pausePanelHtml(reclaimCase, kind) {
   });
 }
 
+/**
+ * Ende eines Einreichen-Schritts (Stand 2.1, gleich in allen Ländern):
+ * vorher Pause-Komponente mit "✓ Ist abgeschickt" ([data-action="mark-mailed"]),
+ * danach "Antrag eingereicht" und die Pause bis zur Auszahlung.
+ * @param {{ submittedAt?: string, doneSub: string, question?: string, actionLabel?: string }} options
+ */
+export function submitEndHtml(reclaimCase, { submittedAt, doneSub, question = "Abgeschickt? Dann ist dein Antrag eingereicht.", actionLabel = "✓ Ist abgeschickt" }) {
+  if (!submittedAt) {
+    return pauseHtml({
+      title: question,
+      text: "Auf der Übersicht siehst du danach, wie lange es schon dauert.",
+      actionsHtml: `<button class="btn-primary btn-small" data-action="mark-mailed" type="button">${actionLabel}</button>`,
+    });
+  }
+  return `
+    <div class="done-banner ch-done-banner">
+      <div class="done-icon">✓</div>
+      <div>
+        <div class="done-title">Antrag eingereicht</div>
+        <div class="done-sub">${doneSub}</div>
+      </div>
+    </div>
+    ${pausePanelHtml(reclaimCase, "payout")}`;
+}
+
+/** Navigation am Ende des Einreichens: Zurück, und "Zur Übersicht" (primär, sobald eingereicht) */
+export function submitNavHtml(submitted) {
+  return `
+    <div class="ch-step-nav">
+      <button class="btn-secondary" data-step-back type="button">← Zurück</button>
+      <a class="${submitted ? "btn-primary" : "btn-secondary"}" href="#/home">Zur Übersicht</a>
+    </div>`;
+}
+
 export function bindPausePanel(container, reclaimCase) {
   container.querySelector('[data-action="save-state"]')?.addEventListener("click", async () => {
     const choice = await openExportOptionsModal();

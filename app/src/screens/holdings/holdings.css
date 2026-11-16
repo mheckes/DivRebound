@@ -11,30 +11,31 @@
   margin: 0 0 16px;
   max-width: 680px;
 }
-/* Frage im Folge-DivRebound: "Ist dein Bestand seit … noch aktuell?" */
+/* Frage im Folge-Antrag: "Ist dein Bestand noch aktuell?" - wie die
+   Fragen auf der Startseite: weiße Karte mit cyan Rahmen (Stand 2.1) */
 #divrebound-app .holdings-question {
-  background: var(--navy);
-  color: #fff;
-  border-radius: 14px;
-  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--cyan);
+  box-shadow: 0 0 0 3px var(--cyan-light);
+  border-radius: 12px;
+  padding: 16px 18px;
   margin-bottom: 18px;
 }
 #divrebound-app .holdings-question h3 {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 19px;
-  margin: 0 0 6px;
+  font-size: var(--t-title);
+  font-weight: 700;
+  margin: 0 0 4px;
 }
 #divrebound-app .holdings-question p {
   margin: 0;
-  font-size: 12.5px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--t-hint);
+  color: var(--muted);
 }
-#divrebound-app .holdings-question .holdings-question-secondary {
-  background: transparent;
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.6);
+#divrebound-app .holdings-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
 }
 
 #divrebound-app .holdings-sub {

@@ -20,6 +20,9 @@ function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 }
 
+/** Papierkorb als Linien-Icon für alle Löschen-Knöpfe (Klasse .btn-trash) */
+export const TRASH_ICON = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>`;
+
 export function flagHtml(country) {
   return `<span class="flag flag-${esc(String(country).toLowerCase())}" aria-hidden="true"></span>`;
 }
@@ -122,8 +125,8 @@ export function elsterMessageText(profile, { reference, originalRequired = false
   return lines.filter((l, i) => l !== "" || lines[i - 1] !== "").join("\n");
 }
 
-/** Gewählter Weg zum Finanzamt: "elster" (Standard) oder "post" */
-export const taxOfficeWay = (reclaimCase) => reclaimCase?.taxOfficeWay ?? "elster";
+/** Gewählter Weg zum Finanzamt: "post" (empfohlen, Standard) oder "elster" */
+export const taxOfficeWay = (reclaimCase) => reclaimCase?.taxOfficeWay ?? "post";
 
 /**
  * Karte "So kommt es zu deinem Finanzamt" (Stand 2.1): erst den Weg wählen
@@ -142,7 +145,8 @@ export const taxOfficeWay = (reclaimCase) => reclaimCase?.taxOfficeWay ?? "elste
 export function taxOfficeWaysHtml(profile, reclaimCase, { signText, confirmText, letterButtonsHtml }) {
   const office = normalizeTaxOffice(profile.residence.taxOffice);
   const way = taxOfficeWay(reclaimCase);
-  const tile = (key, label) => `<button type="button" class="way-tile ${way === key ? "on" : ""}" data-way="${key}" aria-pressed="${way === key}">${label}</button>`;
+  const tile = (key, label, tag = "") =>
+    `<button type="button" class="way-tile ${way === key ? "on" : ""}" data-way="${key}" aria-pressed="${way === key}">${label}${tag ? `<span class="way-tag">${tag}</span>` : ""}</button>`;
   const path = (...parts) => `<span class="ui-path">${parts.map((p) => `<b>${esc(p)}</b>`).join("<span>›</span>")}</span>`;
   return `
     <div class="card" data-ways>
@@ -151,7 +155,7 @@ export function taxOfficeWaysHtml(profile, reclaimCase, { signText, confirmText,
         <span class="ch-head-sub">${esc(office.name || "")}</span>
       </div>
       <div class="card-body">
-        <div class="way-tiles">${tile("elster", "Digital per ELSTER")}${tile("post", "Per Post")}</div>
+        <div class="way-tiles">${tile("post", "Per Post", "Empfohlen")}${tile("elster", "Digital per ELSTER")}</div>
 
         <div class="way ${way === "elster" ? "on" : ""}" data-way-pane="elster">
           <ol class="flow-steps">
@@ -243,25 +247,39 @@ export function pauseHtml({ icon = "❚❚", title, text = "", actionsHtml = "" 
 }
 
 /**
- * Pause nach "Ans Finanzamt schicken": erst "Ist abgeschickt" (merkt sich das
- * Datum für die Wartezeit auf der Startseite), dann "Bestätigung ist da".
- * Enthält immer [data-step-next] (der Schritt bindet daran das Weiter).
+ * Pause nach "Ans Finanzamt schicken": "Ist abgeschickt" merkt sich das Datum
+ * für die Wartezeit auf der Startseite. Der Weiter-Knopf ("… ist zurück")
+ * steht nicht hier, sondern unten in der Schritt-Navigation (taxOfficeNavHtml),
+ * weil er den nächsten Schritt einleitet.
  */
-export function taxOfficePauseHtml(reclaimCase, readyLabel = "Bestätigung ist da") {
+export function taxOfficePauseHtml(reclaimCase) {
   const sentAt = reclaimCase.taxOfficeSentAt;
   const save = `<button class="btn-secondary btn-small" data-action="save-state" type="button">💾 Sicherung</button>`;
   if (!sentAt) {
     return pauseHtml({
       title: "Abgeschickt? Dann ist hier Pause, meist 2–3 Wochen.",
       text: "Wir merken uns das Datum und zeigen dir auf der Übersicht, wie lange es schon dauert.",
-      actionsHtml: `<button class="btn-secondary btn-small" data-step-next type="button">${esc(readyLabel)} →</button><button class="btn-primary btn-small" data-action="mark-sent" type="button">✓ Ist abgeschickt</button>`,
+      actionsHtml: `<button class="btn-primary btn-small" data-action="mark-sent" type="button">✓ Ist abgeschickt</button>`,
     });
   }
   return pauseHtml({
     title: `Abgeschickt am ${new Date(sentAt).toLocaleDateString("de-DE")} · jetzt ist Pause, meist 2–3 Wochen.`,
-    text: "Wenn die Bestätigung zurück ist, geht es mit dem Einreichen weiter.",
-    actionsHtml: `${save}<button class="btn-primary btn-small" data-step-next type="button">${esc(readyLabel)} →</button>`,
+    text: "Wenn die Bestätigung zurück ist, geht es unten mit dem Einreichen weiter.",
+    actionsHtml: save,
   });
+}
+
+/**
+ * Schritt-Navigation nach "Ans Finanzamt schicken": Zurück links, rechts
+ * "… ist zurück →" ([data-step-next]). Vor "Ist abgeschickt" nur zweitrangig.
+ */
+export function taxOfficeNavHtml(reclaimCase, readyLabel = "Bestätigung ist da") {
+  const cls = reclaimCase.taxOfficeSentAt ? "btn-primary" : "btn-secondary";
+  return `
+    <div class="ch-step-nav">
+      <button class="btn-secondary" data-step-back type="button">← Zurück</button>
+      <button class="${cls}" data-step-next type="button">${esc(readyLabel)} →</button>
+    </div>`;
 }
 
 /** @param {() => void} rerender */

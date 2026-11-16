@@ -495,7 +495,9 @@
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.45);
 }
+/* Website-Link in eigener Zeile über Über mich · Impressum · Datenschutz */
 #divrebound-app .sidebar-website {
+  flex-basis: 100%;
   color: rgba(255, 255, 255, 0.75) !important;
 }
 #divrebound-app .sidebar-bottom {

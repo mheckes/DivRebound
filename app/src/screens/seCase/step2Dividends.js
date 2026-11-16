@@ -9,7 +9,7 @@ export function mount(container, reclaimCase) {
   mountDividendUpload(container, reclaimCase, {
     corridor,
     headerHtml: stepHeader(reclaimCase, 2),
-    lead: "Lade deine Dividendenabrechnungen schwedischer Aktien hoch. DivRebound liest die relevanten Informationen aus und bereitet das Formular vor.",
+    lead: "Lade die Dividendenabrechnungen deiner schwedischen Aktien hoch. DivRebound liest sie aus.",
     countryName: "Schweden",
     shareAdjective: "schwedische",
     groupBy: "issuer",

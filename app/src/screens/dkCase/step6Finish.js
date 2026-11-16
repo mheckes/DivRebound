@@ -4,7 +4,7 @@
 // (zählt für die Statistik, Frage nach der Erstattung auf der Übersicht).
 
 import { formatDateDe } from "../../util/format.js";
-import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
+import { bindPausePanel, submitEndHtml, submitNavHtml } from "../../components/pausePanel.js";
 import { stepHeader, bindStepNav, saveCase } from "./dkShared.js";
 
 export function mount(container, reclaimCase) {
@@ -15,43 +15,38 @@ function render(container, reclaimCase) {
   const done = reclaimCase.status === "submitted";
   const doneAt = reclaimCase.submittedAt ? ` am ${formatDateDe(reclaimCase.submittedAt.slice(0, 10))}` : "";
 
+  // Stand 2.1: Kurzsatz, nummerierte Schritte mit der SKAT-Schaltfläche als
+  // Marke, "Ist eingereicht" in der Pause-Komponente (wie die anderen Länder).
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 6)}
-    <p class="ch-lead">Der Antrag ist eingereicht, sobald du ihn im Online-Formular der dänischen Steuerbehörde (SKAT) abschickst. Danach prüft SKAT deinen Antrag und überweist die Erstattung.</p>
+    <p class="ch-lead">Mit dem Absenden im SKAT-Formular ist dein Antrag eingereicht.</p>
 
     <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Im SKAT-Formular</span></div>
+      <div class="card-head"><span class="card-title">Im SKAT-Formular</span></div>
       <div class="card-body">
-        <div class="ch-next"><span class="ch-next-num">1</span><span>Prüfen, ob die vom Finanzamt gestempelte Wohnsitzbescheinigung hochgeladen ist.</span></div>
-        <div class="ch-next"><span class="ch-next-num">2</span><span>Auf der letzten Seite auf <b>„Send“</b> klicken.</span></div>
-        <div class="ch-next"><span class="ch-next-num">3</span><span>Die Bestätigungsseite als PDF speichern oder ausdrucken. Sie ist dein Nachweis, falls SKAT nachfragt.</span></div>
-        ${
-          done
-            ? `<div class="done-banner ch-done-banner">
-                <div class="done-icon">✓</div>
-                <div>
-                  <div class="done-title">Antrag eingereicht</div>
-                  <div class="done-sub">Bei SKAT eingereicht${doneAt}. Die Auszahlung dauert meist einige Monate. Auf der Übersicht fragen wir dich, ob das Geld da ist.</div>
-                </div>
-              </div>`
-            : `<button class="btn-primary" data-action="finish" type="button" style="margin-top:12px;">✓ Antrag ist eingereicht</button>`
-        }
+        <ol class="flow-steps">
+          <li><div>Prüfen, ob die gestempelte Wohnsitzbescheinigung hochgeladen ist.</div></li>
+          <li><div>Auf der letzten Seite <span class="ui-path"><b>Send</b></span> klicken.</div></li>
+          <li><div>Die Bestätigungsseite als PDF speichern. Sie ist dein Nachweis.</div></li>
+        </ol>
       </div>
     </div>
 
-    ${done ? pausePanelHtml(reclaimCase, "payout") : ""}
+    ${submitEndHtml(reclaimCase, {
+      submittedAt: done ? reclaimCase.submittedAt ?? new Date().toISOString() : null,
+      doneSub: `Bei SKAT eingereicht${doneAt} · die Auszahlung dauert meist einige Monate`,
+      question: "Abgesendet? Dann ist dein Antrag eingereicht.",
+      actionLabel: "✓ Ist eingereicht",
+    })}
 
-    <div class="ch-step-nav">
-      <button class="btn-secondary" data-step-back type="button">← Zurück</button>
-      <a class="btn-secondary" href="#/home">Zur Übersicht</a>
-    </div>
+    ${submitNavHtml(done)}
     </div>`;
 
   bindStepNav(container, reclaimCase, 6);
   bindPausePanel(container, reclaimCase);
 
-  container.querySelector('[data-action="finish"]')?.addEventListener("click", async () => {
+  container.querySelector('[data-action="mark-mailed"]')?.addEventListener("click", async () => {
     if (reclaimCase.status === "submitted") return;
     reclaimCase.status = "submitted";
     reclaimCase.submittedAt = new Date().toISOString();

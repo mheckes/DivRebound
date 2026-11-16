@@ -73,7 +73,7 @@ function render(container, reclaimCase, profile) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 3)}
-    <p class="ch-lead">Diese Angaben kommen in die Wohnsitzbescheinigung und ins dänische Online-Formular. Sie werden in deinem Profil gespeichert und sind beim nächsten Antrag schon da.</p>
+    <p class="ch-lead">Diese Angaben kommen in die Wohnsitzbescheinigung und ins SKAT-Formular.</p>
 
     ${profileCardsHtml(profile, REQUIRED, ["taxOffice"])}
 

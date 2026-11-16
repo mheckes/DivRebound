@@ -4,7 +4,7 @@
 // erzeugt das ePortal das Formular (Antrag DIP-0085) - DivRebound liefert das
 // Anschreiben und merkt sich den Status.
 
-import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, taxOfficePauseHtml, bindTaxOfficePause } from "../../components/flow.js";
+import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, taxOfficePauseHtml, taxOfficeNavHtml, bindTaxOfficePause } from "../../components/flow.js";
 import { getState } from "../../store/store.js";
 import { navigate } from "../../router/router.js";
 import { buildTaxOfficeLetter } from "../../lib/buildTaxOfficeLetter.js";
@@ -88,12 +88,12 @@ function render(container, reclaimCase, transactions) {
     ${taxOfficeWaysHtml(profile, reclaimCase, {
       signText: "Antrag ausdrucken, auf Seite 1 unter „Rechtsgültige Unterschrift“ Ort und Datum eintragen und unterschreiben",
       confirmText: "Das Finanzamt bestätigt auf Seite 1 (Stempel und Unterschrift) und schickt den Antrag zurück",
-      letterButtonsHtml: `<button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Anschreiben</button><button class="btn-accent btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ PDF</button>${taxOfficeComplete ? "" : ` <a href="#" data-go-step="8">Anschrift des Finanzamts ergänzen</a>`}`,
+      letterButtonsHtml: `<button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Vorschau</button><button class="btn-secondary btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ Herunterladen</button>${taxOfficeComplete ? "" : ` <a href="#" data-go-step="8">Anschrift des Finanzamts ergänzen</a>`}`,
     })}
 
-    ${taxOfficePauseHtml(reclaimCase, "Antrag ist zurück")}
+    ${taxOfficePauseHtml(reclaimCase)}
 
-    <div class="ch-step-nav"><button class="btn-secondary" data-step-back type="button">← Zurück</button><span></span></div>
+    ${taxOfficeNavHtml(reclaimCase, "Antrag ist zurück")}
     </div>`;
 
   bindStepNav(container, reclaimCase, 5);

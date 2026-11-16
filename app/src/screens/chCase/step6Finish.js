@@ -5,20 +5,11 @@
 import { signNowHtml } from "../../components/flow.js";
 import { getState } from "../../store/store.js";
 import { statusTimelineHtml, bindStatusTimeline } from "../../components/statusTimeline.js";
-import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
+import { bindPausePanel, submitEndHtml, submitNavHtml } from "../../components/pausePanel.js";
 import { formatDateDe } from "../../util/format.js";
 import { CH_TIMELINE, timelineTitle, chTimelineDone } from "./step5TaxOffice.js";
 import { esc, corridor, saveCase, loadTransactions, entitlementsFor, stepHeader, stepNavHtml, bindStepNav } from "./chShared.js";
 
-// Reihenfolge wie im ePortal (Seite "Unterzeichneten Antrag hochladen"):
-// Datei wählen -> Antrags-ID eingeben -> drei Bestätigungen -> einreichen.
-const UPLOAD_CHECKS = [
-  ["stamp", "<b>Prüfen:</b> Stempel, Unterschrift und Datum des Finanzamts und von dir sind auf Seite 1 vorhanden. Keine handschriftlichen Korrekturen oder Anmerkungen (diese können zur Ablehnung führen)."],
-  ["scan", "<b>Einscannen:</b> alle Seiten als <b>eine</b> PDF-Datei, gut lesbar, höchstens 10 MB."],
-  ["upload", "<b>Hochladen:</b> im ePortal unter „Verrechnungssteuer“ → „Anträge“ auf <b>„Unterzeichneten Antrag hochladen“</b> klicken und das PDF auswählen."],
-  ["antragsId", "<b>Antrags-ID eingeben:</b> so wie sie auf Seite 1 deines Antrags oben rechts steht, z.B. <span class=\"mono\" style=\"white-space:nowrap\">DE-1234-5678-00</span>. Sie steht auch in der Antragsübersicht. Das Portal meldet dann „Die Antrags-ID ist gültig“."],
-  ["confirm", "<b>Bestätigen und einreichen:</b> die drei Bestätigungen anhaken (beglaubigt, rechtsgültig unterzeichnet, vollständig und richtig) und auf <b>„Antrag einreichen“</b> klicken."],
-];
 
 export async function mount(container, reclaimCase) {
   const transactions = await loadTransactions(getState().currentProfile);
@@ -28,50 +19,38 @@ export async function mount(container, reclaimCase) {
 function render(container, reclaimCase, transactions) {
   const results = entitlementsFor(reclaimCase, transactions, getState().currentProfile);
   const total = results.reduce((s, r) => s + (r.refund ?? 0), 0);
-  const checks = new Set(reclaimCase.ch.uploadChecks);
-  const allChecked = UPLOAD_CHECKS.every(([id]) => checks.has(id));
   const completed = Boolean(reclaimCase.ch.completedAt);
 
+  // Stand 2.1: Kurzsatz, ein Klickpfad im ePortal als nummerierte Schritte,
+  // "Ist eingereicht" in der Pause-Komponente (wie in den anderen Ländern).
+  const path = (...parts) => `<span class="ui-path">${parts.map((p) => `<b>${esc(p)}</b>`).join("<span>›</span>")}</span>`;
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 6)}
     ${signNowHtml(reclaimCase, "den bestätigten Antrag auf Seite 1 unter „Rechtsgültige Unterschrift“ (Ort, Datum, Unterschrift)")}
-    <p class="ch-lead">Der vom deutschen Finanzamt bestätigte Antrag wird im ePortal hochgeladen. Erst danach prüft die Eidgenössische Steuerverwaltung deinen Antrag und überweist die Erstattung.</p>
+    <p class="ch-lead">Lade den vom Finanzamt bestätigten Antrag im ePortal hoch. Erst dann prüft die Steuerverwaltung und zahlt aus.</p>
 
     <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Bestätigten Antrag hochladen</span></div>
+      <div class="card-head"><span class="card-title">Im ePortal hochladen</span><a class="btn-secondary btn-small" href="${corridor.onlinePortalUrl}" target="_blank" rel="noopener">ePortal öffnen ↗</a></div>
       <div class="card-body">
-        ${UPLOAD_CHECKS.map(([, text], i) => `<div class="ch-next"><span class="ch-next-num">${i + 1}</span><span>${text}</span></div>`).join("")}
-        <div class="ch-inline-actions">
-          <a class="btn-accent btn-small" href="${corridor.onlinePortalUrl}" target="_blank" rel="noopener">ePortal öffnen ↗</a>
-        </div>
+        <ol class="flow-steps">
+          <li><div>Antrag prüfen: Stempel und beide Unterschriften auf Seite 1, keine handschriftlichen Korrekturen.</div></li>
+          <li><div>Alle Seiten als <b>eine</b> PDF einscannen, höchstens 10 MB.</div></li>
+          <li><div>${path("Verrechnungssteuer", "Anträge", "Unterzeichneten Antrag hochladen")} und das PDF wählen.</div></li>
+          <li><div>Antrags-ID von Seite 1 oben rechts eingeben, z.B. <span class="mono" style="white-space:nowrap">DE-1234-5678-00</span>.</div></li>
+          <li><div>Die drei Bestätigungen anhaken und ${path("Antrag einreichen")}.</div></li>
+        </ol>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Antrag einreichen</span></div>
-      <div class="card-body">
-        ${
-          completed
-            ? `<div class="done-banner ch-done-banner">
-                <div class="done-icon">✓</div>
-                <div>
-                  <div class="done-title">Antrag eingereicht</div>
-                  <div class="done-sub">Hochgeladen am ${esc(formatDateDe(reclaimCase.ch.completedAt.slice(0, 10)))}. Die Eidgenössische Steuerverwaltung prüft jetzt deinen Antrag. Die Auszahlung dauert erfahrungsgemäß einige Wochen.</div>
-                </div>
-              </div>
-              <p class="ch-text">Auf der Übersicht fragen wir dich, ob das Geld da ist.</p>`
-            : `<button class="btn-primary" data-action="finish" type="button">✓ Antrag ist eingereicht</button>`
-        }
-      </div>
-    </div>
+    ${submitEndHtml(reclaimCase, {
+      submittedAt: reclaimCase.ch.completedAt,
+      doneSub: `Hochgeladen am ${esc(formatDateDe((reclaimCase.ch.completedAt ?? "").slice(0, 10)))} · die Auszahlung dauert meist einige Wochen`,
+      question: "Hochgeladen? Dann ist dein Antrag eingereicht.",
+      actionLabel: "✓ Ist eingereicht",
+    })}
 
-    ${completed ? pausePanelHtml(reclaimCase, "payout") : ""}
-
-    <div class="ch-step-nav">
-      <button class="btn-secondary" data-step-back type="button">← Zurück</button>
-      <a class="btn-secondary" href="#/home">Zur Übersicht</a>
-    </div>
+    ${submitNavHtml(completed)}
     </div>`;
 
   bindStepNav(container, reclaimCase, 6);
@@ -92,7 +71,7 @@ function render(container, reclaimCase, transactions) {
     })
   );
 
-  container.querySelector('[data-action="finish"]')?.addEventListener("click", async () => {
+  container.querySelector('[data-action="mark-mailed"]')?.addEventListener("click", async () => {
     reclaimCase.ch.completedAt = new Date().toISOString();
     reclaimCase.submittedAt = reclaimCase.ch.completedAt;
     reclaimCase.ch.timelineStep = Math.max(reclaimCase.ch.timelineStep, 4);

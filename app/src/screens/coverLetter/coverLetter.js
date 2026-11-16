@@ -76,22 +76,26 @@ function render(container) {
   const profile = getState().currentProfile;
   if (!profile) {
     container.innerHTML = `
-      <div class="content-header"><h1 class="content-title">Anschreiben Finanzamt</h1></div>
-      <div class="info-banner"><span class="icon">ℹ</span><div>Es ist kein Profil vorhanden. Lege zunächst über den Einstiegs-Dialog ein Profil an.</div></div>
+      <div class="content-header"><h1 class="content-title">Anschreiben Finanzamt</h1><div class="content-breadcrumb">Für den Postweg</div></div>
+      <div class="info-banner"><span class="icon">ℹ</span><div>Noch kein Profil vorhanden. Starte auf der <a href="#/home">Übersicht</a> einen Antrag, dann ist es angelegt.</div></div>
     `;
     return;
   }
 
   const fileNamePreview = buildLetterFileName(profile);
 
+  // Stand 2.1: gleicher Aufbau wie "Ans Finanzamt schicken" - Kurzsatz statt
+  // Erklärtext, Herunterladen als Primärbutton, eine Textgröße.
   container.innerHTML = `
     <div class="profile-page">
     <div class="content-header">
       <h1 class="content-title">Anschreiben Finanzamt</h1>
+      <div class="content-breadcrumb">Für den Postweg</div>
     </div>
+    <p class="page-lead">Leg das Anschreiben bei, wenn du ein Formular per Post an dein Finanzamt schickst.</p>
 
     <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Zuständiges Finanzamt</span></div>
+      <div class="card-head"><span class="card-title">Anschrift deines Finanzamts</span><span class="ch-head-sub">aus deinem Profil</span></div>
       <div class="card-body">
         <div class="field-grid">
           ${field(profile, "taxOfficeName", "Name", { wide: true, placeholder: "z.B. Finanzamt München I" })}
@@ -103,24 +107,22 @@ function render(container) {
           ${field(profile, "taxOfficePostalCode", "Postleitzahl", { placeholder: "z.B. 80335" })}
           ${field(profile, "taxOfficeCity", "Ort", { placeholder: "z.B. München" })}
         </div>
-        <div class="field-hint">Bitte prüfen. Aus deinen persönlichen Daten übernommen.</div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Dokument erstellen</span></div>
+      <div class="card-head head-navy"><span class="card-title">Anschreiben herunterladen</span></div>
       <div class="doc-item">
         <div>
           <div class="doc-title">Anschreiben an das Finanzamt</div>
-          <div class="doc-sub">Allgemeines Anschreiben mit der Bitte, die beigefügten Formulare zu bestätigen.</div>
           <div class="doc-file">${esc(fileNamePreview)}</div>
         </div>
         <div class="doc-actions">
           <button class="btn-secondary btn-small" data-action="preview" type="button">👁 Vorschau</button>
-          <button class="btn-accent btn-small" data-action="download" type="button">⬇ PDF</button>
+          <button class="btn-primary" data-action="download" type="button">⬇ Herunterladen</button>
         </div>
       </div>
-      <div class="doc-status field-hint" data-incomplete-hint>Bitte zuerst die vollständige Anschrift des Finanzamts eintragen.</div>
+      <div class="doc-status field-hint" data-incomplete-hint>Erst die Anschrift oben vollständig eintragen.</div>
       <div class="doc-status" id="download-status"></div>
     </div>
     </div>

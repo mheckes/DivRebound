@@ -18,7 +18,7 @@ function render(container, reclaimCase, profile) {
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 3)}
-    <p class="ch-lead">Diese Angaben kommen ins Formular. Sie werden in deinem Profil gespeichert und sind beim nächsten Antrag schon da.</p>
+    <p class="ch-lead">Diese Angaben kommen ins Formular.</p>
 
     ${profileCardsHtml(profile, REQUIRED_ITEMS)}
 

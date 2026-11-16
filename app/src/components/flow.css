@@ -114,6 +114,22 @@
   color: var(--charcoal);
   cursor: pointer;
 }
+#divrebound-app .way-tile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+#divrebound-app .way-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--success-bg);
+  color: #065f46;
+  border-radius: 4px;
+  padding: 1px 6px;
+}
 #divrebound-app .way-tile:hover {
   border-color: var(--stone);
 }
@@ -262,6 +278,7 @@
   }
 }
 
+#divrebound-app a.btn-primary,
 #divrebound-app a.btn-secondary {
   text-decoration: none;
   display: inline-flex;

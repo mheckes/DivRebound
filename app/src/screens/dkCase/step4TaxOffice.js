@@ -7,7 +7,7 @@
 // (wiederholten nur Schritt 2 und 3). Danach wartet der Fall auf die
 // Bestätigung durch das Finanzamt (Medienbruch).
 
-import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, taxOfficePauseHtml, bindTaxOfficePause } from "../../components/flow.js";
+import { taxOfficeWaysHtml, bindTaxOfficeWays, elsterMessageText, taxOfficePauseHtml, taxOfficeNavHtml, bindTaxOfficePause } from "../../components/flow.js";
 import { getState, setState } from "../../store/store.js";
 import { goToStep, markStepDone, stepHeader } from "./dkShared.js";
 import * as caseRepo from "../../db/caseRepo.js";
@@ -165,12 +165,12 @@ function render(container) {
     ${taxOfficeWaysHtml(profile, reclaimCase, {
       signText: "Wohnsitzbescheinigung ausdrucken und unterschreiben",
       confirmText: "Das Finanzamt stempelt die Bescheinigung und schickt sie zurück",
-      letterButtonsHtml: `<button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Anschreiben</button><button class="btn-accent btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ PDF</button>${taxOfficeComplete ? "" : ` <a href="#" data-go-step="3">Anschrift des Finanzamts ergänzen</a>`}`,
+      letterButtonsHtml: `<button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${taxOfficeComplete ? "" : "disabled"}>👁 Vorschau</button><button class="btn-secondary btn-small" data-action="letter" type="button" ${taxOfficeComplete ? "" : "disabled"}>⬇ Herunterladen</button>${taxOfficeComplete ? "" : ` <a href="#" data-go-step="3">Anschrift des Finanzamts ergänzen</a>`}`,
     })}
 
-    ${taxOfficePauseHtml(reclaimCase, "Bescheinigung ist zurück")}
+    ${taxOfficePauseHtml(reclaimCase)}
 
-    <div class="ch-step-nav"><button class="btn-secondary" data-step-back type="button">← Zurück</button><span></span></div>
+    ${taxOfficeNavHtml(reclaimCase, "Bescheinigung ist zurück")}
   `;
 
   attachListeners(container, reclaimCase);

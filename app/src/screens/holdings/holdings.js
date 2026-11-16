@@ -25,6 +25,7 @@ import { showToast } from "../../components/toast.js";
 import { navigate } from "../../router/router.js";
 import { chStepRoute } from "../../config/caseSteps.js";
 import { stepHeader, stepNavHtml, bindStepNav, markStepDone } from "../chCase/chShared.js";
+import { TRASH_ICON } from "../../components/flow.js";
 
 const corridor = corridors.CH;
 const ISIN_PATTERN = /^[A-Z]{2}[A-Z0-9]{9}\d$/;
@@ -75,12 +76,15 @@ function render(container) {
 
   // Im Fall bei vorhandenem Bestand zuerst fragen, ob sich etwas geändert hat.
   const askForChanges = Boolean(embeddedCase && lastTx && !captureOpen);
+  // Stand 2.1: Kurzsätze statt Erklärtext, Hauptaktion als Primärbutton,
+  // Papierkorb wie auf der Startseite (siehe home.js, components/flow.js).
   const header = embeddedCase
     ? stepHeader(embeddedCase, 2)
     : `<div class="content-header">
       <h1 class="content-title">Wertpapierbestand Schweiz</h1>
-      <div class="content-breadcrumb">Schweiz <b>›</b> Wertpapierbestand</div>
+      <div class="content-breadcrumb">Gilt für alle Anträge Schweiz</div>
     </div>`;
+  const lastLabel = lastTx ? `${lastTx.type === "buy" ? "Kauf" : "Verkauf"} vom <b>${esc(formatDateDe(lastTx.tradeDate))}</b>` : "";
 
   container.innerHTML = `
     <div class="holdings-page">
@@ -89,16 +93,16 @@ function render(container) {
     ${
       askForChanges
         ? `<div class="holdings-question">
-            <h3>Ist dein Bestand seit dem ${esc(formatDateDe(lastTx.tradeDate))} noch aktuell?</h3>
-            <p>Dein Wertpapierbestand ist bereits erfasst. Die zuletzt erfasste Transaktion ist ein ${lastTx.type === "buy" ? "Kauf" : "Verkauf"} vom <b>${esc(formatDateDe(lastTx.tradeDate))}</b>. Er ist aktuell, wenn du seitdem keine Schweizer Aktien gekauft oder verkauft hast und auch keine älteren Käufe oder Verkäufe fehlen.</p>
+            <h3>Ist dein Bestand noch aktuell?</h3>
+            <p>Zuletzt erfasst: ${lastLabel}. Aktuell heißt: seitdem nichts gekauft oder verkauft, und es fehlt nichts.</p>
             <div class="holdings-actions">
-              <button class="btn-accent" data-action="no-changes" type="button">Ja, Bestand ist aktuell</button>
-              <button class="btn-secondary holdings-question-secondary" data-action="open-capture" type="button">Nein, Änderungen erfassen</button>
+              <button class="btn-primary" data-action="no-changes" type="button">Ja, ist aktuell →</button>
+              <button class="btn-secondary" data-action="open-capture" type="button">Nein, Änderungen erfassen</button>
             </div>
           </div>`
         : lastTx
-        ? `<div class="info-banner"><span class="icon">ℹ</span><div>Zuletzt erfasst: ${lastTx.type === "buy" ? "Kauf" : "Verkauf"} vom <b>${esc(formatDateDe(lastTx.tradeDate))}</b>. Ergänze hier Käufe und Verkäufe, die seitdem dazugekommen sind oder noch fehlen. Daraus berechnet DivRebound das Erwerbsdatum deiner Aktien, das im ePortal anzugeben ist.</div></div>`
-        : `<p class="holdings-lead">Im ePortal gibst du zu jeder Dividende an, wann du die Aktien gekauft hast, die du am Stichtag hieltest (Erwerbsdatum). Damit DivRebound das berechnen kann, erfasst du hier <b>alle Käufe und Verkäufe</b> deiner Schweizer Aktien, lückenlos ab dem ersten Kauf. Am einfachsten per Upload der Abrechnungen: DivRebound liest Handelstag, Stückzahl und ISIN aus. Beim nächsten DivRebound ergänzt du nur noch, was neu dazugekommen ist.</p>`
+        ? `<p class="page-lead">Zuletzt erfasst: ${lastLabel}. Ergänze, was seitdem dazugekommen ist oder noch fehlt.</p>`
+        : `<p class="page-lead">Alle Käufe und Verkäufe deiner Schweizer Aktien, lückenlos ab dem ersten Kauf. Daraus berechnet DivRebound das Erwerbsdatum fürs ePortal.</p>`
     }
 
     ${askForChanges ? "" : renderCaptureCard()}
@@ -126,17 +130,16 @@ function render(container) {
 function renderCaptureCard() {
   return `
     <div class="card">
-      <div class="card-head"><span class="card-title">Käufe und Verkäufe erfassen</span><span class="holdings-sub">Dateien verlassen deinen Rechner nicht</span></div>
+      <div class="card-head"><span class="card-title">Käufe und Verkäufe erfassen</span><span class="ch-head-sub">Dateien bleiben auf deinem Rechner</span></div>
       <div class="card-body">
         <div class="dropzone" id="dropzone">
           <input type="file" id="file-input" multiple accept="application/pdf" hidden />
-          <div class="dz-main">Wertpapierabrechnungen hochladen oder hierher ziehen</div>
-          <div class="dz-sub">PDF · Mehrfachauswahl möglich</div>
+          <div class="dz-main">Abrechnungen hochladen oder hierher ziehen</div>
+          <div class="dz-sub">PDF · mehrere auf einmal möglich</div>
         </div>
         <div class="holdings-or">oder</div>
         <div style="text-align:center;">
-          <button class="btn-secondary" data-action="toggle-manual" type="button">＋ Transaktion manuell erfassen</button>
-          <div class="field-hint" style="margin-top:6px;">z.B. wenn alte Abrechnungen beim Broker nicht mehr abrufbar sind</div>
+          <button class="btn-secondary" data-action="toggle-manual" type="button">＋ Von Hand erfassen</button>
         </div>
       </div>
       ${renderManualForm()}
@@ -268,8 +271,8 @@ function renderTransactions() {
             <td>${esc(knownName(t.isin) || t.isin)}<div class="mono holdings-lot-note">${esc(t.isin)}</div></td>
             <td class="num">${t.type === "sell" ? "−" : ""}${t.quantity}</td>
             <td class="holdings-source">${t.source?.kind === "manual" ? "manuell erfasst" : esc(t.source?.fileName ?? "Abrechnung")}
-              ${t.extractionConfidence === "extracted" ? `<div><span class="badge badge-warn">bitte prüfen</span> <button class="holdings-link" data-confirm="${esc(t.transactionId)}" type="button">stimmt</button></div>` : ""}</td>
-            <td><button class="holdings-delete" data-delete="${esc(t.transactionId)}" title="Löschen" type="button">✕</button></td>
+              ${t.extractionConfidence === "extracted" ? `<div class="holdings-check"><span class="badge badge-warn">bitte prüfen</span> <button class="btn-secondary btn-small" data-confirm="${esc(t.transactionId)}" type="button">✓ Stimmt</button></div>` : ""}</td>
+            <td><button class="btn-trash" data-delete="${esc(t.transactionId)}" title="Transaktion löschen" aria-label="Transaktion löschen" type="button">${TRASH_ICON}</button></td>
           </tr>`
           )
           .join("")}</tbody>

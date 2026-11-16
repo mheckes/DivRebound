@@ -81,6 +81,36 @@
 #divrebound-app .applicant-chip a:hover {
   text-decoration: underline;
 }
+
+/* Löschen überall gleich: Papierkorb-Icon (flow.js TRASH_ICON), grau, rot beim Überfahren */
+#divrebound-app .btn-trash {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+#divrebound-app .btn-trash:hover,
+#divrebound-app .btn-trash:focus-visible {
+  background: var(--danger-tint);
+  border-color: #e7c3be;
+  color: var(--danger);
+  outline: none;
+}
+/* Kurzer Einleitungssatz unter dem Seitentitel */
+#divrebound-app .page-lead {
+  margin: -6px 0 18px;
+  color: #3b4a60;
+  font-size: var(--t-body);
+  max-width: 720px;
+}
 #divrebound-app .content-title {
   font-family: var(--font-display);
   font-size: 22px;
@@ -143,8 +173,9 @@
 #divrebound-app .btn-primary {
   background: var(--navy);
   color: #fff;
-  border: none;
-  padding: 11px 22px;
+  /* transparenter Rand: gleiche Höhe wie .btn-secondary daneben */
+  border: 1px solid transparent;
+  padding: 10px 22px;
   border-radius: 9px;
   font-size: 13.5px;
   font-weight: 600;
@@ -174,7 +205,7 @@
 #divrebound-app .btn-accent {
   background: var(--cyan);
   color: var(--charcoal);
-  border: none;
+  border: 1px solid transparent;
   padding: 9px 16px;
   border-radius: 9px;
   cursor: pointer;

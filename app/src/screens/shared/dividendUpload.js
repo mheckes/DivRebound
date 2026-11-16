@@ -5,6 +5,7 @@
 // immer gezahlte Steuer − DBA-Satz × Brutto.
 // Länderunterschiede kommen über die Optionen (Gruppierung, Währung, Spalten).
 
+import { TRASH_ICON } from "../../components/flow.js";
 import { getState, setState } from "../../store/store.js";
 import * as caseRepo from "../../db/caseRepo.js";
 import * as profileRepo from "../../db/profileRepo.js";
@@ -180,7 +181,7 @@ export function mountDividendUpload(container, reclaimCase, options) {
         <td><span class="du-rate ${ratePill}">${c.effectiveRate === null ? "–" : pct(c.effectiveRate)}</span></td>
         <td class="num refund-cell">${refundable ? formatNumberDe(refundFor(d, corridor, residence()).refund) : "–"}</td>
         <td>${badge}</td>
-        <td><button class="icon-btn" data-action="remove-row" title="Entfernen" type="button">✕</button></td>
+        <td><button class="btn-trash" data-action="remove-row" title="Entfernen" aria-label="Entfernen" type="button">${TRASH_ICON}</button></td>
       </tr>`;
   }
 

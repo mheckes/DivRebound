@@ -10,7 +10,7 @@ import { buildItalyCoverLetter, italyCoverLetterFileName } from "../../lib/build
 import { openPdfPreview } from "../../util/pdfPreview.js";
 import { formatDateDe } from "../../util/format.js";
 import { showToast } from "../../components/toast.js";
-import { pausePanelHtml, bindPausePanel } from "../../components/pausePanel.js";
+import { bindPausePanel, submitEndHtml, submitNavHtml } from "../../components/pausePanel.js";
 import { groupByIssuer } from "../../lib/italy.js";
 import {
   esc, saveCase, caseSummary, formatEurPlain, stepHeader, stepNavHtml, bindStepNav, timelineHtml, bindTimeline, downloadBlob,
@@ -20,8 +20,8 @@ const ADDRESS = corridors.IT.mailingAddress;
 
 function envelopeChecks(formsCount, statements) {
   return [
-    ["forms", `<b>${formsCount} × Formular „Form A“</b> im Original, je 5 Seiten, vom Finanzamt auf Seite 5 gestempelt und unterschrieben`],
-    ["signatures", "Deine Unterschriften auf <b>Seite 3 und Seite 5</b> jedes Formulars"],
+    ["forms", `<b>${formsCount} × Formular „Form A“</b> im Original, vom Finanzamt auf Seite 5 bestätigt`],
+    ["signatures", "mit deinen <b>Unterschriften auf Seite 3 und 5</b>"],
     ["statements", `<b>Kopien der ${statements} Dividendenabrechnung${statements === 1 ? "" : "en"}</b>`],
     ["letter", "<b>Begleitschreiben</b>, unterschrieben"],
   ];
@@ -36,74 +36,49 @@ function letterDetails(reclaimCase) {
 function render(container, reclaimCase) {
   const profile = getState().currentProfile;
   const { eligible, forms, years, total } = caseSummary(reclaimCase);
-  const checks = new Set(reclaimCase.it.envelopeChecks ?? []);
   const items = envelopeChecks(forms.length, eligible.length);
-  const allChecked = items.every(([id]) => checks.has(id));
   const mailed = Boolean(reclaimCase.it.mailedAt);
 
+  // Stand 2.1: Kurzsatz, Dokument mit Primärbutton, nummerierte Schritte,
+  // "Ist abgeschickt" in der Pause-Komponente (wie Schweden).
   container.innerHTML = `
     <div class="ch-page">
     ${stepHeader(reclaimCase, 5)}
     ${signNowHtml(reclaimCase, "jedes Formular auf Seite 3 und Seite 5")}
-    <p class="ch-lead">Sobald das Finanzamt die Formulare bestätigt zurückgeschickt hat, gehen sie zusammen mit Kopien deiner Abrechnungen und dem Begleitschreiben per Post an die italienische Steuerbehörde.</p>
+    <p class="ch-lead">Schick die bestätigten Formulare mit Kopien deiner Abrechnungen und dem Begleitschreiben per Post nach Italien.</p>
 
     <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Begleitschreiben (Englisch)</span><span class="ch-head-sub">an die Agenzia delle Entrate</span></div>
+      <div class="card-head head-navy"><span class="card-title">Begleitschreiben herunterladen</span><span class="ch-head-sub">Englisch · an die Agenzia delle Entrate</span></div>
       <div class="doc-item">
         <div>
           <div class="doc-title">Begleitschreiben an die Agenzia delle Entrate</div>
-          <div class="doc-sub">Antrag auf Erstattung, Liste der Unternehmen, Anlagen und Bankverbindung – auf Englisch, bitte unterschreiben.</div>
           <div class="doc-file">${esc(italyCoverLetterFileName(profile, years))}</div>
         </div>
         <div class="doc-actions">
           <button class="btn-secondary btn-small" data-action="letter-preview" type="button" ${forms.length ? "" : "disabled"}>👁 Vorschau</button>
-          <button class="btn-accent btn-small" data-action="letter" type="button" ${forms.length ? "" : "disabled"}>⬇ PDF</button>
+          <button class="btn-primary" data-action="letter" type="button" ${forms.length ? "" : "disabled"}>⬇ Herunterladen</button>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Das kommt in den Umschlag</span><span class="ch-head-sub">${forms.length} ${forms.length === 1 ? "Formular" : "Formulare"} · ${eligible.length} Abrechnung${eligible.length === 1 ? "" : "en"}</span></div>
+      <div class="card-head"><span class="card-title">So kommt es nach Italien</span><span class="ch-head-sub">${forms.length} ${forms.length === 1 ? "Formular" : "Formulare"} · ${eligible.length} Abrechnung${eligible.length === 1 ? "" : "en"}</span></div>
       <div class="card-body">
-        <ul class="ch-list">${items.map(([, text]) => `<li>${text}</li>`).join("")}</ul>
+        <ol class="flow-steps">
+          <li><div>In den Umschlag:<ul class="ch-list se-envelope">${items.map(([, text]) => `<li>${text}</li>`).join("")}</ul></div></li>
+          <li><div>An diese Adresse schicken, am besten als Einschreiben mit Rückschein. <button class="btn-secondary btn-small" data-action="copy-address" type="button">⧉ Adresse kopieren</button>
+            <div class="se-address mono">${ADDRESS.map(esc).join("<br>")}</div></div></li>
+        </ol>
+        <p class="flow-after">Mit dem Versand ist die Frist von 48 Monaten gewahrt.</p>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Adresse</span><span class="ch-head-sub">Einschreiben mit Rückschein empfohlen</span></div>
-      <div class="card-body">
-        <div class="it-address mono">${ADDRESS.map(esc).join("<br>")}</div>
-        <div class="ch-inline-actions"><button class="btn-secondary btn-small" data-action="copy-address" type="button">⧉ Adresse kopieren</button></div>
-      </div>
-    </div>
+    ${submitEndHtml(reclaimCase, {
+      submittedAt: reclaimCase.it.mailedAt,
+      doneSub: `Am ${esc(formatDateDe((reclaimCase.it.mailedAt ?? "").slice(0, 10)))} nach Italien versendet · erwartete Erstattung ${formatEurPlain(total)} €`,
+    })}
 
-    <div class="card">
-      <div class="card-head head-navy"><span class="card-title">Antrag einreichen</span></div>
-      <div class="card-body">
-        ${
-          mailed
-            ? `<div class="done-banner ch-done-banner">
-                <div class="done-icon">✓</div>
-                <div>
-                  <div class="done-title">Antrag eingereicht</div>
-                  <div class="done-sub">Am ${esc(formatDateDe(reclaimCase.it.mailedAt.slice(0, 10)))} nach Italien versendet · erwartete Erstattung ${formatEurPlain(total)} €</div>
-                </div>
-              </div>
-              <p class="ch-text">Auf der Übersicht fragen wir dich, ob das Geld da ist.</p>`
-            : `<p class="ch-text">Sobald der Umschlag unterwegs ist, gilt dein Antrag als eingereicht.</p>
-              <button class="btn-primary" data-action="mark-mailed" type="button">✓ Umschlag ist unterwegs</button>`
-        }
-      </div>
-    </div>
-
-    <div class="info-banner"><span class="icon">⏳</span><div><b>Geduld nötig:</b> Die Bearbeitung in Pescara dauert erfahrungsgemäß viele Monate. Die Frist von 48 Monaten ist mit dem Versand gewahrt.</div></div>
-
-    ${mailed ? pausePanelHtml(reclaimCase, "payout") : ""}
-
-    <div class="ch-step-nav">
-      <button class="btn-secondary" data-step-back type="button">← Zurück</button>
-      <a class="btn-secondary" href="#/home">Zur Übersicht</a>
-    </div>
+    ${submitNavHtml(mailed)}
     </div>`;
 
   bindStepNav(container, reclaimCase, 5);
