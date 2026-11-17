@@ -60,7 +60,10 @@
   --danger: #a8433a;
   --danger-tint: #f7e9e7;
 
-  /* Typo-Skala (Stand 2.1): Text, Hinweis (grau), Kartentitel (fett) */
+  /* Typo-Skala (Stand 2.1): nur diese vier Stufen verwenden.
+     micro = Überzeilen, Badges, Tabellenköpfe · hint = Hinweise, Meta, kleine
+     Buttons · body = Fließtext, Listen, Buttons, Eingaben · title = Kartentitel */
+  --t-micro: 11px;
   --t-body: 14px;
   --t-hint: 12.5px;
   --t-title: 15px;
@@ -76,6 +79,7 @@
 
 #divrebound-app {
   font-family: var(--font-body);
+  font-size: var(--t-body);
   color: var(--charcoal);
   background: var(--bg);
 }

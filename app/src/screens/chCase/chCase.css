@@ -3,26 +3,26 @@
    aus dkCase/step4TaxOffice.css) werden wiederverwendet. */
 
 #divrebound-app .ch-page {
-  max-width: 900px;
+  max-width: none;
 }
 #divrebound-app .ch-page-wide {
-  max-width: 1080px;
+  max-width: none;
 }
 #divrebound-app .ch-lead {
-  font-size: 13px;
+  font-size: var(--t-body);
   color: var(--muted);
   line-height: 1.6;
   margin: 0 0 16px;
   max-width: 700px;
 }
 #divrebound-app .ch-text {
-  font-size: 12.5px;
+  font-size: var(--t-body);
   color: var(--muted);
   line-height: 1.6;
   margin: 0 0 12px;
 }
 #divrebound-app .ch-head-sub {
-  font-size: 11.5px;
+  font-size: var(--t-hint);
   color: rgba(255, 255, 255, 0.75);
 }
 #divrebound-app .card-head:not(.head-navy) .ch-head-sub {
@@ -30,7 +30,7 @@
 }
 #divrebound-app .btn-small {
   padding: 6px 11px;
-  font-size: 11.5px;
+  font-size: var(--t-hint);
   border-radius: 7px;
   text-decoration: none;
   display: inline-flex;
@@ -53,12 +53,12 @@
   font-variant-numeric: tabular-nums;
 }
 #divrebound-app .ch-sub {
-  font-size: 11px;
+  font-size: var(--t-hint);
   color: var(--muted);
 }
 #divrebound-app .ch-empty {
   margin: 0;
-  font-size: 12.5px;
+  font-size: var(--t-hint);
   color: var(--muted);
 }
 #divrebound-app .ch-file {
@@ -66,13 +66,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 11.5px;
+  font-size: var(--t-hint);
 }
 
 /* --- Schritt 1: Checkliste --- */
 #divrebound-app .ch-check-group {
   padding: 12px 18px 4px;
-  font-size: 10.5px;
+  font-size: var(--t-micro);
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: var(--muted);
@@ -117,10 +117,10 @@
 }
 #divrebound-app .ch-check-label {
   font-weight: 600;
-  font-size: 12.5px;
+  font-size: var(--t-hint);
 }
 #divrebound-app .ch-check-text {
-  font-size: 12px;
+  font-size: var(--t-hint);
   color: var(--muted);
   line-height: 1.45;
 }
@@ -132,7 +132,7 @@
   align-items: center;
 }
 #divrebound-app .ch-check-toggle {
-  font-size: 12px;
+  font-size: var(--t-hint);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -154,7 +154,7 @@
 }
 #divrebound-app .ch-inline.mono {
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: var(--t-hint);
 }
 #divrebound-app .ch-check-item.missing .field-input {
   border-color: var(--danger);
@@ -180,7 +180,7 @@
   margin: 0;
   padding-left: 18px;
   line-height: 1.7;
-  font-size: 12.5px;
+  font-size: var(--t-body);
 }
 
 /* --- Schritt 3: Dividenden --- */
@@ -193,7 +193,7 @@
 #divrebound-app .ch-cell-input {
   height: 32px;
   padding: 4px 8px;
-  font-size: 12px;
+  font-size: var(--t-hint);
   min-width: 128px;
 }
 #divrebound-app .ch-cell-num {
@@ -205,7 +205,7 @@
 #divrebound-app .ch-chip {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--t-micro);
   background: var(--navy-light);
   color: var(--navy);
   padding: 2px 7px;
@@ -233,7 +233,7 @@
   border-radius: 10px;
   padding: 12px 16px;
   margin-bottom: 16px;
-  font-size: 12.5px;
+  font-size: var(--t-body);
   line-height: 1.55;
   color: #5c4300;
 }
@@ -270,7 +270,7 @@
   border-radius: 8px;
   padding: 4px 10px;
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: var(--t-hint);
   font-weight: 600;
   color: var(--stone);
 }
@@ -285,7 +285,7 @@
   padding: 9px 18px;
   background: var(--navy-light);
   border-top: 1px solid var(--divider);
-  font-size: 12px;
+  font-size: var(--t-hint);
   font-weight: 700;
   color: var(--navy);
 }
@@ -307,7 +307,7 @@
   border-top: 1px solid var(--divider);
 }
 #divrebound-app .ch-entry-head {
-  font-size: 10.5px;
+  font-size: var(--t-micro);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--muted);
@@ -326,14 +326,14 @@
 }
 #divrebound-app .ch-entry-cell .row-value {
   padding: 4px 6px;
-  font-size: 12px;
+  font-size: var(--t-hint);
 }
 #divrebound-app .ch-entry-refund {
-  font-size: 12px;
+  font-size: var(--t-hint);
 }
 #divrebound-app .ch-derivation {
   border-top: 1px dashed var(--divider);
-  font-size: 11.5px;
+  font-size: var(--t-hint);
   color: var(--muted);
 }
 #divrebound-app .ch-derivation > summary {
@@ -367,18 +367,18 @@
   border-radius: 8px;
   background: #fff4d6;
   border: 1px solid #e6c15a;
-  font-size: 12px;
+  font-size: var(--t-hint);
   color: #5c4300;
 }
 #divrebound-app .ch-pane-empty,
 #divrebound-app .ch-pane-note {
   padding: 14px 18px;
-  font-size: 12.5px;
+  font-size: var(--t-hint);
   color: var(--muted);
 }
 #divrebound-app .ch-pane-note-top {
   padding: 10px 18px;
-  font-size: 12px;
+  font-size: var(--t-hint);
   border-bottom: 1px solid var(--divider);
 }
 
@@ -388,7 +388,7 @@
   gap: 10px;
   align-items: flex-start;
   padding: 7px 0;
-  font-size: 12.5px;
+  font-size: var(--t-hint);
   line-height: 1.5;
   cursor: pointer;
 }
@@ -404,7 +404,7 @@
   gap: 12px;
   align-items: flex-start;
   padding: 7px 0;
-  font-size: 12.5px;
+  font-size: var(--t-hint);
   line-height: 1.5;
 }
 #divrebound-app .ch-next-num {
@@ -444,7 +444,7 @@
   border: 1px solid #e6c15a;
   border-radius: 8px;
   padding: 8px 12px;
-  font-size: 12px;
+  font-size: var(--t-hint);
   color: #5c4300;
   margin-bottom: 8px;
 }
@@ -469,10 +469,10 @@
 }
 #divrebound-app .guide-step-title {
   font-weight: 700;
-  font-size: 13px;
+  font-size: var(--t-body);
 }
 #divrebound-app .guide-step-text {
-  font-size: 12px;
+  font-size: var(--t-hint);
   color: var(--muted);
 }
 #divrebound-app .guide-step-shot {
@@ -483,7 +483,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: var(--t-hint);
   color: var(--stone);
   background: #fafbfc;
 }
@@ -516,7 +516,7 @@
     display: none;
   }
   #divrebound-app .ch-entry .row-value {
-    font-size: 11.5px;
+    font-size: var(--t-hint);
     padding: 3px 6px;
   }
 }
@@ -529,7 +529,7 @@
   gap: 2px;
 }
 #divrebound-app .ch-exdate-hint {
-  font-size: 10.5px;
+  font-size: var(--t-micro);
   color: #8a5a00;
   max-width: 180px;
   line-height: 1.35;

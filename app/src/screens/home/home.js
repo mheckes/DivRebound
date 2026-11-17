@@ -142,8 +142,9 @@ function caseCardHtml(reclaimCase, residence) {
     meta = expected ? `<b>${formatNumberDe(expected)} ${currency}</b> erwartet` : submitted ? `eingereicht am ${formatDateDe(submitted.slice(0, 10))}` : "eingereicht";
     route = stepRoute(reclaimCase, refundStep.n);
     const since = submitted ? `Eingereicht vor ${durationDe(daysSince(submitted))}` : "Eingereicht";
-    wait = `<span class="wait-info"><b>${since}</b> · meist ${esc(payoutTime(reclaimCase.targetCountry))}</span>
-      <button class="btn-accent btn-small" data-nav="${route}" type="button">Geld ist da →</button>`;
+    wait = `<span class="wait-info"><b>${since}</b> · meist ${esc(payoutTime(reclaimCase.targetCountry))}</span>`;
+    // Gleiche Stelle wie "Weiter"/"Starten": oben rechts neben dem Papierkorb
+    button = `<button class="btn-accent btn-small" data-nav="${route}" type="button">Geld ist da →</button>`;
   } else if (phase === "confirm") {
     meta = expected ? `<b>${formatNumberDe(expected)} ${currency}</b> erwartet` : `angelegt am ${formatDateDe(reclaimCase.createdAt.slice(0, 10))}`;
     route = stepRoute(reclaimCase, step.n);
@@ -151,8 +152,8 @@ function caseCardHtml(reclaimCase, residence) {
     const days = sentAt ? daysSince(sentAt) : null;
     late = days !== null && days > TAX_OFFICE_LATE_DAYS;
     const since = sentAt ? (days === 0 ? "Heute ans Finanzamt geschickt" : `Beim Finanzamt seit ${durationDe(days)}`) : "Wartet auf dein Finanzamt";
-    wait = `<span class="wait-info"><b>${since}</b> · ${late ? `länger als üblich. <a href="#" data-follow-up="${reclaimCase.caseId}">Beim Finanzamt nachfragen</a>` : "meist 2–3 Wochen"}</span>
-      <button class="btn-accent btn-small" data-confirmed="${reclaimCase.caseId}" type="button">Bestätigung ist da →</button>`;
+    wait = `<span class="wait-info"><b>${since}</b> · ${late ? `länger als üblich. <a href="#" data-follow-up="${reclaimCase.caseId}">Beim Finanzamt nachfragen</a>` : "meist 2–3 Wochen"}</span>`;
+    button = `<button class="btn-accent btn-small" data-confirmed="${reclaimCase.caseId}" type="button">Ist bestätigt →</button>`;
   } else {
     meta = expected ? `<b>${formatNumberDe(expected)} ${currency}</b> erwartet` : `angelegt am ${formatDateDe(reclaimCase.createdAt.slice(0, 10))}`;
     route = stepRoute(reclaimCase, step.n);

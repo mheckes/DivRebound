@@ -18,17 +18,17 @@
 }
 #divrebound-app .doc-title {
   font-weight: 600;
-  font-size: 13px;
+  font-size: var(--t-body);
   color: var(--charcoal);
 }
 #divrebound-app .doc-sub {
-  font-size: 11.5px;
+  font-size: var(--t-hint);
   color: var(--muted);
   margin-top: 2px;
 }
 #divrebound-app .doc-file {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-hint);
   color: var(--stone);
   margin-top: 4px;
   word-break: break-all;
@@ -42,7 +42,7 @@
 /* "Vorschau" neben "Herunterladen": gleiche Höhe und Schriftgröße (Stand 2.1) */
 #divrebound-app .doc-actions .btn-small {
   padding: 10px 16px;
-  font-size: 13.5px;
+  font-size: var(--t-body);
   border-radius: 9px;
 }
 #divrebound-app .doc-status {
@@ -102,13 +102,13 @@
 }
 #divrebound-app .field label {
   display: block;
-  font-size: 12.5px;
+  font-size: var(--t-hint);
   font-weight: 600;
   color: var(--charcoal);
   margin-bottom: 5px;
 }
 #divrebound-app .field .hint {
-  font-size: 11px;
+  font-size: var(--t-hint);
   color: var(--muted);
   margin-top: 6px;
   line-height: 1.5;
@@ -119,7 +119,7 @@
   border: 1.5px solid var(--divider);
   border-radius: 8px;
   font-family: var(--font-mono);
-  font-size: 13.5px;
+  font-size: var(--t-body);
   color: var(--charcoal);
   background: #fff;
   transition: border-color 0.15s ease;
@@ -145,7 +145,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 12.5px;
+  font-size: var(--t-hint);
   font-weight: 600;
   cursor: pointer;
   margin-bottom: 14px;
@@ -164,7 +164,7 @@
   border: none;
   padding: 18px;
   border-radius: 12px;
-  font-size: 13.5px;
+  font-size: var(--t-body);
   font-weight: 600;
   font-family: var(--font-body);
   cursor: pointer;
@@ -194,7 +194,7 @@
 #divrebound-app .filename-preview {
   margin-top: 10px;
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: var(--t-hint);
   color: var(--muted);
   text-align: center;
   word-break: break-all;
@@ -202,7 +202,7 @@
 
 #divrebound-app .download-status {
   margin-top: 12px;
-  font-size: 12px;
+  font-size: var(--t-hint);
   padding: 10px 12px;
   border-radius: 8px;
 }
@@ -234,7 +234,7 @@
   margin: 0 0 16px;
   border: 1px solid var(--divider);
   border-radius: 10px;
-  font-size: 12px;
+  font-size: var(--t-hint);
   color: var(--muted);
   line-height: 1.5;
 }
@@ -247,7 +247,7 @@
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  font-size: 12.5px;
+  font-size: var(--t-hint);
   color: var(--charcoal);
   line-height: 1.5;
   margin-bottom: 8px;
@@ -271,7 +271,7 @@
 }
 
 #divrebound-app .back-link {
-  font-size: 12.5px;
+  font-size: var(--t-hint);
   color: var(--navy);
   cursor: pointer;
   text-decoration: none;

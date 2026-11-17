@@ -173,7 +173,7 @@ export function mountDividendUpload(container, reclaimCase, options) {
     return `
       <tr class="dist-row ${cls}" data-id="${d.distributionId}">
         <td><input type="checkbox" class="confirm-check row-check" ${confirmed && refundable ? "checked" : ""} ${refundable ? "" : "disabled"}></td>
-        ${showIssuer ? `<td><div style="font-weight:600;">${esc(d.issuerName || "—")}</div><div class="mono" style="font-size:10.5px;color:var(--muted);">${esc(d.isin)}</div></td>` : ""}
+        ${showIssuer ? `<td><div style="font-weight:600;">${esc(d.issuerName || "—")}</div><div class="mono" style="font-size:var(--t-micro);color:var(--muted);">${esc(d.isin)}</div></td>` : ""}
         <td class="du-date-cell"><input class="editable mono date-input" data-field="paymentDate" value="${esc(formatDateDe(d.paymentDate))}">${note}</td>
         <td class="num"><input class="editable mono" data-field="shares" value="${esc(d.shares ?? "")}"></td>
         <td class="num"><input class="editable mono" data-field="grossDividend" value="${esc(formatNumberDe(d.grossDividend))}"></td>

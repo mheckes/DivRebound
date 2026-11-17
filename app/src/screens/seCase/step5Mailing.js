@@ -75,7 +75,7 @@ function render(container, reclaimCase) {
           <ol class="flow-steps">
             <li><div>In den Umschlag:<ul class="ch-list se-envelope">${items.map(([, text]) => `<li>${text}</li>`).join("")}</ul></div></li>
             <li><div>An diese Adresse schicken, am besten als Einschreiben. <button class="btn-secondary btn-small" data-action="copy-address" type="button">⧉ Adresse kopieren</button>
-              <div class="se-address mono">${ADDRESS.map(esc).join("<br>")}</div></div></li>
+              <div class="se-address">${ADDRESS.map(esc).join("<br>")}</div></div></li>
           </ol>
         </div>
 

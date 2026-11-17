@@ -42,13 +42,13 @@
   color: var(--navy);
 }
 #divrebound-app .home-tile-title {
-  font-size: 14px;
+  font-size: var(--t-body);
   font-weight: 600;
   color: var(--charcoal);
   margin-bottom: 6px;
 }
 #divrebound-app .home-tile-desc {
-  font-size: 12px;
+  font-size: var(--t-hint);
   color: var(--muted);
   line-height: 1.6;
 }
@@ -92,7 +92,7 @@
   border-radius: 999px;
   background: var(--cyan);
   color: var(--charcoal);
-  font-size: 11px;
+  font-size: var(--t-micro);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -107,7 +107,7 @@
 }
 #divrebound-app .home-beta-lead {
   margin: 0 0 18px;
-  font-size: 13.5px;
+  font-size: var(--t-body);
   line-height: 1.65;
   color: rgba(255, 255, 255, 0.85);
 }
@@ -118,7 +118,7 @@
   padding: 11px 20px;
   border-radius: 9px;
   font-family: var(--font-body);
-  font-size: 13.5px;
+  font-size: var(--t-body);
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease, transform 0.15s ease;
@@ -142,14 +142,14 @@
   margin-bottom: 8px;
 }
 #divrebound-app .home-beta-focus-title {
-  font-size: 14px;
+  font-size: var(--t-body);
   font-weight: 600;
   margin-bottom: 6px;
   color: #fff;
 }
 #divrebound-app .home-beta-focus-text {
   margin: 0;
-  font-size: 12.5px;
+  font-size: var(--t-hint);
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.8);
 }
@@ -166,12 +166,12 @@
 
 /* ───────── Neue Startseite (Mock Up Ablauf 11-2026) ───────── */
 #divrebound-app .home-page {
-  max-width: 940px;
+  max-width: none;
 }
 #divrebound-app .home-section {
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: 15px;
+  font-size: var(--t-title);
   margin: 24px 0 10px;
 }
 /* Kopf: Begrüßung links, großer "+ Neuer Antrag" rechts */
@@ -183,7 +183,7 @@
 }
 #divrebound-app .home-new-btn {
   padding: 12px 20px;
-  font-size: 15px;
+  font-size: var(--t-title);
   border-radius: 10px;
   box-shadow: 0 4px 14px rgba(15, 34, 64, 0.18);
   white-space: nowrap;
@@ -234,7 +234,7 @@
   padding: 2px 0;
   color: var(--cyan-dark);
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: var(--t-body);
   font-weight: 600;
   cursor: pointer;
   text-decoration: underline;
@@ -242,7 +242,7 @@
 
 /* Gruppen der Antragsliste: Du bist dran / Wartet / Abgeschlossen (eingeklappt) */
 #divrebound-app .home-group {
-  font-size: 11px;
+  font-size: var(--t-micro);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -305,13 +305,13 @@
 #divrebound-app .home-country b {
   display: flex;
   align-items: center;
-  font-size: 15px;
+  font-size: var(--t-title);
   margin-bottom: 3px;
   color: var(--charcoal);
 }
 #divrebound-app .home-country span:not(.flag) {
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--t-hint);
 }
 
 /* Antragskarte (Stand 2.1): zwei Zeilen, ganze Karte klickbar */
@@ -341,6 +341,30 @@
 #divrebound-app .case-card.late {
   border-color: #e9c46a;
   box-shadow: 0 0 0 3px #fff4d6;
+}
+/* Stand 2.1: Alle Karten reagieren gleich - die ganze Karte ist der
+   Klickbereich, beim Drüberfahren heben sich Rahmen UND Button hervor. */
+#divrebound-app .case-card.attn:hover,
+#divrebound-app .case-card.attn:focus-visible {
+  border-color: var(--cyan-dark);
+  box-shadow: 0 0 0 3px var(--cyan-light), 0 4px 14px rgba(15, 34, 64, 0.08);
+}
+#divrebound-app .case-card.late:hover,
+#divrebound-app .case-card.late:focus-visible {
+  border-color: #c99a1e;
+  box-shadow: 0 0 0 3px #fff4d6, 0 4px 14px rgba(15, 34, 64, 0.08);
+}
+#divrebound-app .case-card:hover .case-tools .btn-primary,
+#divrebound-app .case-card:focus-visible .case-tools .btn-primary {
+  background: var(--navy-mid);
+}
+#divrebound-app .case-card:hover .case-tools .btn-accent,
+#divrebound-app .case-card:focus-visible .case-tools .btn-accent {
+  background: #0090ad;
+}
+#divrebound-app .case-card:hover .case-tools .btn-secondary,
+#divrebound-app .case-card:focus-visible .case-tools .btn-secondary {
+  border-color: var(--navy);
 }
 #divrebound-app .case-top {
   display: flex;
@@ -372,8 +396,10 @@
 }
 /* Gleich breite Knöpfe ("Weiter", "Starten", "Ansehen"), damit die Spalte ruhig steht */
 #divrebound-app .case-tools .btn-small {
-  min-width: 104px;
+  min-width: 118px;
+  min-height: 32px;
   text-align: center;
+  justify-content: center;
 }
 /* Wartezeit statt Ja/Nein-Frage */
 #divrebound-app .case-wait {
@@ -418,7 +444,7 @@
   list-style: none;
   margin: 10px 0 0;
   padding: 0;
-  font-size: 12px;
+  font-size: var(--t-hint);
   color: var(--stone);
 }
 #divrebound-app .case-steps li {
@@ -482,7 +508,7 @@
   font-size: var(--t-hint);
 }
 #divrebound-app .home-statline b {
-  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   color: var(--charcoal);
   font-size: var(--t-body);
 }
@@ -507,7 +533,7 @@
 }
 #divrebound-app .beta-badge {
   display: inline-block;
-  font-size: 10px;
+  font-size: var(--t-micro);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -524,15 +550,15 @@
 }
 #divrebound-app .beta-card p {
   margin: 0 0 12px;
-  color: #3b4a60;
-  font-size: 13px;
+  color: var(--charcoal);
+  font-size: var(--t-body);
 }
 #divrebound-app .beta-want {
   background: var(--navy-light);
   padding: 18px 20px;
 }
 #divrebound-app .beta-want-label {
-  font-size: 10px;
+  font-size: var(--t-micro);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -541,7 +567,7 @@
 }
 #divrebound-app .beta-want b {
   display: block;
-  font-size: 14.5px;
+  font-size: var(--t-body);
   margin-bottom: 4px;
 }
 #divrebound-app .beta-want p {

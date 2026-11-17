@@ -4,10 +4,9 @@
 // nur für Phasen) und rechts der Antragsteller-Chip (wer stellt den Antrag,
 // privat, Wohnsitz) statt eines Häkchens im Überblick.
 
-import { stepOf, PHASES, phaseNumber } from "../../config/caseSteps.js";
+import { stepOf } from "../../config/caseSteps.js";
 import { neighborStep } from "../../config/caseSteps.js";
 import { caseName } from "../../util/caseName.js";
-import { feedbackLinkHtml } from "../../components/feedbackModal.js";
 import { getState } from "../../store/store.js";
 
 function esc(value) {
@@ -32,16 +31,12 @@ export function applicantChipHtml(profile) {
 
 export function stepHeaderHtml(steps, reclaimCase, n) {
   const step = stepOf(steps, n);
-  const parent = step?.parent ? stepOf(steps, step.parent) : step;
-  const phase = parent?.phase;
-  const crumbPhase = phase
-    ? ` <b>›</b> <span class="crumb-phase"><i>${phaseNumber(phase)}</i>${esc(PHASES[phase].title)}</span>`
-    : "";
+  // Stand 2.1: unter dem Titel nur noch der Antrag - die Phase steht in der Seitenleiste
   return `
     <div class="content-header step-head">
       <div>
         <h1 class="content-title">${esc(step.heading ?? step.title)}</h1>
-        <div class="content-breadcrumb">${esc(caseName(reclaimCase))}${crumbPhase}${feedbackLinkHtml()}</div>
+        <div class="content-breadcrumb">${esc(caseName(reclaimCase))}</div>
       </div>
       ${applicantChipHtml(getState().currentProfile)}
     </div>`;

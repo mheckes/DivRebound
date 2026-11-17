@@ -9,7 +9,7 @@
 }
 #divrebound-app .it-optional > summary {
   cursor: pointer;
-  font-size: 12px;
+  font-size: var(--t-hint);
   font-weight: 600;
   color: var(--navy);
   margin-bottom: 6px;
@@ -23,7 +23,7 @@
 /* --- Schritt 5: Adresse --- */
 #divrebound-app .it-address {
   display: inline-block;
-  font-size: 12.5px;
+  font-size: var(--t-hint);
   line-height: 1.6;
   background: var(--bg);
   padding: 10px 14px;

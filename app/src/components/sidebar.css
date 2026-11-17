@@ -9,6 +9,13 @@
   display: flex;
   flex-direction: column;
   gap: 22px;
+  /* Stand 2.1: Seitenleiste bleibt beim Scrollen stehen, damit Profil,
+     Sicherung und Feedback auch auf langen Seiten sichtbar sind. */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 #divrebound-app .sidebar-brand {
   display: flex;
@@ -325,6 +332,9 @@
     flex-direction: column;
   }
   #divrebound-app .sidebar {
+    position: static;
+    height: auto;
+    overflow: visible;
     width: 100%;
     flex-direction: row;
     flex-wrap: wrap;
@@ -496,9 +506,12 @@
   color: rgba(255, 255, 255, 0.45);
 }
 /* Website-Link in eigener Zeile über Über mich · Impressum · Datenschutz */
-#divrebound-app .sidebar-website {
+#divrebound-app .sidebar-foot a.sidebar-website {
   flex-basis: 100%;
-  color: rgba(255, 255, 255, 0.75) !important;
+  color: rgba(255, 255, 255, 0.75);
+}
+#divrebound-app .sidebar-foot a.sidebar-website:hover {
+  color: #fff;
 }
 #divrebound-app .sidebar-bottom {
   margin-top: auto;

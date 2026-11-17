@@ -40,20 +40,20 @@
 }
 #divrebound-app .phase-title {
   font-weight: 700;
-  font-size: 15px;
+  font-size: var(--t-title);
   margin: 8px 0 2px;
 }
 #divrebound-app .phase-time {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-hint);
   color: var(--cyan-dark);
   margin-bottom: 6px;
   white-space: nowrap;
 }
 #divrebound-app .phase p {
   margin: 0;
-  color: #3b4a60;
-  font-size: 12.5px;
+  color: var(--charcoal);
+  font-size: var(--t-hint);
   line-height: 1.45;
 }
 
@@ -121,7 +121,7 @@
   gap: 8px;
 }
 #divrebound-app .way-tag {
-  font-size: 10.5px;
+  font-size: var(--t-micro);
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
