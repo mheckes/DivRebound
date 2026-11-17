@@ -138,23 +138,28 @@
   gap: 4px;
 }
 #divrebound-app .ch-inline-fields {
-  display: flex;
+  /* 6 Spalten: erstes Feld 1-3, weitere ab Spalte 4 (PLZ 1, Ort 2) */
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 6px;
-  flex-wrap: wrap;
 }
 #divrebound-app .ch-inline {
-  flex: 1;
-  min-width: 110px;
+  min-width: 0;
+  width: 100%;
   height: 34px;
   padding: 6px 10px;
 }
-#divrebound-app .ch-inline.wide {
-  flex: 2;
-  min-width: 180px;
-}
+#divrebound-app .ch-inline.col-a { grid-column: 1 / span 3; }
+#divrebound-app .ch-inline.col-b { grid-column: 4 / span 3; }
+#divrebound-app .ch-inline.col-plz { grid-column: 4 / span 1; }
+#divrebound-app .ch-inline.col-city { grid-column: 5 / span 2; }
+#divrebound-app .ch-inline.col-full { grid-column: 1 / -1; }
+/* IDs und IBAN: gleiche Schrift wie alles andere, nur Ziffern gleich breit */
 #divrebound-app .ch-inline.mono {
-  font-family: var(--font-mono);
-  font-size: var(--t-hint);
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
 }
 #divrebound-app .ch-check-item.missing .field-input {
   border-color: var(--danger);

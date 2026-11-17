@@ -55,11 +55,15 @@ export function textRow(state, label, text, actionsHtml = "", attrs = "") {
 
 /** Direkt bearbeitbare Profilfelder einer Zeile (gespeichert über data-field) */
 export function profileInputsHtml(profile, item) {
+  // Stand 2.1: feste Spalten statt freier Breiten, damit alle Zeilen
+  // untereinander stehen - erstes Feld links, alle weiteren ab derselben
+  // zweiten Spalte (PLZ schmal, Ort daneben).
   const inputs = item.fields
-    .map(([key, placeholder, extra = ""]) => {
+    .map(([key, placeholder, extra = ""], i) => {
       const value = PROFILE_FIELDS[key].read(profile);
       const type = extra.includes("date") ? "date" : "text";
-      return `<input class="${confirmedFieldClasses(value).inputClass} ch-inline ${extra.replace("date", "")}" type="${type}" data-field="${key}" placeholder="${esc(placeholder)}" value="${esc(value)}">`;
+      const col = i === 0 ? "col-a" : /postalcode/i.test(key) ? "col-plz" : /city/i.test(key) ? "col-city" : "col-b";
+      return `<input class="${confirmedFieldClasses(value).inputClass} ch-inline ${col} ${extra.replace(/date|wide/g, "")}" type="${type}" data-field="${key}" placeholder="${esc(placeholder)}" value="${esc(value)}">`;
     })
     .join("");
   const errors = item.fields.map(([key]) => `<span class="field-error" data-error-for="${key}" hidden></span>`).join("");

@@ -83,9 +83,7 @@ function renderCase(reclaimCase) {
 export function renderSidebar(container) {
   const state = getState();
   const hash = window.location.hash;
-  const profile = state.currentProfile;
   const onCase = /^#\/(dk|ch|it|se)\/[^/]+\/\d$/.test(hash);
-  const name = [profile?.residence?.firstName, profile?.residence?.lastName].filter(Boolean).join(" ");
   const link = (route, label) => `<a class="sidebar-link ${hash === route ? "active" : ""}" data-nav="${route}">${label}</a>`;
 
   container.innerHTML = `
@@ -111,10 +109,6 @@ export function renderSidebar(container) {
     ${onCase && state.currentCase ? renderCase(state.currentCase) : ""}
 
     <div class="sidebar-bottom">
-      <div class="side-account">
-        <span class="side-avatar">${esc((name || "?").slice(0, 1).toUpperCase())}</span>
-        <div><b>${esc(name || "Ohne Konto")}</b><small>Daten nur in diesem Browser</small></div>
-      </div>
       <div class="sidebar-actions">
         <button class="sidebar-btn" data-action="save">💾 Sicherung speichern</button>
         <button class="sidebar-btn" data-action="load">📂 Sicherung laden</button>
