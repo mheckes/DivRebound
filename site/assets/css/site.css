@@ -266,6 +266,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
 .content-page a { color: var(--cyan-dark); text-decoration: underline; }
 .placeholder { background: var(--cyan-light); border: 1px dashed var(--cyan-dark); border-radius: 10px; padding: 14px 18px; font-size: 13px; color: var(--cyan-dark); margin: 10px 0 20px; }
 .placeholder strong { color: var(--navy); }
+span.placeholder { display: inline; padding: 1px 6px; margin: 0; border-radius: 4px; font-size: inherit; }
 
 /* ─── Footer ─── */
 .site-footer { border-top: 1px solid var(--divider); padding: 24px 32px; margin-top: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
